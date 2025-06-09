@@ -18,6 +18,7 @@ import LawyerDashboard from "./pages/LawyerDashboard";
 import LawyerRegister from "./pages/LawyerRegister";
 import RequestService from "./pages/RequestService";
 import InstantConsultation from "./pages/InstantConsultation";
+import VoiceCall from "./pages/VoiceCall";
 import LegalAuctions from "./pages/LegalAuctions";
 import LegalLibrary from "./pages/LegalLibrary";
 import Articles from "./pages/Articles";
@@ -50,6 +51,7 @@ const App = () => (
           <Route path="/lawyer-register" element={<LawyerRegister />} />
           <Route path="/request-service" element={<RequestService />} />
           <Route path="/instant-consultation" element={<InstantConsultation />} />
+          <Route path="/voice-call" element={<VoiceCall />} />
           <Route path="/legal-auctions" element={<LegalAuctions />} />
           <Route path="/legal-library" element={<LegalLibrary />} />
           <Route path="/articles" element={<Articles />} />
