@@ -2,8 +2,27 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Star, Shield, Clock } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/lawyers');
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <section className="bg-gradient-to-r from-primary to-primary/90 text-white py-20">
       <div className="container mx-auto px-4">
@@ -24,9 +43,16 @@ const Hero = () => {
             <div className="flex flex-col md:flex-row gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4">
               <Input
                 placeholder="ابحث عن محامي أو خدمة قانونية..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
                 className="flex-1 bg-white text-black border-0 text-right"
               />
-              <Button size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
+              <Button 
+                size="lg" 
+                className="bg-secondary text-secondary-foreground hover:bg-secondary/90"
+                onClick={handleSearch}
+              >
                 <Search className="ml-2 h-5 w-5" />
                 بحث
               </Button>

@@ -12,8 +12,11 @@ import {
   Gavel,
   ArrowLeft 
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const LegalServices = () => {
+  const navigate = useNavigate();
+
   const services = [
     {
       id: 1,
@@ -71,6 +74,10 @@ const LegalServices = () => {
     }
   ];
 
+  const handleServiceRequest = (serviceId: number) => {
+    navigate(`/request-service?service=${serviceId}`);
+  };
+
   return (
     <section className="py-16 bg-white" id="services">
       <div className="container mx-auto px-4">
@@ -113,6 +120,7 @@ const LegalServices = () => {
                   <Button 
                     variant="outline" 
                     className="w-full border-primary text-primary hover:bg-primary hover:text-white group"
+                    onClick={() => handleServiceRequest(service.id)}
                   >
                     طلب استشارة
                     <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
@@ -124,7 +132,11 @@ const LegalServices = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button size="lg" className="bg-primary hover:bg-primary/90 px-8">
+          <Button 
+            size="lg" 
+            className="bg-primary hover:bg-primary/90 px-8"
+            onClick={() => navigate('/services')}
+          >
             عرض جميع الخدمات
           </Button>
         </div>

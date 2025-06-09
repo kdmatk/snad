@@ -4,9 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, User, Clock, Phone, Shield, MapPin, Award, MessageCircle } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const FeaturedLawyers = () => {
   const [selectedLawyer, setSelectedLawyer] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   const lawyers = [
     {
@@ -55,7 +57,7 @@ const FeaturedLawyers = () => {
 
   const handleConsultation = (lawyer: typeof lawyers[0]) => {
     setSelectedLawyer(lawyer.id);
-    alert(`بدء استشارة فورية مع ${lawyer.name}\nالتخصص: ${lawyer.specialty}\nالسعر: ${lawyer.price}`);
+    navigate(`/instant-consultation?lawyer=${lawyer.id}`);
   };
 
   const handleCall = (lawyer: typeof lawyers[0]) => {
@@ -63,7 +65,7 @@ const FeaturedLawyers = () => {
   };
 
   const handleViewProfile = (lawyer: typeof lawyers[0]) => {
-    alert(`عرض الملف الشخصي للمحامي ${lawyer.name}\nسيتم إضافة صفحة تفصيلية قريباً`);
+    navigate(`/lawyer/${lawyer.id}`);
   };
 
   return (
@@ -167,7 +169,7 @@ const FeaturedLawyers = () => {
             variant="outline" 
             size="lg" 
             className="border-primary text-primary hover:bg-primary hover:text-white px-8"
-            onClick={() => alert('سيتم توجيهك إلى صفحة جميع المحامين قريباً')}
+            onClick={() => navigate('/lawyers')}
           >
             عرض جميع المحامين
           </Button>

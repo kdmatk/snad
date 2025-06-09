@@ -1,4 +1,6 @@
 
+import { Link } from "react-router-dom";
+
 const Footer = () => {
   return (
     <footer className="bg-primary text-white py-12">
@@ -6,7 +8,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="md:col-span-2">
-            <div className="flex items-center space-x-reverse space-x-3 mb-4">
+            <Link to="/" className="flex items-center space-x-reverse space-x-3 mb-4">
               <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">س</span>
               </div>
@@ -14,7 +16,7 @@ const Footer = () => {
                 <h3 className="text-xl font-bold">سند</h3>
                 <p className="text-sm opacity-80">منصة الخدمات القانونية</p>
               </div>
-            </div>
+            </Link>
             <p className="opacity-90 mb-4 max-w-md">
               منصة إلكترونية شاملة تربط بين المحامين والعملاء في الوطن العربي، 
               نقدم خدمات قانونية موثوقة وسهلة الوصول.
@@ -25,10 +27,26 @@ const Footer = () => {
           <div>
             <h4 className="font-bold mb-4">روابط سريعة</h4>
             <ul className="space-y-2 opacity-90">
-              <li><a href="#" className="hover:text-secondary transition-colors">من نحن</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">المحامين</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">الخدمات</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">مركز المساعدة</a></li>
+              <li>
+                <Link to="/about" className="hover:text-secondary transition-colors">
+                  من نحن
+                </Link>
+              </li>
+              <li>
+                <Link to="/lawyers" className="hover:text-secondary transition-colors">
+                  المحامين
+                </Link>
+              </li>
+              <li>
+                <Link to="/services" className="hover:text-secondary transition-colors">
+                  الخدمات
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="hover:text-secondary transition-colors">
+                  مركز المساعدة
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -36,10 +54,26 @@ const Footer = () => {
           <div>
             <h4 className="font-bold mb-4">قانوني</h4>
             <ul className="space-y-2 opacity-90">
-              <li><a href="#" className="hover:text-secondary transition-colors">الشروط والأحكام</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">سياسة الخصوصية</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">اتفاقية الاستخدام</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">اتصل بنا</a></li>
+              <li>
+                <Link to="/terms" className="hover:text-secondary transition-colors">
+                  الشروط والأحكام
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="hover:text-secondary transition-colors">
+                  سياسة الخصوصية
+                </Link>
+              </li>
+              <li>
+                <Link to="/legal-library" className="hover:text-secondary transition-colors">
+                  المكتبة القانونية
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-secondary transition-colors">
+                  اتصل بنا
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
