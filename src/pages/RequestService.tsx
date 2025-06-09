@@ -1,4 +1,3 @@
-
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,9 +9,15 @@ import { Label } from "@/components/ui/label";
 import { FileText, Clock, DollarSign, Upload } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useClientData } from "@/hooks/useClientData";
+import { useToast } from "@/hooks/use-toast";
 
 const RequestService = () => {
   const navigate = useNavigate();
+  const { createServiceRequest } = useClientData();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const [formData, setFormData] = useState({
     serviceType: "",
     specialty: "",
@@ -76,11 +81,31 @@ const RequestService = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Service request:", formData);
-    alert("تم تقديم طلب الخدمة بنجاح! سيتم التواصل معك قريباً من قبل المحامين المتخصصين.");
-    navigate('/client-dashboard');
+    setIsSubmitting(true);
+
+    try {
+      console.log("Service request:", formData);
+      
+      await createServiceRequest(formData);
+      
+      toast({
+        title: "تم تقديم الطلب بنجاح!",
+        description: "سيتم التواصل معك قريباً من قبل المحامين المتخصصين.",
+      });
+      
+      navigate('/client-dashboard');
+    } catch (error) {
+      console.error('Error submitting request:', error);
+      toast({
+        title: "خطأ في تقديم الطلب",
+        description: "حدث خطأ أثناء تقديم الطلب. يرجى المحاولة مرة أخرى.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -291,8 +316,8 @@ const RequestService = () => {
                     </CardContent>
                   </Card>
 
-                  <Button type="submit" size="lg" className="w-full">
-                    تقديم الطلب
+                  <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? 'جاري التقديم...' : 'تقديم الطلب'}
                   </Button>
                 </form>
               </CardContent>
