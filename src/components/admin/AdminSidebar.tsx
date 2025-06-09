@@ -1,18 +1,17 @@
-
 import { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Home, Users, UserCheck, Briefcase, Scale, CreditCard, FileText, Settings, LogOut, Menu, X } from "lucide-react";
-
 interface AdminSidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
-
-const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
+const AdminSidebar = ({
+  activeTab,
+  onTabChange
+}: AdminSidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  
   const menuItems = [{
     icon: Home,
     label: "الرئيسية",
@@ -54,17 +53,13 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
     value: "settings",
     badge: null
   }];
-
-  return (
-    <div className={`bg-white border-l border-gray-200 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-full`}>
-      <div className="p-4">
+  return <div className={`bg-white border-l border-gray-200 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-full`}>
+      <div className="p-4 bg-sky-700">
         <div className="flex items-center justify-between mb-8">
-          {!isCollapsed && (
-            <div>
+          {!isCollapsed && <div>
               <h2 className="text-xl font-bold text-primary">سند</h2>
-              <p className="text-sm text-muted-foreground">لوحة التحكم</p>
-            </div>
-          )}
+              <p className="text-sm text-slate-50">لوحة التحكم</p>
+            </div>}
           <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(!isCollapsed)}>
             {isCollapsed ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />}
           </Button>
@@ -72,46 +67,27 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
 
         <nav className="space-y-2">
           {menuItems.map(item => {
-            const IconComponent = item.icon;
-            const isActive = activeTab === item.value;
-            
-            return (
-              <Button 
-                key={item.value}
-                variant={isActive ? "default" : "ghost"}
-                className={`w-full justify-start h-12 ${isCollapsed ? 'px-2' : 'px-4'} ${
-                  isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'
-                }`}
-                onClick={() => onTabChange(item.value)}
-              >
+          const IconComponent = item.icon;
+          const isActive = activeTab === item.value;
+          return <Button key={item.value} variant={isActive ? "default" : "ghost"} className={`w-full justify-start h-12 ${isCollapsed ? 'px-2' : 'px-4'} ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}`} onClick={() => onTabChange(item.value)}>
                 <IconComponent className={`h-5 w-5 ${isCollapsed ? 'mx-auto' : 'ml-3'}`} />
-                {!isCollapsed && (
-                  <>
+                {!isCollapsed && <>
                     <span className="flex-1 text-right">{item.label}</span>
-                    {item.badge && (
-                      <Badge variant="secondary" className="mr-2">
+                    {item.badge && <Badge variant="secondary" className="mr-2">
                         {item.badge}
-                      </Badge>
-                    )}
-                  </>
-                )}
-              </Button>
-            );
-          })}
+                      </Badge>}
+                  </>}
+              </Button>;
+        })}
         </nav>
 
         <div className="mt-8 pt-8 border-t">
-          <Button 
-            variant="ghost" 
-            className={`w-full justify-start h-12 text-red-600 hover:text-red-700 hover:bg-red-50 ${isCollapsed ? 'px-2' : 'px-4'}`}
-          >
+          <Button variant="ghost" className={`w-full justify-start h-12 text-red-600 hover:text-red-700 hover:bg-red-50 ${isCollapsed ? 'px-2' : 'px-4'}`}>
             <LogOut className={`h-5 w-5 ${isCollapsed ? 'mx-auto' : 'ml-3'}`} />
             {!isCollapsed && <span className="flex-1 text-right">تسجيل الخروج</span>}
           </Button>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AdminSidebar;
