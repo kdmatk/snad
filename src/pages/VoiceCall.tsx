@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Layout from '@/components/Layout';
@@ -9,50 +8,36 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { generateUUID } from '@/utils/uuid';
-import { 
-  Phone, 
-  ArrowRight, 
-  Shield, 
-  Clock,
-  CheckCircle2,
-  Settings
-} from 'lucide-react';
-
+import { Phone, ArrowRight, Shield, Clock, CheckCircle2, Settings } from 'lucide-react';
 const VoiceCall = () => {
-  const { sessionId } = useParams();
+  const {
+    sessionId
+  } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('call');
-  
+
   // توليد UUID صحيح للمستخدم الحالي والمحامي
   const currentUser = {
     id: generateUUID(),
     type: 'client' as 'client' | 'lawyer',
     name: 'أحمد محمد'
   };
-
   const demoLawyer = {
     id: generateUUID(),
     name: 'د. فاطمة الزهراني',
     specialty: 'قانون الأسرة'
   };
-
   const handleSessionEnd = () => {
     navigate('/services');
   };
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="py-8">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => navigate(-1)}
-              >
+              <Button variant="outline" size="icon" onClick={() => navigate(-1)} className="text-slate-800">
                 <ArrowRight className="h-4 w-4" />
               </Button>
               <div>
@@ -98,14 +83,7 @@ const VoiceCall = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* واجهة المكالمة */}
                   <div className="lg:col-span-2">
-                    <VoiceCallInterface
-                      sessionId={sessionId}
-                      clientId={currentUser.type === 'client' ? currentUser.id : generateUUID()}
-                      lawyerId={currentUser.type === 'lawyer' ? currentUser.id : demoLawyer.id}
-                      durationMinutes={30}
-                      onSessionEnd={handleSessionEnd}
-                      userType={currentUser.type}
-                    />
+                    <VoiceCallInterface sessionId={sessionId} clientId={currentUser.type === 'client' ? currentUser.id : generateUUID()} lawyerId={currentUser.type === 'lawyer' ? currentUser.id : demoLawyer.id} durationMinutes={30} onSessionEnd={handleSessionEnd} userType={currentUser.type} />
                   </div>
 
                   {/* معلومات الجلسة */}
@@ -161,17 +139,12 @@ const VoiceCall = () => {
               </TabsContent>
 
               <TabsContent value="manage" className="mt-6">
-                <VoiceSessionManager
-                  lawyerId={currentUser.type === 'lawyer' ? currentUser.id : demoLawyer.id}
-                  userType={currentUser.type}
-                />
+                <VoiceSessionManager lawyerId={currentUser.type === 'lawyer' ? currentUser.id : demoLawyer.id} userType={currentUser.type} />
               </TabsContent>
             </Tabs>
           </div>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default VoiceCall;
