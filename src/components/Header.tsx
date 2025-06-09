@@ -1,24 +1,30 @@
-
 import { Button } from "@/components/ui/button";
 import { Bell, Menu, X, Scale, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-
-  const navigationItems = [
-    { label: "الرئيسية", href: "/" },
-    { label: "المحامين", href: "/lawyers" },
-    { label: "الخدمات", href: "/services" },
-    { label: "الخدمات السريعة", href: "/quick-services" },
-    { label: "من نحن", href: "/about" },
-    { label: "اتصل بنا", href: "/contact" }
-  ];
-
-  return (
-    <header className="relative bg-gradient-to-l from-primary via-blue-900 to-slate-900 shadow-2xl sticky top-0 z-50 backdrop-blur-xl border-b border-secondary/20">
+  const navigationItems = [{
+    label: "الرئيسية",
+    href: "/"
+  }, {
+    label: "المحامين",
+    href: "/lawyers"
+  }, {
+    label: "الخدمات",
+    href: "/services"
+  }, {
+    label: "الخدمات السريعة",
+    href: "/quick-services"
+  }, {
+    label: "من نحن",
+    href: "/about"
+  }, {
+    label: "اتصل بنا",
+    href: "/contact"
+  }];
+  return <header className="relative bg-gradient-to-l from-primary via-blue-900 to-slate-900 shadow-2xl sticky top-0 z-50 backdrop-blur-xl border-b border-secondary/20">
       {/* Animated background elements */}
       <div className="absolute inset-0 bg-gradient-to-l from-primary/80 via-blue-900/90 to-slate-900/95"></div>
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-secondary via-yellow-400 to-secondary"></div>
@@ -54,12 +60,7 @@ const Header = () => {
           {/* Enhanced Desktop Navigation */}
           <nav className="hidden lg:flex items-center">
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-lg rounded-full px-6 py-3 border border-white/20 shadow-xl">
-              {navigationItems.map((item, index) => (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  className="relative px-4 py-2 text-white/90 hover:text-white transition-all duration-300 font-medium text-sm group rounded-xl hover:bg-white/15 backdrop-blur-sm"
-                >
+              {navigationItems.map((item, index) => <Link key={item.label} to={item.href} className="relative px-4 py-2 text-white/90 hover:text-white transition-all duration-300 font-medium text-sm group rounded-xl hover:bg-white/15 backdrop-blur-sm">
                   <span className="relative z-10">{item.label}</span>
                   
                   {/* Animated underline */}
@@ -68,11 +69,8 @@ const Header = () => {
                   {/* Hover background effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-secondary/20 to-yellow-400/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-0"></div>
                   
-                  {index < navigationItems.length - 1 && (
-                    <div className="absolute left-full top-1/2 transform -translate-y-1/2 w-px h-4 bg-white/20 ml-2"></div>
-                  )}
-                </Link>
-              ))}
+                  {index < navigationItems.length - 1 && <div className="absolute left-full top-1/2 transform -translate-y-1/2 w-px h-4 bg-white/20 ml-2"></div>}
+                </Link>)}
             </div>
           </nav>
 
@@ -95,18 +93,11 @@ const Header = () => {
             
             {/* Enhanced Action Buttons */}
             <div className="hidden md:flex items-center gap-3">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/login')}
-                className="border-2 border-white/40 text-white hover:bg-white hover:text-primary font-medium px-6 py-2.5 backdrop-blur-sm transition-all duration-300 hover:scale-105 rounded-xl shadow-lg hover:shadow-xl hover:border-white/80"
-              >
+              <Button variant="outline" onClick={() => navigate('/login')} className="border-2 border-white/40 hover:bg-white font-medium px-6 py-2.5 backdrop-blur-sm transition-all duration-300 hover:scale-105 rounded-xl shadow-lg hover:shadow-xl hover:border-white/80 text-slate-700">
                 تسجيل الدخول
               </Button>
               
-              <Button 
-                className="bg-gradient-to-l from-secondary via-yellow-400 to-secondary/90 text-white hover:from-secondary/90 hover:via-yellow-300 hover:to-secondary/80 font-medium px-6 py-2.5 shadow-xl border-2 border-white/30 transition-all duration-300 hover:scale-105 hover:shadow-2xl rounded-xl relative overflow-hidden group"
-                onClick={() => navigate('/lawyer-register')}
-              >
+              <Button className="bg-gradient-to-l from-secondary via-yellow-400 to-secondary/90 text-white hover:from-secondary/90 hover:via-yellow-300 hover:to-secondary/80 font-medium px-6 py-2.5 shadow-xl border-2 border-white/30 transition-all duration-300 hover:scale-105 hover:shadow-2xl rounded-xl relative overflow-hidden group" onClick={() => navigate('/lawyer-register')}>
                 <span className="relative z-10">انضم كمحامي</span>
                 
                 {/* Animated background */}
@@ -115,69 +106,43 @@ const Header = () => {
             </div>
 
             {/* Enhanced Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden hover:bg-white/15 text-white border-2 border-white/30 hover:border-secondary/50 backdrop-blur-sm transition-all duration-300 hover:scale-110 rounded-xl shadow-lg"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
+            <Button variant="ghost" size="icon" className="lg:hidden hover:bg-white/15 text-white border-2 border-white/30 hover:border-secondary/50 backdrop-blur-sm transition-all duration-300 hover:scale-110 rounded-xl shadow-lg" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               <div className="relative">
-                {isMenuOpen ? (
-                  <X className="h-5 w-5 rotate-180 transition-transform duration-300" />
-                ) : (
-                  <Menu className="h-5 w-5 transition-transform duration-300" />
-                )}
+                {isMenuOpen ? <X className="h-5 w-5 rotate-180 transition-transform duration-300" /> : <Menu className="h-5 w-5 transition-transform duration-300" />}
               </div>
             </Button>
           </div>
         </div>
 
         {/* Enhanced Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="lg:hidden mt-6 pb-6 border-t border-white/20 backdrop-blur-xl">
+        {isMenuOpen && <div className="lg:hidden mt-6 pb-6 border-t border-white/20 backdrop-blur-xl">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-secondary to-transparent"></div>
             
             <nav className="flex flex-col gap-3 mt-6">
-              {navigationItems.map((item, index) => (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  className="text-white/90 hover:text-white hover:bg-white/10 transition-all duration-300 font-medium py-3 px-4 rounded-xl backdrop-blur-sm border border-transparent hover:border-white/20 group relative overflow-hidden"
-                  onClick={() => setIsMenuOpen(false)}
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
+              {navigationItems.map((item, index) => <Link key={item.label} to={item.href} className="text-white/90 hover:text-white hover:bg-white/10 transition-all duration-300 font-medium py-3 px-4 rounded-xl backdrop-blur-sm border border-transparent hover:border-white/20 group relative overflow-hidden" onClick={() => setIsMenuOpen(false)} style={{
+            animationDelay: `${index * 50}ms`
+          }}>
                   <span className="relative z-10">{item.label}</span>
                   
                   {/* Slide-in background effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-secondary/20 to-yellow-400/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300 rounded-xl"></div>
-                </Link>
-              ))}
+                </Link>)}
               
               <div className="flex flex-col gap-3 mt-6 pt-4 border-t border-white/20">
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-secondary/50 to-transparent"></div>
                 
-                <Button 
-                  variant="outline" 
-                  className="w-full border-2 border-white/40 text-white hover:bg-white hover:text-primary font-medium backdrop-blur-sm transition-all duration-300 py-3 rounded-xl hover:border-white/80" 
-                  onClick={() => navigate('/login')}
-                >
+                <Button variant="outline" className="w-full border-2 border-white/40 text-white hover:bg-white hover:text-primary font-medium backdrop-blur-sm transition-all duration-300 py-3 rounded-xl hover:border-white/80" onClick={() => navigate('/login')}>
                   تسجيل الدخول
                 </Button>
                 
-                <Button 
-                  className="w-full bg-gradient-to-l from-secondary via-yellow-400 to-secondary/90 text-white hover:from-secondary/90 hover:via-yellow-300 hover:to-secondary/80 font-medium shadow-xl border-2 border-white/30 transition-all duration-300 py-3 rounded-xl relative overflow-hidden group"
-                  onClick={() => navigate('/lawyer-register')}
-                >
+                <Button className="w-full bg-gradient-to-l from-secondary via-yellow-400 to-secondary/90 text-white hover:from-secondary/90 hover:via-yellow-300 hover:to-secondary/80 font-medium shadow-xl border-2 border-white/30 transition-all duration-300 py-3 rounded-xl relative overflow-hidden group" onClick={() => navigate('/lawyer-register')}>
                   <span className="relative z-10">انضم كمحامي</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-300/30 to-secondary/30 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
                 </Button>
               </div>
             </nav>
-          </div>
-        )}
+          </div>}
       </div>
-    </header>
-  );
+    </header>;
 };
-
 export default Header;
