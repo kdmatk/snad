@@ -1,8 +1,7 @@
-
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, User, Clock, Phone } from "lucide-react";
+import { Star, User, Clock, Phone, Shield } from "lucide-react";
 
 const FeaturedLawyers = () => {
   const lawyers = [
