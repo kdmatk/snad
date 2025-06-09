@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -83,8 +84,7 @@ const LawyersManagement = () => {
     setDialogOpen(true);
   };
 
-  const handleAddLawyer = async (lawyerData: any) => {
-    await addLawyer(lawyerData);
+  const handleAddLawyerSuccess = () => {
     loadLawyers();
   };
 
@@ -360,7 +360,7 @@ const LawyersManagement = () => {
       <AddLawyerDialog
         isOpen={addDialogOpen}
         onClose={() => setAddDialogOpen(false)}
-        onSave={handleAddLawyer}
+        onSuccess={handleAddLawyerSuccess}
       />
     </div>
   );
