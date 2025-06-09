@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Bell, Menu, X, Shield, ChevronDown } from "lucide-react";
+import { Bell, Menu, X, Scale, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -33,7 +33,7 @@ const Header = () => {
               
               {/* Main logo container */}
               <div className="relative w-14 h-14 bg-gradient-to-br from-secondary via-yellow-400 to-secondary/80 rounded-2xl flex items-center justify-center shadow-2xl transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border-2 border-white/30">
-                <Shield className="text-white h-7 w-7 drop-shadow-xl filter" />
+                <Scale className="text-white h-7 w-7 drop-shadow-xl filter" />
                 
                 {/* Animated dots */}
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse shadow-lg"></div>
