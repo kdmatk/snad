@@ -1,5 +1,6 @@
 
 import { Link } from "react-router-dom";
+import { Scale } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -11,7 +12,7 @@ const Footer = () => {
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center space-x-reverse space-x-3 mb-4">
               <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">س</span>
+                <Scale className="text-white h-6 w-6" />
               </div>
               <div>
                 <h3 className="text-xl font-bold">سند</h3>
