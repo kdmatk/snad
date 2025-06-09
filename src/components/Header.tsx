@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Bell, Menu, X, Shield, Home, Users, Briefcase, Zap } from "lucide-react";
+import { Bell, Menu, X, Shield } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -9,10 +9,10 @@ const Header = () => {
   const navigate = useNavigate();
 
   const navigationItems = [
-    { label: "الرئيسية", href: "/", icon: Home },
-    { label: "المحامين", href: "/lawyers", icon: Users },
-    { label: "الخدمات", href: "/services", icon: Briefcase },
-    { label: "الخدمات السريعة", href: "/quick-services", icon: Zap },
+    { label: "الرئيسية", href: "/" },
+    { label: "المحامين", href: "/lawyers" },
+    { label: "الخدمات", href: "/services" },
+    { label: "الخدمات السريعة", href: "/quick-services" },
     { label: "من نحن", href: "/about" },
     { label: "اتصل بنا", href: "/contact" }
   ];
@@ -41,9 +41,8 @@ const Header = () => {
               <Link
                 key={item.label}
                 to={item.href}
-                className="relative px-6 py-4 text-white/90 hover:text-white transition-all duration-500 font-bold text-lg group rounded-2xl hover:bg-white/15 backdrop-blur-sm border border-transparent hover:border-white/20 flex items-center space-x-reverse space-x-2"
+                className="relative px-6 py-4 text-white/90 hover:text-white transition-all duration-500 font-bold text-lg group rounded-2xl hover:bg-white/15 backdrop-blur-sm border border-transparent hover:border-white/20"
               >
-                {item.icon && <item.icon className="h-5 w-5 ml-2" />}
                 {item.label}
                 <span className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-secondary rounded-full transition-all duration-500 group-hover:w-10 shadow-lg"></span>
               </Link>
@@ -95,10 +94,9 @@ const Header = () => {
                 <Link
                   key={item.label}
                   to={item.href}
-                  className="text-white/90 hover:text-white hover:bg-white/15 transition-all duration-500 font-bold py-4 px-6 rounded-2xl backdrop-blur-sm border-2 border-transparent hover:border-white/30 flex items-center space-x-reverse space-x-3"
+                  className="text-white/90 hover:text-white hover:bg-white/15 transition-all duration-500 font-bold py-4 px-6 rounded-2xl backdrop-blur-sm border-2 border-transparent hover:border-white/30"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {item.icon && <item.icon className="h-5 w-5 ml-2" />}
                   {item.label}
                 </Link>
               ))}
