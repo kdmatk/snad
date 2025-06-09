@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -32,8 +31,8 @@ const LegalServices = () => {
       title: "القانون التجاري",
       description: "خدمات قانونية متخصصة للشركات والأعمال التجارية",
       icon: Building2,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
+      color: "text-blue-500",
+      bgColor: "bg-blue-50",
       cases: "890+ قضية"
     },
     {
@@ -41,8 +40,8 @@ const LegalServices = () => {
       title: "قانون الأسرة",
       description: "قضايا الزواج والطلاق والحضانة والأحوال الشخصية",
       icon: Users,
-      color: "text-pink-600",
-      bgColor: "bg-pink-50",
+      color: "text-slate-600",
+      bgColor: "bg-slate-50",
       cases: "2,100+ قضية"
     },
     {
@@ -50,8 +49,8 @@ const LegalServices = () => {
       title: "القانون العقاري",
       description: "استشارات وخدمات قانونية في العقارات والملكية",
       icon: Home,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      color: "text-blue-700",
+      bgColor: "bg-blue-50",
       cases: "750+ قضية"
     },
     {
@@ -59,8 +58,8 @@ const LegalServices = () => {
       title: "قانون العمل",
       description: "حقوق العمال وقضايا العمل والتأمينات الاجتماعية",
       icon: Briefcase,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
+      color: "text-slate-700",
+      bgColor: "bg-slate-50",
       cases: "640+ قضية"
     },
     {
@@ -68,8 +67,8 @@ const LegalServices = () => {
       title: "القانون الجنائي",
       description: "الدفاع في القضايا الجنائية والجرائم المختلفة",
       icon: Shield,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
+      color: "text-blue-800",
+      bgColor: "bg-blue-50",
       cases: "450+ قضية"
     }
   ];
@@ -82,10 +81,10 @@ const LegalServices = () => {
     <section className="py-16 bg-white" id="services">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">
             خدماتنا القانونية
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+          <p className="text-slate-600 max-w-2xl mx-auto text-lg">
             مجموعة شاملة من الخدمات القانونية المتخصصة لتلبية جميع احتياجاتكم
           </p>
         </div>
@@ -96,19 +95,19 @@ const LegalServices = () => {
             return (
               <Card 
                 key={service.id} 
-                className="hover:shadow-lg transition-all duration-300 border-0 shadow-md hover:-translate-y-1"
+                className="hover:shadow-xl transition-all duration-300 border-blue-200 bg-white/90 backdrop-blur-sm shadow-lg hover:-translate-y-1"
               >
                 <CardHeader className="text-center">
-                  <div className={`w-16 h-16 ${service.bgColor} rounded-full mx-auto mb-4 flex items-center justify-center`}>
+                  <div className={`w-16 h-16 ${service.bgColor} rounded-full mx-auto mb-4 flex items-center justify-center border border-blue-200`}>
                     <IconComponent className={`h-8 w-8 ${service.color}`} />
                   </div>
-                  <CardTitle className="text-xl font-bold text-primary">
+                  <CardTitle className="text-xl font-bold text-blue-900">
                     {service.title}
                   </CardTitle>
                 </CardHeader>
                 
                 <CardContent className="text-center space-y-4">
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-slate-600 leading-relaxed">
                     {service.description}
                   </p>
                   
@@ -119,7 +118,7 @@ const LegalServices = () => {
                   
                   <Button 
                     variant="outline" 
-                    className="w-full border-primary text-primary hover:bg-primary hover:text-white group"
+                    className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white group"
                     onClick={() => handleServiceRequest(service.id)}
                   >
                     طلب استشارة
@@ -134,7 +133,7 @@ const LegalServices = () => {
         <div className="text-center mt-12">
           <Button 
             size="lg" 
-            className="bg-primary hover:bg-primary/90 px-8"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8"
             onClick={() => navigate('/services')}
           >
             عرض جميع الخدمات

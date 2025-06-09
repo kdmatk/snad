@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -69,13 +68,13 @@ const FeaturedLawyers = () => {
   };
 
   return (
-    <section className="py-16 bg-gray-50" id="lawyers">
+    <section className="py-16 bg-gradient-to-br from-slate-100 to-blue-50" id="lawyers">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">
             المحامون المميزون
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+          <p className="text-slate-600 max-w-2xl mx-auto text-lg">
             تعرف على نخبة من أفضل المحامين المتخصصين والمعتمدين في منصة سند
           </p>
         </div>
@@ -84,14 +83,14 @@ const FeaturedLawyers = () => {
           {lawyers.map((lawyer) => (
             <Card 
               key={lawyer.id} 
-              className={`hover:shadow-xl transition-all duration-300 bg-white border-0 shadow-lg hover:-translate-y-2 cursor-pointer ${
-                selectedLawyer === lawyer.id ? 'ring-2 ring-primary' : ''
+              className={`hover:shadow-xl transition-all duration-300 bg-white/90 backdrop-blur-sm border-blue-200 shadow-lg hover:-translate-y-2 cursor-pointer ${
+                selectedLawyer === lawyer.id ? 'ring-2 ring-blue-500' : ''
               }`}
               onClick={() => handleViewProfile(lawyer)}
             >
               <CardHeader className="text-center pb-4">
                 <div className="relative mx-auto mb-4">
-                  <div className="w-24 h-24 bg-gradient-to-br from-primary to-primary/80 rounded-full mx-auto flex items-center justify-center">
+                  <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-blue-500 rounded-full mx-auto flex items-center justify-center shadow-lg">
                     <User className="h-12 w-12 text-white" />
                   </div>
                   {lawyer.verified && (
@@ -103,7 +102,7 @@ const FeaturedLawyers = () => {
                 
                 <div className="space-y-2">
                   <div className="flex items-center justify-center gap-2 flex-wrap">
-                    <h3 className="font-bold text-xl text-center">{lawyer.name}</h3>
+                    <h3 className="font-bold text-xl text-center text-blue-900">{lawyer.name}</h3>
                     {lawyer.verified && (
                       <Badge variant="secondary" className="text-xs bg-secondary/10 text-secondary border-secondary/20">
                         مُوثق
@@ -111,39 +110,39 @@ const FeaturedLawyers = () => {
                     )}
                   </div>
                   <p className="text-secondary font-semibold text-lg">{lawyer.specialty}</p>
-                  <div className="flex items-center justify-center gap-1 text-muted-foreground">
+                  <div className="flex items-center justify-center gap-1 text-slate-500">
                     <MapPin className="h-4 w-4" />
                     <span className="text-sm">{lawyer.location}</span>
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed px-2">
+                  <p className="text-sm text-slate-600 leading-relaxed px-2">
                     {lawyer.description}
                   </p>
                 </div>
               </CardHeader>
               
               <CardContent className="space-y-4" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center justify-between text-sm bg-gray-50 rounded-lg p-3">
+                <div className="flex items-center justify-between text-sm bg-blue-50 rounded-lg p-3 border border-blue-200">
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1">
                       <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                      <span className="font-bold text-lg">{lawyer.rating}</span>
+                      <span className="font-bold text-lg text-blue-900">{lawyer.rating}</span>
                     </div>
-                    <span className="text-muted-foreground">({lawyer.reviews} تقييم)</span>
+                    <span className="text-slate-600">({lawyer.reviews} تقييم)</span>
                   </div>
-                  <div className="flex items-center gap-1 text-muted-foreground">
+                  <div className="flex items-center gap-1 text-slate-600">
                     <Award className="h-4 w-4" />
                     <span className="font-medium">{lawyer.experience}</span>
                   </div>
                 </div>
 
-                <div className="text-center py-3 bg-primary/5 rounded-lg">
-                  <p className="text-2xl font-bold text-primary">{lawyer.price}</p>
-                  <p className="text-xs text-muted-foreground">رسوم الاستشارة</p>
+                <div className="text-center py-3 bg-gradient-to-r from-blue-600/10 to-blue-500/10 rounded-lg border border-blue-200">
+                  <p className="text-2xl font-bold text-blue-900">{lawyer.price}</p>
+                  <p className="text-xs text-slate-600">رسوم الاستشارة</p>
                 </div>
 
                 <div className="flex gap-2">
                   <Button 
-                    className="flex-1 bg-primary hover:bg-primary/90" 
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white" 
                     size="sm"
                     onClick={() => handleConsultation(lawyer)}
                   >
@@ -153,7 +152,7 @@ const FeaturedLawyers = () => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="border-primary text-primary hover:bg-primary hover:text-white"
+                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
                     onClick={() => handleCall(lawyer)}
                   >
                     <Phone className="h-4 w-4" />
@@ -168,7 +167,7 @@ const FeaturedLawyers = () => {
           <Button 
             variant="outline" 
             size="lg" 
-            className="border-primary text-primary hover:bg-primary hover:text-white px-8"
+            className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8"
             onClick={() => navigate('/lawyers')}
           >
             عرض جميع المحامين
