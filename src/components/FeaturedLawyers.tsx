@@ -1,71 +1,82 @@
+
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, User, Clock, Phone, Shield, MapPin, Award, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSupabaseLawyers } from "@/hooks/useSupabaseLawyers";
 
 const FeaturedLawyers = () => {
-  const [selectedLawyer, setSelectedLawyer] = useState<number | null>(null);
+  const [selectedLawyer, setSelectedLawyer] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { lawyers, loading } = useSupabaseLawyers();
 
-  const lawyers = [
-    {
-      id: 1,
-      name: "د. أحمد محمد العلي",
-      specialty: "القانون التجاري",
-      experience: "15 سنة",
-      rating: 4.9,
-      reviews: 245,
-      location: "الرياض، السعودية",
-      verified: true,
-      price: "500 ريال/ساعة",
-      image: "/placeholder.svg",
-      description: "خبير في القانون التجاري والشركات مع سجل حافل من القضايا الناجحة",
-      phone: "+966501234567"
-    },
-    {
-      id: 2,
-      name: "د. فاطمة سالم الزهراني",
-      specialty: "قانون الأسرة",
-      experience: "12 سنة",
-      rating: 4.8,
-      reviews: 189,
-      location: "دبي، الإمارات",
-      verified: true,
-      price: "400 ريال/ساعة",
-      image: "/placeholder.svg",
-      description: "متخصصة في قضايا الأسرة والأحوال الشخصية",
-      phone: "+971501234567"
-    },
-    {
-      id: 3,
-      name: "د. محمود علي الخطيب",
-      specialty: "القانون الجنائي",
-      experience: "20 سنة",
-      rating: 5.0,
-      reviews: 312,
-      location: "القاهرة، مصر",
-      verified: true,
-      price: "600 ريال/ساعة",
-      image: "/placeholder.svg",
-      description: "محامي جنائي بارز مع خبرة واسعة في القضايا المعقدة",
-      phone: "+201234567890"
-    }
-  ];
+  // اختيار أفضل 3 محامين (الأعلى تقييماً)
+  const featuredLawyers = lawyers
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+    .slice(0, 3)
+    .map(lawyer => ({
+      id: lawyer.id,
+      name: lawyer.name,
+      specialty: lawyer.specialty,
+      experience: lawyer.experience_years ? `${lawyer.experience_years} سنة` : "غير محدد",
+      rating: lawyer.rating || 0,
+      reviews: Math.floor(Math.random() * 200) + 50, // مؤقت
+      location: "المملكة العربية السعودية", // مؤقت
+      verified: lawyer.license_verified,
+      price: lawyer.hourly_rate ? `${lawyer.hourly_rate} ريال/ساعة` : "غير محدد",
+      image: lawyer.avatar_url || "/placeholder.svg",
+      description: lawyer.bio || "محامي معتمد ومتخصص",
+      phone: lawyer.phone || "+966501234567"
+    }));
 
-  const handleConsultation = (lawyer: typeof lawyers[0]) => {
+  const handleConsultation = (lawyer: typeof featuredLawyers[0]) => {
     setSelectedLawyer(lawyer.id);
     navigate(`/instant-consultation?lawyer=${lawyer.id}`);
   };
 
-  const handleCall = (lawyer: typeof lawyers[0]) => {
-    window.open(`tel:${lawyer.phone}`, '_self');
+  const handleCall = (lawyer: typeof featuredLawyers[0]) => {
+    if (lawyer.phone) {
+      window.open(`tel:${lawyer.phone}`, '_self');
+    }
   };
 
-  const handleViewProfile = (lawyer: typeof lawyers[0]) => {
+  const handleViewProfile = (lawyer: typeof featuredLawyers[0]) => {
     navigate(`/lawyer/${lawyer.id}`);
   };
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-gradient-to-br from-slate-100 to-blue-50" id="lawyers">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-300 rounded w-64 mx-auto mb-4"></div>
+              <div className="h-4 bg-gray-300 rounded w-96 mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (featuredLawyers.length === 0) {
+    return (
+      <section className="py-16 bg-gradient-to-br from-slate-100 to-blue-50" id="lawyers">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">
+              المحامون المميزون
+            </h2>
+            <p className="text-slate-600 max-w-2xl mx-auto text-lg">
+              لا يوجد محامون معتمدون حالياً
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-gradient-to-br from-slate-100 to-blue-50" id="lawyers">
@@ -80,7 +91,7 @@ const FeaturedLawyers = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {lawyers.map((lawyer) => (
+          {featuredLawyers.map((lawyer) => (
             <Card 
               key={lawyer.id} 
               className={`hover:shadow-xl transition-all duration-300 bg-white/90 backdrop-blur-sm border-blue-200 shadow-lg hover:-translate-y-2 cursor-pointer ${
@@ -149,14 +160,16 @@ const FeaturedLawyers = () => {
                     <MessageCircle className="h-4 w-4 ml-1" />
                     استشارة فورية
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
-                    onClick={() => handleCall(lawyer)}
-                  >
-                    <Phone className="h-4 w-4" />
-                  </Button>
+                  {lawyer.phone && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+                      onClick={() => handleCall(lawyer)}
+                    >
+                      <Phone className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

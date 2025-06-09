@@ -4,6 +4,7 @@ import LawyersHeader from "@/components/lawyers/LawyersHeader";
 import LawyersSearch from "@/components/lawyers/LawyersSearch";
 import LawyersGrid from "@/components/lawyers/LawyersGrid";
 import { useLawyersData } from "@/hooks/useLawyersData";
+import { Loader2 } from "lucide-react";
 
 const Lawyers = () => {
   const {
@@ -16,7 +17,8 @@ const Lawyers = () => {
     setSelectedCity,
     selectedSpecialty,
     setSelectedSpecialty,
-    resetFilters
+    resetFilters,
+    loading
   } = useLawyersData();
 
   return (
@@ -36,10 +38,17 @@ const Lawyers = () => {
             cities={cities}
           />
 
-          <LawyersGrid 
-            filteredLawyers={filteredLawyers}
-            onResetFilters={resetFilters}
-          />
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <span className="mr-2">جاري تحميل المحامين...</span>
+            </div>
+          ) : (
+            <LawyersGrid 
+              filteredLawyers={filteredLawyers}
+              onResetFilters={resetFilters}
+            />
+          )}
         </div>
       </div>
     </Layout>

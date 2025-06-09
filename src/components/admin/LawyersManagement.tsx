@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import LawyerApprovalDialog from './LawyerApprovalDialog';
+import AddLawyerDialog from './AddLawyerDialog';
+import { useSupabaseLawyers } from '@/hooks/useSupabaseLawyers';
 import { 
   Search, 
   Filter, 
@@ -47,7 +48,9 @@ const LawyersManagement = () => {
   const [loading, setLoading] = useState(true);
   const [selectedLawyer, setSelectedLawyer] = useState<Lawyer | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { addLawyer } = useSupabaseLawyers();
 
   useEffect(() => {
     loadLawyers();
@@ -78,6 +81,11 @@ const LawyersManagement = () => {
   const handleViewLawyer = (lawyer: Lawyer) => {
     setSelectedLawyer(lawyer);
     setDialogOpen(true);
+  };
+
+  const handleAddLawyer = async (lawyerData: any) => {
+    await addLawyer(lawyerData);
+    loadLawyers();
   };
 
   const handleApproveLawyer = async (lawyerId: string) => {
@@ -174,7 +182,7 @@ const LawyersManagement = () => {
           <h2 className="text-2xl font-bold">إدارة المحامين</h2>
           <p className="text-muted-foreground">عرض وإدارة المحامين المسجلين في المنصة</p>
         </div>
-        <Button>
+        <Button onClick={() => setAddDialogOpen(true)}>
           <Plus className="h-4 w-4 ml-2" />
           إضافة محامي جديد
         </Button>
@@ -347,6 +355,12 @@ const LawyersManagement = () => {
         }}
         onApprove={handleApproveLawyer}
         onReject={handleRejectLawyer}
+      />
+
+      <AddLawyerDialog
+        isOpen={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onSave={handleAddLawyer}
       />
     </div>
   );

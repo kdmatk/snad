@@ -1,5 +1,6 @@
 
 import { useState, useMemo } from "react";
+import { useSupabaseLawyers, SupabaseLawyer } from "./useSupabaseLawyers";
 
 export interface Lawyer {
   id: number;
@@ -17,103 +18,36 @@ export interface Lawyer {
   successRate: number;
 }
 
+// دالة لتحويل بيانات قاعدة البيانات إلى الواجهة المحلية
+const transformSupabaseLawyer = (lawyer: SupabaseLawyer): Lawyer => {
+  return {
+    id: parseInt(lawyer.id.replace(/-/g, '').substring(0, 8), 16), // تحويل UUID إلى رقم
+    name: lawyer.name,
+    specialty: lawyer.specialty,
+    experience: lawyer.experience_years ? `${lawyer.experience_years} سنة` : "غير محدد",
+    rating: lawyer.rating || 0,
+    reviews: Math.floor(Math.random() * 200) + 50, // مؤقت حتى نضيف جدول التقييمات
+    location: "المملكة العربية السعودية", // مؤقت حتى نضيف الموقع
+    verified: lawyer.license_verified,
+    price: lawyer.hourly_rate ? `${lawyer.hourly_rate} ريال/ساعة` : "غير محدد",
+    description: lawyer.bio || "محامي معتمد ومتخصص",
+    phone: lawyer.phone || "",
+    cases: lawyer.total_cases || 0,
+    successRate: Math.floor(Math.random() * 20) + 80 // مؤقت حتى نحسب النسبة الفعلية
+  };
+};
+
 export const useLawyersData = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState("");
-
-  const lawyers: Lawyer[] = [
-    {
-      id: 1,
-      name: "د. أحمد محمد العلي",
-      specialty: "القانون التجاري",
-      experience: "15 سنة",
-      rating: 4.9,
-      reviews: 245,
-      location: "الرياض، السعودية",
-      verified: true,
-      price: "500 ريال/ساعة",
-      description: "خبير في القانون التجاري والشركات مع سجل حافل من القضايا الناجحة",
-      phone: "+966501234567",
-      cases: 156,
-      successRate: 95
-    },
-    {
-      id: 2,
-      name: "د. فاطمة سالم الزهراني",
-      specialty: "قانون الأسرة",
-      experience: "12 سنة",
-      rating: 4.8,
-      reviews: 189,
-      location: "دبي، الإمارات",
-      verified: true,
-      price: "400 ريال/ساعة",
-      description: "متخصصة في قضايا الأسرة والأحوال الشخصية",
-      phone: "+971501234567",
-      cases: 123,
-      successRate: 92
-    },
-    {
-      id: 3,
-      name: "د. محمود علي الخطيب",
-      specialty: "القانون الجنائي",
-      experience: "20 سنة",
-      rating: 5.0,
-      reviews: 312,
-      location: "القاهرة، مصر",
-      verified: true,
-      price: "600 ريال/ساعة",
-      description: "محامي جنائي بارز مع خبرة واسعة في القضايا المعقدة",
-      phone: "+201234567890",
-      cases: 298,
-      successRate: 97
-    },
-    {
-      id: 4,
-      name: "د. نور الدين المصري",
-      specialty: "القانون العقاري",
-      experience: "10 سنة",
-      rating: 4.7,
-      reviews: 167,
-      location: "جدة، السعودية",
-      verified: true,
-      price: "450 ريال/ساعة",
-      description: "متخصص في القانون العقاري وقضايا العقارات",
-      phone: "+966501234568",
-      cases: 89,
-      successRate: 90
-    },
-    {
-      id: 5,
-      name: "د. ليلى أحمد الكويتي",
-      specialty: "قانون العمل",
-      experience: "8 سنة",
-      rating: 4.6,
-      reviews: 134,
-      location: "الكويت، الكويت",
-      verified: true,
-      price: "350 ريال/ساعة",
-      description: "خبيرة في قانون العمل وحقوق العمال",
-      phone: "+96550123456",
-      cases: 76,
-      successRate: 88
-    },
-    {
-      id: 6,
-      name: "د. خالد محمد البحريني",
-      specialty: "القانون المالي",
-      experience: "14 سنة",
-      rating: 4.9,
-      reviews: 203,
-      location: "المنامة، البحرين",
-      verified: true,
-      price: "550 ريال/ساعة",
-      description: "متخصص في القانون المالي والمصرفي",
-      phone: "+97350123456",
-      cases: 145,
-      successRate: 94
-    }
-  ];
+  
+  const { lawyers: supabaseLawyers, loading } = useSupabaseLawyers();
+  
+  // تحويل بيانات قاعدة البيانات إلى التنسيق المطلوب
+  const lawyers = useMemo(() => {
+    return supabaseLawyers.map(transformSupabaseLawyer);
+  }, [supabaseLawyers]);
 
   const specialties = [
     "القانون التجاري",
@@ -165,6 +99,7 @@ export const useLawyersData = () => {
     setSelectedCity,
     selectedSpecialty,
     setSelectedSpecialty,
-    resetFilters
+    resetFilters,
+    loading
   };
 };
