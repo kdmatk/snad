@@ -33,7 +33,7 @@ export const useSupabaseLawyers = () => {
         .from('lawyers')
         .select('*')
         .eq('registration_status', 'approved')
-        .order('rating', { ascending: false, nullsLast: true });
+        .order('rating', { ascending: false, nullsFirst: false });
 
       if (error) throw error;
       setLawyers(data || []);
@@ -55,15 +55,27 @@ export const useSupabaseLawyers = () => {
 
   const addLawyer = async (lawyerData: Partial<SupabaseLawyer>) => {
     try {
+      // التأكد من وجود الحقول المطلوبة
+      if (!lawyerData.name || !lawyerData.email || !lawyerData.specialty || !lawyerData.license_number) {
+        throw new Error('الحقول المطلوبة مفقودة');
+      }
+
       const { data, error } = await supabase
         .from('lawyers')
-        .insert([{
-          ...lawyerData,
+        .insert({
+          name: lawyerData.name,
+          email: lawyerData.email,
+          phone: lawyerData.phone || null,
+          specialty: lawyerData.specialty,
+          license_number: lawyerData.license_number,
+          bio: lawyerData.bio || null,
+          experience_years: lawyerData.experience_years || null,
+          hourly_rate: lawyerData.hourly_rate || null,
           registration_status: 'approved',
           license_verified: true,
           rating: 0,
           total_cases: 0
-        }])
+        })
         .select()
         .single();
 
