@@ -12,7 +12,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Search, Filter } from "lucide-react";
 
 const QuickServices = () => {
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("rating");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedService, setSelectedService] = useState<any>(null);
@@ -21,7 +21,7 @@ const QuickServices = () => {
   const { services, categories } = useQuickServicesData();
 
   const filteredServices = services.filter(service => {
-    const matchesCategory = !selectedCategory || service.category === selectedCategory;
+    const matchesCategory = selectedCategory === "all" || service.category === selectedCategory;
     const matchesSearch = !searchTerm || 
       service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       service.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -81,7 +81,7 @@ const QuickServices = () => {
                   <SelectValue placeholder="اختر الفئة" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">جميع الفئات</SelectItem>
+                  <SelectItem value="all">جميع الفئات</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.value} value={category.value}>
                       {category.name}
