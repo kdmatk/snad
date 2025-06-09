@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Lawyers from "./pages/Lawyers";
 import LawyerProfile from "./pages/LawyerProfile";
 import Services from "./pages/Services";
+import QuickServices from "./pages/QuickServices";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/lawyers" element={<Lawyers />} />
           <Route path="/lawyer/:id" element={<LawyerProfile />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/quick-services" element={<QuickServices />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />

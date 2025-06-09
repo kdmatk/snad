@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Bell, Menu, X } from "lucide-react";
 import { useState } from "react";
@@ -12,6 +11,7 @@ const Header = () => {
     { label: "الرئيسية", href: "/" },
     { label: "المحامين", href: "/lawyers" },
     { label: "الخدمات", href: "/services" },
+    { label: "الخدمات السريعة", href: "/quick-services" },
     { label: "من نحن", href: "/about" },
     { label: "اتصل بنا", href: "/contact" }
   ];
