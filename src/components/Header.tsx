@@ -1,4 +1,5 @@
 
+
 import { Button } from "@/components/ui/button";
 import { Bell, Menu, X, Shield } from "lucide-react";
 import { useState } from "react";
@@ -35,8 +36,8 @@ const Header = () => {
             </div>
           </Link>
 
-          {/* Desktop Navigation with enhanced styling */}
-          <nav className="hidden lg:flex items-center space-x-reverse space-x-2">
+          {/* Desktop Navigation with enhanced spacing */}
+          <nav className="hidden lg:flex items-center gap-8">
             {navigationItems.map((item) => (
               <Link
                 key={item.label}
@@ -49,16 +50,16 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* User Actions with enhanced design */}
-          <div className="flex items-center space-x-reverse space-x-4">
+          {/* User Actions with enhanced spacing */}
+          <div className="flex items-center gap-6">
             {/* Notifications with enhanced styling */}
             <Button variant="ghost" size="icon" className="relative hover:bg-white/15 text-white border-2 border-white/30 hover:border-white/50 backdrop-blur-sm transition-all duration-300 hover:scale-110 rounded-xl">
               <Bell className="h-6 w-6" />
               <span className="absolute -top-2 -right-2 h-5 w-5 bg-gradient-to-r from-secondary to-secondary/80 rounded-full text-xs flex items-center justify-center text-white font-bold border-2 border-white shadow-lg animate-bounce">3</span>
             </Button>
             
-            {/* Enhanced action buttons */}
-            <div className="hidden md:flex items-center space-x-reverse space-x-3">
+            {/* Enhanced action buttons with proper spacing */}
+            <div className="hidden md:flex items-center gap-4">
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/login')}
@@ -86,10 +87,10 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Enhanced Mobile Navigation */}
+        {/* Enhanced Mobile Navigation with proper spacing */}
         {isMenuOpen && (
           <div className="lg:hidden mt-8 pb-8 border-t-2 border-white/30 backdrop-blur-lg">
-            <nav className="flex flex-col space-y-3 mt-8">
+            <nav className="flex flex-col gap-4 mt-8">
               {navigationItems.map((item) => (
                 <Link
                   key={item.label}
@@ -100,7 +101,7 @@ const Header = () => {
                   {item.label}
                 </Link>
               ))}
-              <div className="flex flex-col space-y-4 mt-8 pt-6 border-t-2 border-white/30">
+              <div className="flex flex-col gap-4 mt-8 pt-6 border-t-2 border-white/30">
                 <Button 
                   variant="outline" 
                   className="w-full border-3 border-white/40 text-white hover:bg-white hover:text-primary font-bold backdrop-blur-sm transition-all duration-500 py-4 rounded-xl" 
@@ -124,3 +125,4 @@ const Header = () => {
 };
 
 export default Header;
+
