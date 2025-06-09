@@ -42,18 +42,18 @@ export const useVoiceSession = () => {
     try {
       // التحقق من صحة UUID
       if (!isValidUUID(clientId)) {
-        console.error('Invalid client UUID:', clientId);
+        console.warn('Invalid client UUID, generating new one:', clientId);
         clientId = generateUUID();
       }
       
       if (!isValidUUID(lawyerId)) {
-        console.error('Invalid lawyer UUID:', lawyerId);
+        console.warn('Invalid lawyer UUID, generating new one:', lawyerId);
         lawyerId = generateUUID();
       }
 
       const roomId = `voice_room_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      console.log('Creating session with:', { clientId, lawyerId, durationMinutes, roomId });
+      console.log('Creating session with valid UUIDs:', { clientId, lawyerId, durationMinutes, roomId });
       
       const { data, error } = await supabase
         .from('voice_sessions')
@@ -82,11 +82,11 @@ export const useVoiceSession = () => {
       });
 
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating voice session:', error);
       toast({
         title: "خطأ في إنشاء الجلسة",
-        description: "حدث خطأ أثناء إنشاء جلسة الاتصال الصوتي",
+        description: error?.message || "حدث خطأ أثناء إنشاء جلسة الاتصال الصوتي",
         variant: "destructive"
       });
       return null;
@@ -141,12 +141,19 @@ export const useVoiceSession = () => {
         description: "تم الاتصال بنجاح، يمكنك الآن التحدث"
       });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error starting voice session:', error);
       setIsConnecting(false);
+      
+      // إغلاق البث في حالة حدوث خطأ
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        setLocalStream(null);
+      }
+      
       toast({
         title: "خطأ في بدء الجلسة",
-        description: "حدث خطأ أثناء بدء الاتصال الصوتي",
+        description: error?.message || "حدث خطأ أثناء بدء الاتصال الصوتي",
         variant: "destructive"
       });
     }
@@ -162,7 +169,7 @@ export const useVoiceSession = () => {
           : 0;
 
         // تحديث قاعدة البيانات
-        await supabase
+        const { error } = await supabase
           .from('voice_sessions')
           .update({
             session_status: 'ended',
@@ -170,6 +177,10 @@ export const useVoiceSession = () => {
             actual_duration: actualDuration
           })
           .eq('id', session.id);
+
+        if (error) {
+          console.error('Error updating session end:', error);
+        }
 
         // إضافة حدث إنهاء الجلسة
         await supabase
@@ -207,11 +218,11 @@ export const useVoiceSession = () => {
         description: "تم إنهاء المكالمة بنجاح"
       });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error ending voice session:', error);
       toast({
         title: "خطأ في إنهاء الجلسة",
-        description: "حدث خطأ أثناء إنهاء المكالمة",
+        description: error?.message || "حدث خطأ أثناء إنهاء المكالمة",
         variant: "destructive"
       });
     }
