@@ -9,7 +9,177 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      session_events: {
+        Row: {
+          event_data: Json | null
+          event_type: string
+          id: string
+          participant_type: string | null
+          session_id: string | null
+          timestamp: string | null
+        }
+        Insert: {
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          participant_type?: string | null
+          session_id?: string | null
+          timestamp?: string | null
+        }
+        Update: {
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          participant_type?: string | null
+          session_id?: string | null
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "voice_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_notifications: {
+        Row: {
+          channel: string
+          created_at: string | null
+          id: string
+          notification_type: string
+          recipient_id: string
+          sent_at: string | null
+          session_id: string | null
+          status: string | null
+        }
+        Insert: {
+          channel: string
+          created_at?: string | null
+          id?: string
+          notification_type: string
+          recipient_id: string
+          sent_at?: string | null
+          session_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          channel?: string
+          created_at?: string | null
+          id?: string
+          notification_type?: string
+          recipient_id?: string
+          sent_at?: string | null
+          session_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_notifications_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "voice_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_reports: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          report_reason: string
+          reporter_id: string
+          reporter_type: string | null
+          resolved_at: string | null
+          session_id: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          report_reason: string
+          reporter_id: string
+          reporter_type?: string | null
+          resolved_at?: string | null
+          session_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          report_reason?: string
+          reporter_id?: string
+          reporter_type?: string | null
+          resolved_at?: string | null
+          session_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_reports_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "voice_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      voice_sessions: {
+        Row: {
+          actual_duration: number | null
+          client_id: string
+          consultation_id: string | null
+          created_at: string | null
+          duration_minutes: number
+          end_time: string | null
+          id: string
+          is_encrypted: boolean | null
+          lawyer_id: string
+          recording_consent: boolean | null
+          room_id: string
+          session_status: string
+          start_time: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          actual_duration?: number | null
+          client_id: string
+          consultation_id?: string | null
+          created_at?: string | null
+          duration_minutes?: number
+          end_time?: string | null
+          id?: string
+          is_encrypted?: boolean | null
+          lawyer_id: string
+          recording_consent?: boolean | null
+          room_id: string
+          session_status?: string
+          start_time?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          actual_duration?: number | null
+          client_id?: string
+          consultation_id?: string | null
+          created_at?: string | null
+          duration_minutes?: number
+          end_time?: string | null
+          id?: string
+          is_encrypted?: boolean | null
+          lawyer_id?: string
+          recording_consent?: boolean | null
+          room_id?: string
+          session_status?: string
+          start_time?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

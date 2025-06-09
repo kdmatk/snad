@@ -5,8 +5,13 @@ import AvailableLawyers from "@/components/consultation/AvailableLawyers";
 import ConsultationFeatures from "@/components/consultation/ConsultationFeatures";
 import EmergencyContact from "@/components/consultation/EmergencyContact";
 import { useInstantConsultationData } from "@/hooks/useInstantConsultationData";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const InstantConsultation = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
   const {
     consultationMethods,
     availableLawyers,
@@ -16,12 +21,29 @@ const InstantConsultation = () => {
 
   const handleStartConsultation = (lawyerId: number, method: string) => {
     if (!method) {
-      alert("يرجى اختيار طريقة الاستشارة أولاً");
+      toast({
+        title: "يرجى اختيار طريقة الاستشارة أولاً",
+        variant: "destructive"
+      });
       return;
     }
     
-    alert(`بدء استشارة ${method} مع المحامي ${availableLawyers.find(l => l.id === lawyerId)?.name}`);
-    // Here you would typically start the consultation session
+    const lawyer = availableLawyers.find(l => l.id === lawyerId);
+    
+    if (method === "voice") {
+      // التوجه إلى صفحة الاتصال الصوتي
+      navigate(`/voice-call?lawyer=${lawyerId}`);
+      toast({
+        title: "جاري إنشاء جلسة صوتية",
+        description: `سيتم إنشاء جلسة صوتية مع ${lawyer?.name}`
+      });
+    } else {
+      // للطرق الأخرى
+      toast({
+        title: `بدء استشارة ${method === "chat" ? "نصية" : "فيديو"}`,
+        description: `جاري بدء الاستشارة مع ${lawyer?.name}`
+      });
+    }
   };
 
   return (
