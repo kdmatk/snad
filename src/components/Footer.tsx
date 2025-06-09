@@ -1,10 +1,7 @@
-
 import { Link } from "react-router-dom";
 import { Scale } from "lucide-react";
-
 const Footer = () => {
-  return (
-    <footer className="bg-gradient-to-br from-blue-900 via-blue-800 to-slate-800 text-white py-12 relative">
+  return <footer className="bg-gradient-to-br from-blue-900 via-blue-800 to-slate-800 text-white py-12 relative">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-slate-800/60"></div>
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -15,8 +12,8 @@ const Footer = () => {
                 <Scale className="text-white h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">سند</h3>
-                <p className="text-sm text-slate-300">منصة الخدمات القانونية</p>
+                <h3 className="text-xl font-bold text-right">سند</h3>
+                <p className="text-sm text-slate-300 text-right">منصة الخدمات القانونية</p>
               </div>
             </Link>
             <p className="text-slate-300 mb-4 max-w-md">
@@ -81,11 +78,9 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-white/20 mt-8 pt-8 text-center text-slate-300">
-          <p>&copy; 2024 منصة سند للخدمات القانونية. جميع الحقوق محفوظة.</p>
+          <p>منصة سند للخدمات القانونية. جميع الحقوق محفوظة © 2025 </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
