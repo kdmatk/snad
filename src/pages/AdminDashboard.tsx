@@ -13,7 +13,8 @@ import ArticlesManagement from "@/components/admin/ArticlesManagement";
 import SettingsManagement from "@/components/admin/SettingsManagement";
 import AdminLogin from "@/components/admin/AdminLogin";
 import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -23,10 +24,13 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-            <p>جاري التحقق من الصلاحيات...</p>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+            <div>
+              <p className="text-lg font-medium">جاري التحقق من الصلاحيات...</p>
+              <p className="text-sm text-muted-foreground">الرجاء الانتظار</p>
+            </div>
           </div>
         </div>
       </Layout>
@@ -39,40 +43,56 @@ const AdminDashboard = () => {
   }
 
   const renderContent = () => {
-    switch (activeTab) {
-      case "overview":
-        return (
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold text-primary">لوحة تحكم المدير</h1>
-              <p className="text-muted-foreground mt-2">إدارة شاملة لمنصة سند للخدمات القانونية</p>
-              <p className="text-sm text-gray-600 mt-1">مرحباً {admin?.name}</p>
+    try {
+      switch (activeTab) {
+        case "overview":
+          return (
+            <div className="space-y-6">
+              <div>
+                <h1 className="text-3xl font-bold text-primary">لوحة تحكم المدير</h1>
+                <p className="text-muted-foreground mt-2">إدارة شاملة لمنصة سند للخدمات القانونية</p>
+                {admin && (
+                  <p className="text-sm text-gray-600 mt-1">مرحباً {admin.name} - {admin.role}</p>
+                )}
+              </div>
+              <AdminStats />
+              <AdminCharts />
             </div>
-            <AdminStats />
-            <AdminCharts />
-          </div>
-        );
-      case "lawyers":
-        return <LawyersManagement />;
-      case "clients":
-        return <ClientsManagement />;
-      case "services":
-        return <ServicesManagement />;
-      case "cases":
-        return <CasesManagement />;
-      case "payments":
-        return <PaymentsManagement />;
-      case "articles":
-        return <ArticlesManagement />;
-      case "settings":
-        return <SettingsManagement />;
-      default:
-        return (
-          <div className="space-y-6">
-            <AdminStats />
-            <AdminCharts />
-          </div>
-        );
+          );
+        case "lawyers":
+          return <LawyersManagement />;
+        case "clients":
+          return <ClientsManagement />;
+        case "services":
+          return <ServicesManagement />;
+        case "cases":
+          return <CasesManagement />;
+        case "payments":
+          return <PaymentsManagement />;
+        case "articles":
+          return <ArticlesManagement />;
+        case "settings":
+          return <SettingsManagement />;
+        default:
+          return (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                القسم المطلوب غير متوفر. الرجاء اختيار قسم آخر من القائمة الجانبية.
+              </AlertDescription>
+            </Alert>
+          );
+      }
+    } catch (error) {
+      console.error('خطأ في عرض المحتوى:', error);
+      return (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            حدث خطأ في تحميل المحتوى. الرجاء إعادة تحميل الصفحة أو المحاولة لاحقاً.
+          </AlertDescription>
+        </Alert>
+      );
     }
   };
 

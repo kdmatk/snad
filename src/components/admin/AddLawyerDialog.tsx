@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -13,39 +12,63 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { SupabaseLawyer } from '@/hooks/useSupabaseLawyers';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useSupabaseLawyers } from '@/hooks/useSupabaseLawyers';
+import { Loader2 } from "lucide-react";
 
 interface AddLawyerDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (lawyerData: Partial<SupabaseLawyer>) => Promise<void>;
+  onSuccess: () => void;
 }
 
-const AddLawyerDialog = ({ 
-  isOpen, 
-  onClose, 
-  onSave 
-}: AddLawyerDialogProps) => {
-  const [formData, setFormData] = useState<Partial<SupabaseLawyer>>({
+const AddLawyerDialog = ({ isOpen, onClose, onSuccess }: AddLawyerDialogProps) => {
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     specialty: '',
     license_number: '',
     bio: '',
-    experience_years: 0,
-    hourly_rate: 0
+    experience_years: '',
+    hourly_rate: ''
   });
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { addLawyer } = useSupabaseLawyers();
 
-  const handleSave = async () => {
+  const specialties = [
+    'قانون مدني',
+    'قانون جنائي',
+    'قانون تجاري',
+    'قانون عمل',
+    'قانون عقاري',
+    'قانون أسرة',
+    'قانون إداري',
+    'قانون دولي'
+  ];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (!formData.name || !formData.email || !formData.specialty || !formData.license_number) {
       return;
     }
 
+    setIsSubmitting(true);
     try {
-      setLoading(true);
-      await onSave(formData);
+      await addLawyer({
+        ...formData,
+        experience_years: formData.experience_years ? parseInt(formData.experience_years) : undefined,
+        hourly_rate: formData.hourly_rate ? parseFloat(formData.hourly_rate) : undefined
+      });
+      
+      // إعادة تعيين النموذج
       setFormData({
         name: '',
         email: '',
@@ -53,27 +76,22 @@ const AddLawyerDialog = ({
         specialty: '',
         license_number: '',
         bio: '',
-        experience_years: 0,
-        hourly_rate: 0
+        experience_years: '',
+        hourly_rate: ''
       });
+      
+      onSuccess();
       onClose();
     } catch (error) {
-      console.error('Error saving lawyer:', error);
+      console.error('خطأ في إضافة المحامي:', error);
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
-  const specialties = [
-    'القانون التجاري',
-    'قانون الأسرة',
-    'القانون الجنائي',
-    'القانون العقاري',
-    'قانون العمل',
-    'القانون المالي',
-    'القانون الإداري',
-    'قانون الضرائب'
-  ];
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -81,60 +99,61 @@ const AddLawyerDialog = ({
         <DialogHeader>
           <DialogTitle>إضافة محامي جديد</DialogTitle>
           <DialogDescription>
-            أدخل بيانات المحامي الجديد
+            أدخل بيانات المحامي الجديد لإضافته إلى المنصة
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              الاسم *
-            </Label>
-            <Input
-              id="name"
-              value={formData.name || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              className="col-span-3"
-              placeholder="أدخل اسم المحامي"
-            />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">الاسم الكامل *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="أدخل الاسم الكامل"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">البريد الإلكتروني *</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                placeholder="example@email.com"
+                required
+              />
+            </div>
           </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="email" className="text-right">
-              البريد الإلكتروني *
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              className="col-span-3"
-              placeholder="أدخل البريد الإلكتروني"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="phone">رقم الهاتف</Label>
+              <Input
+                id="phone"
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                placeholder="+966xxxxxxxxx"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="license_number">رقم الترخيص *</Label>
+              <Input
+                id="license_number"
+                value={formData.license_number}
+                onChange={(e) => handleInputChange('license_number', e.target.value)}
+                placeholder="رقم ترخيص مزاولة المهنة"
+                required
+              />
+            </div>
           </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="phone" className="text-right">
-              رقم الهاتف
-            </Label>
-            <Input
-              id="phone"
-              value={formData.phone || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-              className="col-span-3"
-              placeholder="أدخل رقم الهاتف"
-            />
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="specialty" className="text-right">
-              التخصص *
-            </Label>
-            <Select 
-              value={formData.specialty || ''} 
-              onValueChange={(value) => setFormData(prev => ({ ...prev, specialty: value }))}
-            >
-              <SelectTrigger className="col-span-3">
+          <div className="space-y-2">
+            <Label htmlFor="specialty">التخصص *</Label>
+            <Select value={formData.specialty} onValueChange={(value) => handleInputChange('specialty', value)}>
+              <SelectTrigger>
                 <SelectValue placeholder="اختر التخصص" />
               </SelectTrigger>
               <SelectContent>
@@ -147,69 +166,63 @@ const AddLawyerDialog = ({
             </Select>
           </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="license_number" className="text-right">
-              رقم الترخيص *
-            </Label>
-            <Input
-              id="license_number"
-              value={formData.license_number || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, license_number: e.target.value }))}
-              className="col-span-3"
-              placeholder="أدخل رقم الترخيص"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="experience_years">سنوات الخبرة</Label>
+              <Input
+                id="experience_years"
+                type="number"
+                min="0"
+                max="50"
+                value={formData.experience_years}
+                onChange={(e) => handleInputChange('experience_years', e.target.value)}
+                placeholder="عدد سنوات الخبرة"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="hourly_rate">السعر بالساعة (ريال)</Label>
+              <Input
+                id="hourly_rate"
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.hourly_rate}
+                onChange={(e) => handleInputChange('hourly_rate', e.target.value)}
+                placeholder="السعر بالساعة"
+              />
+            </div>
           </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="experience_years" className="text-right">
-              سنوات الخبرة
-            </Label>
-            <Input
-              id="experience_years"
-              type="number"
-              value={formData.experience_years || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, experience_years: Number(e.target.value) }))}
-              className="col-span-3"
-              placeholder="أدخل سنوات الخبرة"
-            />
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="hourly_rate" className="text-right">
-              الأجر بالساعة (ريال)
-            </Label>
-            <Input
-              id="hourly_rate"
-              type="number"
-              value={formData.hourly_rate || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, hourly_rate: Number(e.target.value) }))}
-              className="col-span-3"
-              placeholder="أدخل الأجر بالساعة"
-            />
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="bio" className="text-right">
-              نبذة تعريفية
-            </Label>
+          <div className="space-y-2">
+            <Label htmlFor="bio">النبذة الشخصية</Label>
             <Textarea
               id="bio"
-              value={formData.bio || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-              className="col-span-3"
-              placeholder="أدخل نبذة تعريفية عن المحامي"
+              value={formData.bio}
+              onChange={(e) => handleInputChange('bio', e.target.value)}
+              placeholder="نبذة مختصرة عن المحامي وخبراته"
+              rows={3}
             />
           </div>
-        </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={loading}>
-            إلغاء
-          </Button>
-          <Button onClick={handleSave} disabled={loading}>
-            {loading ? 'جاري الحفظ...' : 'إضافة المحامي'}
-          </Button>
-        </DialogFooter>
+          <DialogFooter className="gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              إلغاء
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={isSubmitting || !formData.name || !formData.email || !formData.specialty || !formData.license_number}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  جاري الإضافة...
+                </>
+              ) : (
+                'إضافة المحامي'
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
