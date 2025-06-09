@@ -17,16 +17,16 @@ interface Lawyer {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone: string | null;
   specialty: string;
   license_number: string;
-  status: string;
-  rating: number;
-  cases: number;
-  avatar: string;
+  registration_status: string;
+  rating: number | null;
+  total_cases: number | null;
+  avatar_url: string | null;
   created_at: string;
-  bio?: string;
-  experience_years?: number;
+  bio?: string | null;
+  experience_years?: number | null;
 }
 
 interface LawyerApprovalDialogProps {
@@ -82,7 +82,7 @@ const LawyerApprovalDialog = ({
           {/* معلومات المحامي الأساسية */}
           <div className="flex items-start gap-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage src={lawyer.avatar} />
+              <AvatarImage src={lawyer.avatar_url || undefined} />
               <AvatarFallback className="text-lg">{lawyer.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
@@ -93,14 +93,17 @@ const LawyerApprovalDialog = ({
                   <Mail className="h-4 w-4" />
                   {lawyer.email}
                 </span>
-                <span className="flex items-center gap-1 text-sm">
-                  <Phone className="h-4 w-4" />
-                  {lawyer.phone}
-                </span>
+                {lawyer.phone && (
+                  <span className="flex items-center gap-1 text-sm">
+                    <Phone className="h-4 w-4" />
+                    {lawyer.phone}
+                  </span>
+                )}
               </div>
             </div>
-            <Badge variant={lawyer.status === 'pending' ? 'secondary' : 'default'}>
-              {lawyer.status === 'pending' ? 'قيد المراجعة' : lawyer.status}
+            <Badge variant={lawyer.registration_status === 'pending' ? 'secondary' : 'default'}>
+              {lawyer.registration_status === 'pending' ? 'قيد المراجعة' : 
+               lawyer.registration_status === 'approved' ? 'معتمد' : 'مرفوض'}
             </Badge>
           </div>
 
@@ -127,7 +130,7 @@ const LawyerApprovalDialog = ({
               )}
               <div>
                 <span className="font-medium">عدد القضايا: </span>
-                <span>{lawyer.cases}</span>
+                <span>{lawyer.total_cases || 0}</span>
               </div>
             </div>
           </div>

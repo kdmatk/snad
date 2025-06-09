@@ -28,16 +28,16 @@ interface Lawyer {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone: string | null;
   specialty: string;
   license_number: string;
   registration_status: string;
-  rating: number;
-  total_cases: number;
-  avatar_url: string;
+  rating: number | null;
+  total_cases: number | null;
+  avatar_url: string | null;
   created_at: string;
-  bio?: string;
-  experience_years?: number;
+  bio?: string | null;
+  experience_years?: number | null;
 }
 
 const LawyersManagement = () => {
@@ -267,7 +267,7 @@ const LawyersManagement = () => {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar>
-                        <AvatarImage src={lawyer.avatar_url} />
+                        <AvatarImage src={lawyer.avatar_url || undefined} />
                         <AvatarFallback>{lawyer.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div>
