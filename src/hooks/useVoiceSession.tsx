@@ -2,13 +2,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { generateUUID, isValidUUID } from '@/utils/uuid';
 
 export interface VoiceSession {
   id: string;
   client_id: string;
   lawyer_id: string;
   consultation_id?: string;
-  session_status: string; // تغيير هذا إلى string عام بدلاً من القيم المحددة
+  session_status: string;
   duration_minutes: number;
   start_time?: string;
   end_time?: string;
@@ -39,7 +40,20 @@ export const useVoiceSession = () => {
     consultationId?: string
   ) => {
     try {
+      // التحقق من صحة UUID
+      if (!isValidUUID(clientId)) {
+        console.error('Invalid client UUID:', clientId);
+        clientId = generateUUID();
+      }
+      
+      if (!isValidUUID(lawyerId)) {
+        console.error('Invalid lawyer UUID:', lawyerId);
+        lawyerId = generateUUID();
+      }
+
       const roomId = `voice_room_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      console.log('Creating session with:', { clientId, lawyerId, durationMinutes, roomId });
       
       const { data, error } = await supabase
         .from('voice_sessions')
@@ -54,7 +68,10 @@ export const useVoiceSession = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
 
       setSession(data as VoiceSession);
       setRemainingTime(durationMinutes * 60);
@@ -110,7 +127,7 @@ export const useVoiceSession = () => {
         .insert({
           session_id: sessionId,
           event_type: 'session_started',
-          participant_type: 'client' // يمكن تحديد النوع بناءً على المستخدم الحالي
+          participant_type: 'client'
         });
 
       setIsConnected(true);

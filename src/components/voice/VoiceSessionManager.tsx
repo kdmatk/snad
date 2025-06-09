@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { isValidUUID } from '@/utils/uuid';
 
 // واجهة محلية للجلسات الصوتية مع session_status كـ string عام
 interface VoiceSessionData {
@@ -54,13 +55,23 @@ const VoiceSessionManager = ({ lawyerId, userType }: VoiceSessionManagerProps) =
     try {
       setLoading(true);
       
+      // التحقق من صحة UUID
+      if (!isValidUUID(lawyerId)) {
+        console.warn('Invalid lawyer UUID, cannot fetch sessions');
+        setSessions([]);
+        return;
+      }
+      
       const { data, error } = await supabase
         .from('voice_sessions')
         .select('*')
         .eq(userType === 'lawyer' ? 'lawyer_id' : 'client_id', lawyerId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
 
       // تحويل البيانات للواجهة المحلية
       const typedSessions: VoiceSessionData[] = (data || []).map(session => ({

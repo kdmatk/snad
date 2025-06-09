@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import VoiceCallInterface from '@/components/voice/VoiceCallInterface';
 import VoiceSessionManager from '@/components/voice/VoiceSessionManager';
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { generateUUID } from '@/utils/uuid';
 import { 
   Phone, 
   ArrowRight, 
@@ -19,18 +20,19 @@ import {
 
 const VoiceCall = () => {
   const { sessionId } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('call');
   
-  // في التطبيق الحقيقي، ستحصل على هذه البيانات من المصادقة والسياق
+  // توليد UUID صحيح للمستخدم الحالي والمحامي
   const currentUser = {
-    id: 'user_123',
+    id: generateUUID(),
     type: 'client' as 'client' | 'lawyer',
     name: 'أحمد محمد'
   };
 
   const demoLawyer = {
-    id: 'lawyer_456',
+    id: generateUUID(),
     name: 'د. فاطمة الزهراني',
     specialty: 'قانون الأسرة'
   };
@@ -98,7 +100,7 @@ const VoiceCall = () => {
                   <div className="lg:col-span-2">
                     <VoiceCallInterface
                       sessionId={sessionId}
-                      clientId={currentUser.type === 'client' ? currentUser.id : 'demo_client'}
+                      clientId={currentUser.type === 'client' ? currentUser.id : generateUUID()}
                       lawyerId={currentUser.type === 'lawyer' ? currentUser.id : demoLawyer.id}
                       durationMinutes={30}
                       onSessionEnd={handleSessionEnd}
