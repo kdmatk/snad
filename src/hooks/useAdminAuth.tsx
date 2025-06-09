@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface Admin {
   id: string;
@@ -15,6 +16,7 @@ export const useAdminAuth = () => {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkAdminStatus();
@@ -77,6 +79,11 @@ export const useAdminAuth = () => {
           title: "تم تسجيل الدخول بنجاح",
           description: `مرحباً ${adminData.name}`,
         });
+
+        // التوجيه إلى لوحة التحكم
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
       }
     } catch (error: any) {
       console.error('خطأ في تسجيل الدخول:', error);
@@ -99,6 +106,7 @@ export const useAdminAuth = () => {
         title: "تم تسجيل الخروج",
         description: "تم تسجيل الخروج بنجاح",
       });
+      navigate('/admin');
     } catch (error) {
       console.error('خطأ في تسجيل الخروج:', error);
       toast({
