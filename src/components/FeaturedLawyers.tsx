@@ -2,9 +2,12 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, User, Clock, Phone, Shield, MapPin, Award } from "lucide-react";
+import { Star, User, Clock, Phone, Shield, MapPin, Award, MessageCircle } from "lucide-react";
+import { useState } from "react";
 
 const FeaturedLawyers = () => {
+  const [selectedLawyer, setSelectedLawyer] = useState<number | null>(null);
+
   const lawyers = [
     {
       id: 1,
@@ -17,7 +20,8 @@ const FeaturedLawyers = () => {
       verified: true,
       price: "500 ريال/ساعة",
       image: "/placeholder.svg",
-      description: "خبير في القانون التجاري والشركات مع سجل حافل من القضايا الناجحة"
+      description: "خبير في القانون التجاري والشركات مع سجل حافل من القضايا الناجحة",
+      phone: "+966501234567"
     },
     {
       id: 2,
@@ -30,7 +34,8 @@ const FeaturedLawyers = () => {
       verified: true,
       price: "400 ريال/ساعة",
       image: "/placeholder.svg",
-      description: "متخصصة في قضايا الأسرة والأحوال الشخصية"
+      description: "متخصصة في قضايا الأسرة والأحوال الشخصية",
+      phone: "+971501234567"
     },
     {
       id: 3,
@@ -43,9 +48,23 @@ const FeaturedLawyers = () => {
       verified: true,
       price: "600 ريال/ساعة",
       image: "/placeholder.svg",
-      description: "محامي جنائي بارز مع خبرة واسعة في القضايا المعقدة"
+      description: "محامي جنائي بارز مع خبرة واسعة في القضايا المعقدة",
+      phone: "+201234567890"
     }
   ];
+
+  const handleConsultation = (lawyer: typeof lawyers[0]) => {
+    setSelectedLawyer(lawyer.id);
+    alert(`بدء استشارة فورية مع ${lawyer.name}\nالتخصص: ${lawyer.specialty}\nالسعر: ${lawyer.price}`);
+  };
+
+  const handleCall = (lawyer: typeof lawyers[0]) => {
+    window.open(`tel:${lawyer.phone}`, '_self');
+  };
+
+  const handleViewProfile = (lawyer: typeof lawyers[0]) => {
+    alert(`عرض الملف الشخصي للمحامي ${lawyer.name}\nسيتم إضافة صفحة تفصيلية قريباً`);
+  };
 
   return (
     <section className="py-16 bg-gray-50" id="lawyers">
@@ -63,7 +82,10 @@ const FeaturedLawyers = () => {
           {lawyers.map((lawyer) => (
             <Card 
               key={lawyer.id} 
-              className="hover:shadow-xl transition-all duration-300 bg-white border-0 shadow-lg hover:-translate-y-2"
+              className={`hover:shadow-xl transition-all duration-300 bg-white border-0 shadow-lg hover:-translate-y-2 cursor-pointer ${
+                selectedLawyer === lawyer.id ? 'ring-2 ring-primary' : ''
+              }`}
+              onClick={() => handleViewProfile(lawyer)}
             >
               <CardHeader className="text-center pb-4">
                 <div className="relative mx-auto mb-4">
@@ -97,7 +119,7 @@ const FeaturedLawyers = () => {
                 </div>
               </CardHeader>
               
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between text-sm bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1">
@@ -118,10 +140,20 @@ const FeaturedLawyers = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button className="flex-1 bg-primary hover:bg-primary/90" size="sm">
+                  <Button 
+                    className="flex-1 bg-primary hover:bg-primary/90" 
+                    size="sm"
+                    onClick={() => handleConsultation(lawyer)}
+                  >
+                    <MessageCircle className="h-4 w-4 ml-1" />
                     استشارة فورية
                   </Button>
-                  <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="border-primary text-primary hover:bg-primary hover:text-white"
+                    onClick={() => handleCall(lawyer)}
+                  >
                     <Phone className="h-4 w-4" />
                   </Button>
                 </div>
@@ -131,7 +163,12 @@ const FeaturedLawyers = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary hover:text-white px-8">
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="border-primary text-primary hover:bg-primary hover:text-white px-8"
+            onClick={() => alert('سيتم توجيهك إلى صفحة جميع المحامين قريباً')}
+          >
             عرض جميع المحامين
           </Button>
         </div>
