@@ -11,9 +11,32 @@ import CasesManagement from "@/components/admin/CasesManagement";
 import PaymentsManagement from "@/components/admin/PaymentsManagement";
 import ArticlesManagement from "@/components/admin/ArticlesManagement";
 import SettingsManagement from "@/components/admin/SettingsManagement";
+import AdminLogin from "@/components/admin/AdminLogin";
+import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { Loader2 } from "lucide-react";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const { admin, loading, isAuthenticated } = useAdminAuth();
+
+  // عرض شاشة التحميل
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+            <p>جاري التحقق من الصلاحيات...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // إذا لم يكن المستخدم مصدقاً، عرض صفحة تسجيل الدخول
+  if (!isAuthenticated) {
+    return <AdminLogin />;
+  }
 
   const renderContent = () => {
     switch (activeTab) {
@@ -23,6 +46,7 @@ const AdminDashboard = () => {
             <div>
               <h1 className="text-3xl font-bold text-primary">لوحة تحكم المدير</h1>
               <p className="text-muted-foreground mt-2">إدارة شاملة لمنصة سند للخدمات القانونية</p>
+              <p className="text-sm text-gray-600 mt-1">مرحباً {admin?.name}</p>
             </div>
             <AdminStats />
             <AdminCharts />
