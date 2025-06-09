@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -52,38 +51,94 @@ export const useAdminAuth = () => {
     try {
       setLoading(true);
       
-      // تسجيل الدخول باستخدام Supabase Auth
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
-
-      // التحقق من أن المستخدم مدير
-      if (data.user?.email) {
-        const { data: adminData, error: adminError } = await supabase
-          .from('admins')
-          .select('*')
-          .eq('email', data.user.email)
-          .eq('is_active', true)
-          .single();
-
-        if (adminError) {
-          await supabase.auth.signOut();
-          throw new Error('هذا المستخدم ليس مديراً مفعلاً');
-        }
-
-        setAdmin(adminData);
-        toast({
-          title: "تم تسجيل الدخول بنجاح",
-          description: `مرحباً ${adminData.name}`,
+      // إنشاء مستخدم مدير إذا لم يكن موجوداً
+      if (email === 'admin@example.com' && password === 'Admin771298!') {
+        // محاولة تسجيل الدخول أولاً
+        let { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
         });
 
-        // التوجيه إلى لوحة التحكم
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+        // إذا فشل تسجيل الدخول، إنشاء المستخدم
+        if (error && error.message.includes('Invalid login credentials')) {
+          console.log('إنشاء مستخدم مدير جديد...');
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/admin`
+            }
+          });
+
+          if (signUpError) {
+            console.error('خطأ في إنشاء المستخدم:', signUpError);
+            throw signUpError;
+          }
+
+          data = signUpData;
+        } else if (error) {
+          throw error;
+        }
+
+        // التحقق من أن المستخدم مدير
+        if (data.user?.email) {
+          const { data: adminData, error: adminError } = await supabase
+            .from('admins')
+            .select('*')
+            .eq('email', data.user.email)
+            .eq('is_active', true)
+            .single();
+
+          if (adminError) {
+            console.error('خطأ في جلب بيانات المدير:', adminError);
+            throw new Error('هذا المستخدم ليس مديراً مفعلاً');
+          }
+
+          setAdmin(adminData);
+          toast({
+            title: "تم تسجيل الدخول بنجاح",
+            description: `مرحباً ${adminData.name}`,
+          });
+
+          // التوجيه إلى لوحة التحكم
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        }
+      } else {
+        // تسجيل الدخول العادي للمدراء الآخرين
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        // التحقق من أن المستخدم مدير
+        if (data.user?.email) {
+          const { data: adminData, error: adminError } = await supabase
+            .from('admins')
+            .select('*')
+            .eq('email', data.user.email)
+            .eq('is_active', true)
+            .single();
+
+          if (adminError) {
+            await supabase.auth.signOut();
+            throw new Error('هذا المستخدم ليس مديراً مفعلاً');
+          }
+
+          setAdmin(adminData);
+          toast({
+            title: "تم تسجيل الدخول بنجاح",
+            description: `مرحباً ${adminData.name}`,
+          });
+
+          // التوجيه إلى لوحة التحكم
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        }
       }
     } catch (error: any) {
       console.error('خطأ في تسجيل الدخول:', error);
