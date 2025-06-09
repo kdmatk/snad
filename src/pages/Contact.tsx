@@ -1,4 +1,3 @@
-
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +5,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Phone, Mail, MapPin, Clock, MessageCircle, Send } from "lucide-react";
 import { useState } from "react";
-
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -15,48 +13,43 @@ const Contact = () => {
     subject: "",
     message: ""
   });
-
-  const contactInfo = [
-    {
-      icon: Phone,
-      title: "الهاتف",
-      details: ["+966 11 234 5678", "+971 4 567 8901"],
-      description: "متاح 24/7 للدعم الفوري"
-    },
-    {
-      icon: Mail,
-      title: "البريد الإلكتروني",
-      details: ["info@sanad-legal.com", "support@sanad-legal.com"],
-      description: "نرد خلال 24 ساعة"
-    },
-    {
-      icon: MapPin,
-      title: "المكاتب",
-      details: ["الرياض، السعودية", "دبي، الإمارات"],
-      description: "مكاتب رئيسية في المنطقة"
-    },
-    {
-      icon: Clock,
-      title: "ساعات العمل",
-      details: ["الأحد - الخميس: 8ص - 6م", "الجمعة - السبت: 10ص - 4م"],
-      description: "دعم فني متواصل"
-    }
-  ];
-
+  const contactInfo = [{
+    icon: Phone,
+    title: "الهاتف",
+    details: ["+966 11 234 5678", "+971 4 567 8901"],
+    description: "متاح 24/7 للدعم الفوري"
+  }, {
+    icon: Mail,
+    title: "البريد الإلكتروني",
+    details: ["info@sanad-legal.com", "support@sanad-legal.com"],
+    description: "نرد خلال 24 ساعة"
+  }, {
+    icon: MapPin,
+    title: "المكاتب",
+    details: ["الرياض، السعودية", "دبي، الإمارات"],
+    description: "مكاتب رئيسية في المنطقة"
+  }, {
+    icon: Clock,
+    title: "ساعات العمل",
+    details: ["الأحد - الخميس: 8ص - 6م", "الجمعة - السبت: 10ص - 4م"],
+    description: "دعم فني متواصل"
+  }];
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const {
+      name,
+      value
+    } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Here you would typically send the form data to your backend
     console.log("Form submitted:", formData);
     alert("تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.");
-    
+
     // Reset form
     setFormData({
       name: "",
@@ -66,26 +59,20 @@ const Contact = () => {
       message: ""
     });
   };
-
-  const offices = [
-    {
-      city: "الرياض",
-      country: "السعودية",
-      address: "حي الملك فهد، شارع الملك عبدالعزيز، مبنى سند للخدمات القانونية",
-      phone: "+966 11 234 5678",
-      email: "riyadh@sanad-legal.com"
-    },
-    {
-      city: "دبي", 
-      country: "الإمارات",
-      address: "منطقة دبي المالية العالمية، برج الإمارات، الطابق 25",
-      phone: "+971 4 567 8901",
-      email: "dubai@sanad-legal.com"
-    }
-  ];
-
-  return (
-    <Layout>
+  const offices = [{
+    city: "الرياض",
+    country: "السعودية",
+    address: "حي الملك فهد، شارع الملك عبدالعزيز، مبنى سند للخدمات القانونية",
+    phone: "+966 11 234 5678",
+    email: "riyadh@sanad-legal.com"
+  }, {
+    city: "دبي",
+    country: "الإمارات",
+    address: "منطقة دبي المالية العالمية، برج الإمارات، الطابق 25",
+    phone: "+971 4 567 8901",
+    email: "dubai@sanad-legal.com"
+  }];
+  return <Layout>
       <div className="py-8">
         <div className="container mx-auto px-4">
           {/* Header */}
@@ -111,59 +98,27 @@ const Contact = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium mb-2">الاسم الكامل *</label>
-                        <Input
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          placeholder="أدخل اسمك الكامل"
-                          required
-                        />
+                        <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="أدخل اسمك الكامل" required />
                       </div>
                       <div>
                         <label className="block text-sm font-medium mb-2">رقم الهاتف *</label>
-                        <Input
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          placeholder="أدخل رقم هاتفك"
-                          required
-                        />
+                        <Input name="phone" value={formData.phone} onChange={handleInputChange} placeholder="أدخل رقم هاتفك" required />
                       </div>
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium mb-2">البريد الإلكتروني *</label>
-                      <Input
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="أدخل بريدك الإلكتروني"
-                        required
-                      />
+                      <Input name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="أدخل بريدك الإلكتروني" required />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium mb-2">الموضوع *</label>
-                      <Input
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleInputChange}
-                        placeholder="موضوع الرسالة"
-                        required
-                      />
+                      <Input name="subject" value={formData.subject} onChange={handleInputChange} placeholder="موضوع الرسالة" required />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium mb-2">الرسالة *</label>
-                      <Textarea
-                        name="message"
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        placeholder="اكتب رسالتك هنا..."
-                        rows={6}
-                        required
-                      />
+                      <Textarea name="message" value={formData.message} onChange={handleInputChange} placeholder="اكتب رسالتك هنا..." rows={6} required />
                     </div>
 
                     <Button type="submit" size="lg" className="w-full">
@@ -178,9 +133,8 @@ const Contact = () => {
             {/* Contact Information */}
             <div className="space-y-6">
               {contactInfo.map((info, index) => {
-                const IconComponent = info.icon;
-                return (
-                  <Card key={index} className="hover:shadow-lg transition-shadow">
+              const IconComponent = info.icon;
+              return <Card key={index} className="hover:shadow-lg transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex items-start gap-4">
                         <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -188,16 +142,13 @@ const Contact = () => {
                         </div>
                         <div>
                           <h3 className="font-bold text-lg mb-2">{info.title}</h3>
-                          {info.details.map((detail, idx) => (
-                            <p key={idx} className="text-muted-foreground mb-1">{detail}</p>
-                          ))}
+                          {info.details.map((detail, idx) => <p key={idx} className="text-muted-foreground mb-1">{detail}</p>)}
                           <p className="text-sm text-primary font-medium">{info.description}</p>
                         </div>
                       </div>
                     </CardContent>
-                  </Card>
-                );
-              })}
+                  </Card>;
+            })}
 
               {/* Quick Contact */}
               <Card className="bg-gradient-to-br from-primary to-primary/90 text-white">
@@ -219,8 +170,7 @@ const Contact = () => {
           <div className="mb-12">
             <h2 className="text-3xl font-bold text-center text-primary mb-8">مكاتبنا</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {offices.map((office, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow">
+              {offices.map((office, index) => <Card key={index} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -244,8 +194,7 @@ const Contact = () => {
                       </div>
                     </div>
                   </CardContent>
-                </Card>
-              ))}
+                </Card>)}
             </div>
           </div>
 
@@ -256,25 +205,25 @@ const Contact = () => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="font-bold mb-2">كم المدة المتوقعة للرد؟</h3>
+                <h3 className="font-bold mb-2 text-blue-600">كم المدة المتوقعة للرد؟</h3>
                 <p className="text-muted-foreground text-sm">
                   نرد على جميع الاستفسارات خلال 24 ساعة في أيام العمل، وخلال 48 ساعة في العطل.
                 </p>
               </div>
               <div>
-                <h3 className="font-bold mb-2">هل يمكنني طلب استشارة عاجلة؟</h3>
+                <h3 className="font-bold mb-2 text-blue-600">هل يمكنني طلب استشارة عاجلة؟</h3>
                 <p className="text-muted-foreground text-sm">
                   نعم، نوفر خدمة الاستشارات العاجلة على مدار الساعة للحالات الطارئة.
                 </p>
               </div>
               <div>
-                <h3 className="font-bold mb-2">ما هي طرق الدفع المتاحة؟</h3>
+                <h3 className="font-bold mb-2 text-blue-600">ما هي طرق الدفع المتاحة؟</h3>
                 <p className="text-muted-foreground text-sm">
                   نقبل جميع طرق الدفع الإلكترونية والتحويلات البنكية في جميع البلدان العربية.
                 </p>
               </div>
               <div>
-                <h3 className="font-bold mb-2">هل المعلومات آمنة؟</h3>
+                <h3 className="font-bold mb-2 text-blue-600">هل المعلومات آمنة؟</h3>
                 <p className="text-muted-foreground text-sm">
                   نعم، جميع المعلومات محمية بأعلى معايير الأمان والسرية القانونية.
                 </p>
@@ -283,8 +232,6 @@ const Contact = () => {
           </div>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default Contact;
