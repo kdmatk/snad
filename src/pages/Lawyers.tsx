@@ -133,8 +133,8 @@ const Lawyers = () => {
   const filteredLawyers = lawyers.filter(lawyer => {
     const matchesSearch = lawyer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          lawyer.specialty.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCity = !selectedCity || lawyer.location === selectedCity;
-    const matchesSpecialty = !selectedSpecialty || lawyer.specialty === selectedSpecialty;
+    const matchesCity = !selectedCity || selectedCity === "all" || lawyer.location === selectedCity;
+    const matchesSpecialty = !selectedSpecialty || selectedSpecialty === "all" || lawyer.specialty === selectedSpecialty;
     
     return matchesSearch && matchesCity && matchesSpecialty;
   });
@@ -180,7 +180,7 @@ const Lawyers = () => {
                   <SelectValue placeholder="التخصص" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">جميع التخصصات</SelectItem>
+                  <SelectItem value="all">جميع التخصصات</SelectItem>
                   {specialties.map((specialty) => (
                     <SelectItem key={specialty} value={specialty}>
                       {specialty}
@@ -193,7 +193,7 @@ const Lawyers = () => {
                   <SelectValue placeholder="المدينة" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">جميع المدن</SelectItem>
+                  <SelectItem value="all">جميع المدن</SelectItem>
                   {cities.map((city) => (
                     <SelectItem key={city} value={city}>
                       {city}
