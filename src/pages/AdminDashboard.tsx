@@ -1,9 +1,9 @@
 
+import { useState } from 'react';
 import Layout from "@/components/Layout";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminStats from "@/components/admin/AdminStats";
 import AdminCharts from "@/components/admin/AdminCharts";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LawyersManagement from "@/components/admin/LawyersManagement";
 import ClientsManagement from "@/components/admin/ClientsManagement";
 import ServicesManagement from "@/components/admin/ServicesManagement";
@@ -13,66 +13,54 @@ import ArticlesManagement from "@/components/admin/ArticlesManagement";
 import SettingsManagement from "@/components/admin/SettingsManagement";
 
 const AdminDashboard = () => {
+  const [activeTab, setActiveTab] = useState("overview");
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "overview":
+        return (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold text-primary">لوحة تحكم المدير</h1>
+              <p className="text-muted-foreground mt-2">إدارة شاملة لمنصة سند للخدمات القانونية</p>
+            </div>
+            <AdminStats />
+            <AdminCharts />
+          </div>
+        );
+      case "lawyers":
+        return <LawyersManagement />;
+      case "clients":
+        return <ClientsManagement />;
+      case "services":
+        return <ServicesManagement />;
+      case "cases":
+        return <CasesManagement />;
+      case "payments":
+        return <PaymentsManagement />;
+      case "articles":
+        return <ArticlesManagement />;
+      case "settings":
+        return <SettingsManagement />;
+      default:
+        return (
+          <div className="space-y-6">
+            <AdminStats />
+            <AdminCharts />
+          </div>
+        );
+    }
+  };
+
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50">
-        <div className="flex">
-          {/* الشريط الجانبي */}
-          <AdminSidebar />
+      <div className="min-h-screen bg-gray-50 w-full">
+        <div className="flex w-full">
+          <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
           
-          {/* المحتوى الرئيسي */}
-          <div className="flex-1 p-8">
+          <div className="flex-1 p-4 md:p-8 overflow-x-auto">
             <div className="max-w-7xl mx-auto">
-              <div className="mb-8">
-                <h1 className="text-3xl font-bold text-primary">لوحة تحكم المدير</h1>
-                <p className="text-muted-foreground mt-2">إدارة شاملة لمنصة سند للخدمات القانونية</p>
-              </div>
-
-              <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-8 mb-8">
-                  <TabsTrigger value="overview">الرئيسية</TabsTrigger>
-                  <TabsTrigger value="lawyers">المحامون</TabsTrigger>
-                  <TabsTrigger value="clients">العملاء</TabsTrigger>
-                  <TabsTrigger value="services">الخدمات</TabsTrigger>
-                  <TabsTrigger value="cases">القضايا</TabsTrigger>
-                  <TabsTrigger value="payments">المدفوعات</TabsTrigger>
-                  <TabsTrigger value="articles">المقالات</TabsTrigger>
-                  <TabsTrigger value="settings">الإعدادات</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="overview" className="space-y-6">
-                  <AdminStats />
-                  <AdminCharts />
-                </TabsContent>
-
-                <TabsContent value="lawyers">
-                  <LawyersManagement />
-                </TabsContent>
-
-                <TabsContent value="clients">
-                  <ClientsManagement />
-                </TabsContent>
-
-                <TabsContent value="services">
-                  <ServicesManagement />
-                </TabsContent>
-
-                <TabsContent value="cases">
-                  <CasesManagement />
-                </TabsContent>
-
-                <TabsContent value="payments">
-                  <PaymentsManagement />
-                </TabsContent>
-
-                <TabsContent value="articles">
-                  <ArticlesManagement />
-                </TabsContent>
-
-                <TabsContent value="settings">
-                  <SettingsManagement />
-                </TabsContent>
-              </Tabs>
+              {renderContent()}
             </div>
           </div>
         </div>
