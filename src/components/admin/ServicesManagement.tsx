@@ -1,69 +1,49 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { 
-  Search, 
-  Plus, 
-  Eye, 
-  Edit, 
-  Trash2,
-  Clock,
-  DollarSign,
-  ToggleLeft,
-  ToggleRight
-} from "lucide-react";
-
+import { Search, Plus, Eye, Edit, Trash2, Clock, DollarSign, ToggleLeft, ToggleRight } from "lucide-react";
 const ServicesManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
-
-  const services = [
-    {
-      id: 1,
-      name: "استشارة قانونية عامة",
-      category: "عام",
-      price: 100,
-      duration: 30,
-      isActive: true,
-      bookings: 145
-    },
-    {
-      id: 2,
-      name: "استشارة قانون الأسرة",
-      category: "أسرة",
-      price: 150,
-      duration: 45,
-      isActive: true,
-      bookings: 89
-    },
-    {
-      id: 3,
-      name: "استشارة قانون تجاري",
-      category: "تجاري",
-      price: 200,
-      duration: 60,
-      isActive: true,
-      bookings: 67
-    },
-    {
-      id: 4,
-      name: "استشارة قانون عمل",
-      category: "عمل",
-      price: 120,
-      duration: 30,
-      isActive: false,
-      bookings: 23
-    }
-  ];
-
-  return (
-    <div className="space-y-6">
+  const services = [{
+    id: 1,
+    name: "استشارة قانونية عامة",
+    category: "عام",
+    price: 100,
+    duration: 30,
+    isActive: true,
+    bookings: 145
+  }, {
+    id: 2,
+    name: "استشارة قانون الأسرة",
+    category: "أسرة",
+    price: 150,
+    duration: 45,
+    isActive: true,
+    bookings: 89
+  }, {
+    id: 3,
+    name: "استشارة قانون تجاري",
+    category: "تجاري",
+    price: 200,
+    duration: 60,
+    isActive: true,
+    bookings: 67
+  }, {
+    id: 4,
+    name: "استشارة قانون عمل",
+    category: "عمل",
+    price: 120,
+    duration: 30,
+    isActive: false,
+    bookings: 23
+  }];
+  return <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">إدارة الخدمات</h2>
+          <h2 className="text-2xl font-bold text-slate-600">إدارة الخدمات</h2>
           <p className="text-muted-foreground">إدارة الخدمات القانونية المتاحة في المنصة</p>
         </div>
         <Button>
@@ -77,12 +57,7 @@ const ServicesManagement = () => {
         <CardContent className="p-6">
           <div className="relative">
             <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="البحث في الخدمات..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pr-10"
-            />
+            <Input placeholder="البحث في الخدمات..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pr-10" />
           </div>
         </CardContent>
       </Card>
@@ -136,8 +111,7 @@ const ServicesManagement = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {services.map((service) => (
-                <TableRow key={service.id}>
+              {services.map(service => <TableRow key={service.id}>
                   <TableCell>
                     <div className="font-medium">{service.name}</div>
                   </TableCell>
@@ -161,17 +135,13 @@ const ServicesManagement = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      {service.isActive ? (
-                        <>
+                      {service.isActive ? <>
                           <ToggleRight className="h-5 w-5 text-green-600" />
                           <Badge className="bg-green-100 text-green-800">نشطة</Badge>
-                        </>
-                      ) : (
-                        <>
+                        </> : <>
                           <ToggleLeft className="h-5 w-5 text-gray-400" />
                           <Badge variant="secondary">معطلة</Badge>
-                        </>
-                      )}
+                        </>}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -187,14 +157,11 @@ const ServicesManagement = () => {
                       </Button>
                     </div>
                   </TableCell>
-                </TableRow>
-              ))}
+                </TableRow>)}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };
-
 export default ServicesManagement;
