@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,11 +20,12 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface VoiceSession {
+// واجهة محلية للجلسات الصوتية مع session_status كـ string عام
+interface VoiceSessionData {
   id: string;
   client_id: string;
   lawyer_id: string;
-  session_status: 'scheduled' | 'active' | 'ended' | 'cancelled';
+  session_status: string; // string عام للتوافق مع قاعدة البيانات
   duration_minutes: number;
   start_time?: string;
   end_time?: string;
@@ -40,9 +40,9 @@ interface VoiceSessionManagerProps {
 }
 
 const VoiceSessionManager = ({ lawyerId, userType }: VoiceSessionManagerProps) => {
-  const [sessions, setSessions] = useState<VoiceSession[]>([]);
+  const [sessions, setSessions] = useState<VoiceSessionData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSession, setSelectedSession] = useState<VoiceSession | null>(null);
+  const [selectedSession, setSelectedSession] = useState<VoiceSessionData | null>(null);
   const [reportReason, setReportReason] = useState('');
   const [reportDescription, setReportDescription] = useState('');
   const [showReportForm, setShowReportForm] = useState(false);
@@ -62,7 +62,13 @@ const VoiceSessionManager = ({ lawyerId, userType }: VoiceSessionManagerProps) =
 
       if (error) throw error;
 
-      setSessions(data || []);
+      // تحويل البيانات للواجهة المحلية
+      const typedSessions: VoiceSessionData[] = (data || []).map(session => ({
+        ...session,
+        session_status: session.session_status as string
+      }));
+
+      setSessions(typedSessions);
     } catch (error) {
       console.error('Error fetching voice sessions:', error);
       toast({

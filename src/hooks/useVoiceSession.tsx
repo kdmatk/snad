@@ -8,7 +8,7 @@ export interface VoiceSession {
   client_id: string;
   lawyer_id: string;
   consultation_id?: string;
-  session_status: 'scheduled' | 'active' | 'ended' | 'cancelled';
+  session_status: string; // تغيير هذا إلى string عام بدلاً من القيم المحددة
   duration_minutes: number;
   start_time?: string;
   end_time?: string;
@@ -16,6 +16,8 @@ export interface VoiceSession {
   room_id: string;
   is_encrypted: boolean;
   recording_consent: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const useVoiceSession = () => {
@@ -54,7 +56,7 @@ export const useVoiceSession = () => {
 
       if (error) throw error;
 
-      setSession(data);
+      setSession(data as VoiceSession);
       setRemainingTime(durationMinutes * 60);
       
       toast({
