@@ -4,13 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -24,12 +28,62 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically authenticate with your backend
-    console.log("Login attempt:", formData);
-    alert("تم تسجيل الدخول بنجاح!");
-    navigate('/client-dashboard');
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        toast({
+          title: "تم تسجيل الدخول بنجاح",
+          description: "مرحباً بك في منصة سند القانونية",
+        });
+
+        // التحقق من نوع المستخدم وإعادة التوجيه المناسبة
+        const { data: profile } = await supabase
+          .from('clients')
+          .select('id')
+          .eq('id', data.user.id)
+          .single();
+
+        if (profile) {
+          navigate('/client-dashboard');
+        } else {
+          // التحقق من كونه محامي
+          const { data: lawyer } = await supabase
+            .from('lawyers')
+            .select('id')
+            .eq('id', data.user.id)
+            .single();
+
+          if (lawyer) {
+            navigate('/lawyer-dashboard');
+          } else {
+            navigate('/client-dashboard');
+          }
+        }
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast({
+        title: "خطأ في تسجيل الدخول",
+        description: error.message === 'Invalid login credentials' 
+          ? "بيانات الدخول غير صحيحة" 
+          : "حدث خطأ أثناء تسجيل الدخول",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,6 +114,7 @@ const Login = () => {
                         placeholder="أدخل بريدك الإلكتروني"
                         className="pr-10"
                         required
+                        disabled={loading}
                       />
                     </div>
                   </div>
@@ -76,11 +131,13 @@ const Login = () => {
                         placeholder="أدخل كلمة المرور"
                         className="pr-10 pl-10"
                         required
+                        disabled={loading}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        disabled={loading}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -89,7 +146,7 @@ const Login = () => {
 
                   <div className="flex items-center justify-between text-sm">
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
+                      <input type="checkbox" className="rounded" disabled={loading} />
                       <span>تذكرني</span>
                     </label>
                     <Link to="/forgot-password" className="text-primary hover:underline">
@@ -97,26 +154,26 @@ const Login = () => {
                     </Link>
                   </div>
 
-                  <Button type="submit" size="lg" className="w-full">
-                    تسجيل الدخول
+                  <Button type="submit" size="lg" className="w-full" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        جاري تسجيل الدخول...
+                      </>
+                    ) : (
+                      "تسجيل الدخول"
+                    )}
                   </Button>
                 </form>
 
                 <Separator />
 
                 <div className="text-center">
-                  <p className="text-muted-foreground mb-4">أو سجل الدخول باستخدام</p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Button variant="outline" size="lg">
-                      Google
-                    </Button>
-                    <Button variant="outline" size="lg">
-                      Apple
-                    </Button>
+                  <p className="text-muted-foreground mb-4">للاختبار السريع:</p>
+                  <div className="text-xs text-muted-foreground bg-gray-50 p-3 rounded">
+                    <p>مدير: admin@example.com / Admin771298!</p>
                   </div>
                 </div>
-
-                <Separator />
 
                 <div className="text-center space-y-4">
                   <p className="text-muted-foreground">
@@ -130,6 +187,13 @@ const Login = () => {
                     هل أنت محامي؟{" "}
                     <Link to="/lawyer-register" className="text-secondary hover:underline font-medium">
                       انضم كمحامي
+                    </Link>
+                  </p>
+
+                  <p className="text-muted-foreground">
+                    دخول المدير:{" "}
+                    <Link to="/admin" className="text-secondary hover:underline font-medium">
+                      لوحة التحكم
                     </Link>
                   </p>
                 </div>

@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ErrorBoundary from "./components/ErrorBoundary";
 import Index from "./pages/Index";
 import Lawyers from "./pages/Lawyers";
 import LawyerProfile from "./pages/LawyerProfile";
@@ -29,43 +30,52 @@ import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/lawyers" element={<Lawyers />} />
-          <Route path="/lawyer/:id" element={<LawyerProfile />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/quick-services" element={<QuickServices />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/client-dashboard" element={<ClientDashboard />} />
-          <Route path="/lawyer-dashboard" element={<LawyerDashboard />} />
-          <Route path="/lawyer-register" element={<LawyerRegister />} />
-          <Route path="/request-service" element={<RequestService />} />
-          <Route path="/instant-consultation" element={<InstantConsultation />} />
-          <Route path="/voice-call" element={<VoiceCall />} />
-          <Route path="/legal-auctions" element={<LegalAuctions />} />
-          <Route path="/legal-library" element={<LegalLibrary />} />
-          <Route path="/articles" element={<Articles />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/lawyers" element={<Lawyers />} />
+            <Route path="/lawyer/:id" element={<LawyerProfile />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/quick-services" element={<QuickServices />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/client-dashboard" element={<ClientDashboard />} />
+            <Route path="/lawyer-dashboard" element={<LawyerDashboard />} />
+            <Route path="/lawyer-register" element={<LawyerRegister />} />
+            <Route path="/request-service" element={<RequestService />} />
+            <Route path="/instant-consultation" element={<InstantConsultation />} />
+            <Route path="/voice-call" element={<VoiceCall />} />
+            <Route path="/legal-auctions" element={<LegalAuctions />} />
+            <Route path="/legal-library" element={<LegalLibrary />} />
+            <Route path="/articles" element={<Articles />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

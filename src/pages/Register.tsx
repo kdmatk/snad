@@ -5,14 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Mail, Lock, Phone, MapPin, Eye, EyeOff } from "lucide-react";
+import { User, Mail, Lock, Phone, MapPin, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -27,7 +31,7 @@ const Register = () => {
 
   const countries = [
     "السعودية",
-    "الإمارات",
+    "الإمارات", 
     "مصر",
     "الكويت",
     "البحرين",
@@ -54,23 +58,84 @@ const Register = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      alert("كلمات المرور غير متطابقة");
+      toast({
+        title: "خطأ",
+        description: "كلمات المرور غير متطابقة",
+        variant: "destructive",
+      });
       return;
     }
 
     if (!formData.agreeToTerms) {
-      alert("يرجى الموافقة على الشروط والأحكام");
+      toast({
+        title: "خطأ", 
+        description: "يرجى الموافقة على الشروط والأحكام",
+        variant: "destructive",
+      });
       return;
     }
 
-    // Here you would typically register with your backend
-    console.log("Registration data:", formData);
-    alert("تم إنشاء الحساب بنجاح! مرحباً بك في منصة سند");
-    navigate('/client-dashboard');
+    setLoading(true);
+
+    try {
+      // تسجيل المستخدم في Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phone,
+            country: formData.country,
+            city: formData.city
+          }
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        // إنشاء ملف العميل في جدول العملاء
+        const { error: profileError } = await supabase
+          .from('clients')
+          .insert({
+            id: data.user.id,
+            name: `${formData.firstName} ${formData.lastName}`,
+            email: formData.email,
+            phone: formData.phone,
+            country: formData.country,
+            city: formData.city
+          });
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+          // المتابعة حتى لو فشل إنشاء الملف الشخصي
+        }
+
+        toast({
+          title: "تم إنشاء الحساب بنجاح!",
+          description: "مرحباً بك في منصة سند القانونية",
+        });
+
+        navigate('/client-dashboard');
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      toast({
+        title: "خطأ في التسجيل",
+        description: error.message || "فشل في إنشاء الحساب",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -102,6 +167,7 @@ const Register = () => {
                           placeholder="الاسم الأول"
                           className="pr-10"
                           required
+                          disabled={loading}
                         />
                       </div>
                     </div>
@@ -113,6 +179,7 @@ const Register = () => {
                         onChange={handleInputChange}
                         placeholder="الاسم الأخير"
                         required
+                        disabled={loading}
                       />
                     </div>
                   </div>
@@ -131,6 +198,7 @@ const Register = () => {
                           placeholder="البريد الإلكتروني"
                           className="pr-10"
                           required
+                          disabled={loading}
                         />
                       </div>
                     </div>
@@ -145,6 +213,7 @@ const Register = () => {
                           placeholder="رقم الهاتف"
                           className="pr-10"
                           required
+                          disabled={loading}
                         />
                       </div>
                     </div>
@@ -154,7 +223,11 @@ const Register = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-2">البلد *</label>
-                      <Select value={formData.country} onValueChange={(value) => handleSelectChange('country', value)}>
+                      <Select 
+                        value={formData.country} 
+                        onValueChange={(value) => handleSelectChange('country', value)}
+                        disabled={loading}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="اختر البلد" />
                         </SelectTrigger>
@@ -178,6 +251,7 @@ const Register = () => {
                           placeholder="المدينة"
                           className="pr-10"
                           required
+                          disabled={loading}
                         />
                       </div>
                     </div>
@@ -197,11 +271,13 @@ const Register = () => {
                           placeholder="كلمة المرور"
                           className="pr-10 pl-10"
                           required
+                          disabled={loading}
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          disabled={loading}
                         >
                           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
@@ -219,11 +295,13 @@ const Register = () => {
                           placeholder="تأكيد كلمة المرور"
                           className="pr-10 pl-10"
                           required
+                          disabled={loading}
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          disabled={loading}
                         >
                           {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
@@ -240,6 +318,7 @@ const Register = () => {
                       onChange={handleInputChange}
                       className="rounded mt-1"
                       required
+                      disabled={loading}
                     />
                     <label className="text-sm text-muted-foreground">
                       أوافق على{" "}
@@ -253,24 +332,17 @@ const Register = () => {
                     </label>
                   </div>
 
-                  <Button type="submit" size="lg" className="w-full">
-                    إنشاء الحساب
+                  <Button type="submit" size="lg" className="w-full" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        جاري إنشاء الحساب...
+                      </>
+                    ) : (
+                      "إنشاء الحساب"
+                    )}
                   </Button>
                 </form>
-
-                <Separator />
-
-                <div className="text-center">
-                  <p className="text-muted-foreground mb-4">أو سجل باستخدام</p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Button variant="outline" size="lg">
-                      Google
-                    </Button>
-                    <Button variant="outline" size="lg">
-                      Apple
-                    </Button>
-                  </div>
-                </div>
 
                 <Separator />
 
