@@ -3,8 +3,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DollarSign, Users, Calendar, Star, TrendingUp, MessageCircle, FileText, Settings } from "lucide-react";
+import { DollarSign, Users, Calendar, Star, TrendingUp, MessageCircle, FileText, Settings, User, Phone, Mail, MapPin, Loader2, Briefcase } from "lucide-react";
+import { useUserProfile } from "@/hooks/useUserProfile";
+
 const LawyerDashboard = () => {
+  const { profile, loading } = useUserProfile();
+  
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </Layout>
+    );
+  }
+  
   const stats = [{
     title: "الإيرادات الشهرية",
     value: "12,500 ريال",
@@ -26,6 +40,7 @@ const LawyerDashboard = () => {
     icon: Star,
     change: "+0.2"
   }];
+  
   const recentRequests = [{
     id: 1,
     title: "استشارة حول قانون الشركات",
@@ -43,6 +58,7 @@ const LawyerDashboard = () => {
     status: "قيد المراجعة",
     date: "أمس"
   }];
+  
   const upcomingAppointments = [{
     id: 1,
     title: "استشارة قانونية",
@@ -58,13 +74,15 @@ const LawyerDashboard = () => {
     date: "غداً",
     type: "حضوري"
   }];
-  return <Layout>
+  
+  return (
+    <Layout>
       <div className="py-8">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold text-primary">لوحة تحكم المحامي</h1>
-              <p className="text-muted-foreground">مرحباً د. أحمد العلي</p>
+              <p className="text-muted-foreground">مرحباً {profile?.full_name || 'محامي'}</p>
             </div>
             <Button>
               <Settings className="h-4 w-4 ml-2" />
@@ -75,8 +93,9 @@ const LawyerDashboard = () => {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             {stats.map((stat, index) => {
-            const IconComponent = stat.icon;
-            return <Card key={index}>
+              const IconComponent = stat.icon;
+              return (
+                <Card key={index}>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -90,8 +109,9 @@ const LawyerDashboard = () => {
                       <IconComponent className="h-8 w-8 text-primary" />
                     </div>
                   </CardContent>
-                </Card>;
-          })}
+                </Card>
+              );
+            })}
           </div>
 
           <Tabs defaultValue="requests" className="w-full">
@@ -208,27 +228,120 @@ const LawyerDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">الاسم</label>
-                        <p className="text-muted-foreground">د. أحمد محمد العلي</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">التخصص</label>
-                        <p className="text-muted-foreground">القانون التجاري</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">البريد الإلكتروني</label>
-                        <p className="text-muted-foreground">ahmed.ali@example.com</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">رقم الهاتف</label>
-                        <p className="text-muted-foreground">+966501234567</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <Button>تعديل المعلومات</Button>
-                      <Button variant="outline">تغيير كلمة المرور</Button>
+                    {/* Profile Card */}
+                    <Card className="bg-gradient-to-br from-secondary/5 to-primary/5 border-2">
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-6">
+                          <div className="w-24 h-24 bg-secondary/10 rounded-full flex items-center justify-center flex-shrink-0 border-4 border-white shadow-lg">
+                            {profile?.avatar_url ? (
+                              <img 
+                                src={profile.avatar_url} 
+                                alt={profile.full_name}
+                                className="w-full h-full rounded-full object-cover"
+                              />
+                            ) : (
+                              <Briefcase className="h-12 w-12 text-secondary" />
+                            )}
+                          </div>
+                          <div className="flex-1 space-y-4">
+                            <div>
+                              <h3 className="text-2xl font-bold text-secondary mb-1">
+                                {profile?.full_name || 'غير محدد'}
+                              </h3>
+                              <Badge variant="secondary" className="mb-2">محامي معتمد</Badge>
+                            </div>
+                            
+                            {profile?.bio && (
+                              <p className="text-muted-foreground bg-white/50 p-3 rounded-lg">
+                                {profile.bio}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Contact Information */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">معلومات الاتصال</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+                            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                              <Mail className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-muted-foreground mb-1">البريد الإلكتروني</label>
+                              <p className="font-medium text-sm break-all">{profile?.user_id || 'غير محدد'}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+                            <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center">
+                              <Phone className="h-5 w-5 text-secondary" />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-muted-foreground mb-1">رقم الهاتف</label>
+                              <p className="font-medium">{profile?.phone || 'غير محدد'}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+                            <div className="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center">
+                              <MapPin className="h-5 w-5 text-green-600" />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-muted-foreground mb-1">المدينة</label>
+                              <p className="font-medium">{profile?.city || 'غير محدد'}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+                            <div className="w-10 h-10 bg-blue-500/10 rounded-full flex items-center justify-center">
+                              <User className="h-5 w-5 text-blue-600" />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-muted-foreground mb-1">نوع الحساب</label>
+                              <p className="font-medium">
+                                <Badge variant="outline">{profile?.user_type === 'lawyer' ? 'محامي' : 'عميل'}</Badge>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Professional Stats */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">الإحصائيات المهنية</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="text-center p-4 bg-primary/5 rounded-lg">
+                            <Users className="h-8 w-8 text-primary mx-auto mb-2" />
+                            <div className="text-2xl font-bold">48</div>
+                            <div className="text-sm text-muted-foreground">عدد العملاء</div>
+                          </div>
+                          <div className="text-center p-4 bg-secondary/5 rounded-lg">
+                            <MessageCircle className="h-8 w-8 text-secondary mx-auto mb-2" />
+                            <div className="text-2xl font-bold">156</div>
+                            <div className="text-sm text-muted-foreground">الاستشارات</div>
+                          </div>
+                          <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                            <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+                            <div className="text-2xl font-bold">4.9</div>
+                            <div className="text-sm text-muted-foreground">التقييم</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <div className="flex gap-3">
+                      <Button className="flex-1">تعديل المعلومات</Button>
+                      <Button variant="outline" className="flex-1">تغيير كلمة المرور</Button>
                     </div>
                   </div>
                 </CardContent>
@@ -237,6 +350,8 @@ const LawyerDashboard = () => {
           </Tabs>
         </div>
       </div>
-    </Layout>;
+    </Layout>
+  );
 };
+
 export default LawyerDashboard;

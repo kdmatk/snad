@@ -1,16 +1,19 @@
-
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Calendar, MessageCircle, Star, Clock, User, Phone, Plus, Loader2 } from "lucide-react";
+import { FileText, Calendar, MessageCircle, Star, Clock, User, Phone, Plus, Loader2, Mail, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useClientData } from "@/hooks/useClientData";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
-  const { profile, requests, consultations, loading } = useClientData();
+  const { requests, consultations, loading: dataLoading } = useClientData();
+  const { profile, loading: profileLoading } = useUserProfile();
+
+  const loading = dataLoading || profileLoading;
 
   if (loading) {
     return (
@@ -73,8 +76,8 @@ const ClientDashboard = () => {
             <Card>
               <CardContent className="p-6 text-center">
                 <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                <div className="text-2xl font-bold">{profile?.total_spent || 0}</div>
-                <div className="text-sm text-muted-foreground">إجمالي الإنفاق (ريال)</div>
+                <div className="text-2xl font-bold">{consultations.filter(c => c.rating).length}</div>
+                <div className="text-sm text-muted-foreground">تقييمات مكتملة</div>
               </CardContent>
             </Card>
           </div>
@@ -207,29 +210,125 @@ const ClientDashboard = () => {
                   <CardTitle>الملف الشخصي</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                        <User className="h-8 w-8 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold">{profile?.name || 'غير محدد'}</h3>
-                        <p className="text-muted-foreground">
-                          عميل منذ {profile?.created_at ? new Date(profile.created_at).toLocaleDateString('ar-SA') : 'غير محدد'}
-                        </p>
-                      </div>
+                  <div className="space-y-6">
+                    {/* Profile Card */}
+                    <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-2">
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-6">
+                          <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 border-4 border-white shadow-lg">
+                            {profile?.avatar_url ? (
+                              <img 
+                                src={profile.avatar_url} 
+                                alt={profile.full_name}
+                                className="w-full h-full rounded-full object-cover"
+                              />
+                            ) : (
+                              <User className="h-12 w-12 text-primary" />
+                            )}
+                          </div>
+                          <div className="flex-1 space-y-4">
+                            <div>
+                              <h3 className="text-2xl font-bold text-primary mb-1">
+                                {profile?.full_name || 'غير محدد'}
+                              </h3>
+                              <p className="text-muted-foreground flex items-center gap-2">
+                                <Clock className="h-4 w-4" />
+                                عميل منذ {profile?.created_at ? new Date(profile.created_at).toLocaleDateString('ar-SA', { year: 'numeric', month: 'long' }) : 'غير محدد'}
+                              </p>
+                            </div>
+                            
+                            {profile?.bio && (
+                              <p className="text-muted-foreground bg-white/50 p-3 rounded-lg">
+                                {profile.bio}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Contact Information */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">معلومات الاتصال</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+                            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                              <Mail className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-muted-foreground mb-1">البريد الإلكتروني</label>
+                              <p className="font-medium">{profile?.user_id || 'غير محدد'}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+                            <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center">
+                              <Phone className="h-5 w-5 text-secondary" />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-muted-foreground mb-1">رقم الهاتف</label>
+                              <p className="font-medium">{profile?.phone || 'غير محدد'}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+                            <div className="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center">
+                              <MapPin className="h-5 w-5 text-green-600" />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-muted-foreground mb-1">المدينة</label>
+                              <p className="font-medium">{profile?.city || 'غير محدد'}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+                            <div className="w-10 h-10 bg-blue-500/10 rounded-full flex items-center justify-center">
+                              <User className="h-5 w-5 text-blue-600" />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-muted-foreground mb-1">نوع الحساب</label>
+                              <p className="font-medium">
+                                <Badge variant="outline">{profile?.user_type === 'client' ? 'عميل' : 'محامي'}</Badge>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Statistics */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">الإحصائيات</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="text-center p-4 bg-primary/5 rounded-lg">
+                            <FileText className="h-8 w-8 text-primary mx-auto mb-2" />
+                            <div className="text-2xl font-bold">{requests.length}</div>
+                            <div className="text-sm text-muted-foreground">إجمالي الطلبات</div>
+                          </div>
+                          <div className="text-center p-4 bg-secondary/5 rounded-lg">
+                            <MessageCircle className="h-8 w-8 text-secondary mx-auto mb-2" />
+                            <div className="text-2xl font-bold">{consultations.length}</div>
+                            <div className="text-sm text-muted-foreground">الاستشارات</div>
+                          </div>
+                          <div className="text-center p-4 bg-green-50 rounded-lg">
+                            <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+                            <div className="text-2xl font-bold">{consultations.filter(c => c.status === 'completed').length}</div>
+                            <div className="text-sm text-muted-foreground">مكتملة</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <div className="flex gap-3">
+                      <Button className="flex-1">تعديل الملف الشخصي</Button>
+                      <Button variant="outline" className="flex-1">تغيير كلمة المرور</Button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">البريد الإلكتروني</label>
-                        <p className="text-muted-foreground">{profile?.email || 'غير محدد'}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">رقم الهاتف</label>
-                        <p className="text-muted-foreground">{profile?.phone || 'غير محدد'}</p>
-                      </div>
-                    </div>
-                    <Button variant="outline">تعديل الملف الشخصي</Button>
                   </div>
                 </CardContent>
               </Card>

@@ -61,6 +61,19 @@ const Demo = () => {
           duration: 2000,
         });
 
+        // تحديد البيانات الوهمية حسب نوع الحساب
+        const demoData = accountType === 'client' ? {
+          full_name: 'أحمد محمد العميل',
+          phone: '+966501234567',
+          city: 'الرياض',
+          bio: 'عميل تجريبي يبحث عن خدمات قانونية متميزة'
+        } : {
+          full_name: 'د. محمد العلي المحامي',
+          phone: '+966509876543',
+          city: 'جدة',
+          bio: 'محامي معتمد متخصص في القانون التجاري والشركات'
+        };
+
         // Create the demo account with auto-confirm
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
@@ -68,8 +81,11 @@ const Demo = () => {
           options: {
             emailRedirectTo: `${window.location.origin}/`,
             data: {
-              full_name: accountType === 'client' ? 'عميل تجريبي' : 'محامي تجريبي',
-              user_type: accountType
+              full_name: demoData.full_name,
+              user_type: accountType,
+              phone: demoData.phone,
+              city: demoData.city,
+              bio: demoData.bio
             }
           }
         });

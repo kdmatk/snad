@@ -1,10 +1,53 @@
 import { Button } from "@/components/ui/button";
-import { Bell, Menu, X, Scale, ChevronDown, Settings } from "lucide-react";
-import { useState } from "react";
+import { Bell, Menu, X, Scale, ChevronDown, Settings, LogOut, User } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // التحقق من حالة المستخدم الحالية
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      }
+    });
+
+    // الاستماع لتغييرات حالة المصادقة
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      } else {
+        setUserProfile(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchUserProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    
+    if (data) {
+      setUserProfile(data);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+  };
   const navigationItems = [{
     label: "الرئيسية",
     href: "/"
@@ -88,16 +131,46 @@ const Header = () => {
             
             {/* Enhanced Action Buttons */}
             <div className="hidden md:flex items-center gap-3">
-              <Button variant="outline" onClick={() => navigate('/login')} className="border-2 border-white/40 hover:bg-white font-medium px-6 py-2.5 backdrop-blur-sm transition-all duration-300 hover:scale-105 rounded-xl shadow-lg hover:shadow-xl hover:border-white/80 text-slate-700">
-                تسجيل الدخول
-              </Button>
-              
-              <Button className="bg-gradient-to-l from-secondary via-yellow-400 to-secondary/90 text-white hover:from-secondary/90 hover:via-yellow-300 hover:to-secondary/80 font-medium px-6 py-2.5 shadow-xl border-2 border-white/30 transition-all duration-300 hover:scale-105 hover:shadow-2xl rounded-xl relative overflow-hidden group" onClick={() => navigate('/lawyer-register')}>
-                <span className="relative z-10">انضم كمحامي</span>
-                
-                {/* Animated background */}
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-300/30 to-secondary/30 translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
-              </Button>
+              {!user ? (
+                <>
+                  <Button variant="outline" onClick={() => navigate('/login')} className="border-2 border-white/40 hover:bg-white font-medium px-6 py-2.5 backdrop-blur-sm transition-all duration-300 hover:scale-105 rounded-xl shadow-lg hover:shadow-xl hover:border-white/80 text-slate-700">
+                    تسجيل الدخول
+                  </Button>
+                  
+                  <Button className="bg-gradient-to-l from-secondary via-yellow-400 to-secondary/90 text-white hover:from-secondary/90 hover:via-yellow-300 hover:to-secondary/80 font-medium px-6 py-2.5 shadow-xl border-2 border-white/30 transition-all duration-300 hover:scale-105 hover:shadow-2xl rounded-xl relative overflow-hidden group" onClick={() => navigate('/lawyer-register')}>
+                    <span className="relative z-10">انضم كمحامي</span>
+                    
+                    {/* Animated background */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-300/30 to-secondary/30 translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      if (userProfile?.user_type === 'lawyer') {
+                        navigate('/lawyer-dashboard');
+                      } else {
+                        navigate('/client-dashboard');
+                      }
+                    }}
+                    className="border-2 border-white/40 hover:bg-white font-medium px-6 py-2.5 backdrop-blur-sm transition-all duration-300 hover:scale-105 rounded-xl shadow-lg hover:shadow-xl hover:border-white/80 text-slate-700"
+                  >
+                    <User className="h-4 w-4 ml-2" />
+                    {userProfile?.full_name || 'الملف الشخصي'}
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    onClick={handleLogout}
+                    className="border-2 border-red-400 hover:bg-red-600 hover:text-white font-medium px-6 py-2.5 backdrop-blur-sm transition-all duration-300 hover:scale-105 rounded-xl shadow-lg hover:shadow-xl text-slate-700"
+                  >
+                    <LogOut className="h-4 w-4 ml-2" />
+                    تسجيل الخروج
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Enhanced Mobile Menu Button */}
@@ -126,14 +199,48 @@ const Header = () => {
               <div className="flex flex-col gap-3 mt-6 pt-4 border-t border-white/20">
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-secondary/50 to-transparent"></div>
                 
-                <Button variant="outline" className="w-full border-2 border-white/40 text-white hover:bg-white hover:text-primary font-medium backdrop-blur-sm transition-all duration-300 py-3 rounded-xl hover:border-white/80" onClick={() => navigate('/login')}>
-                  تسجيل الدخول
-                </Button>
-                
-                <Button className="w-full bg-gradient-to-l from-secondary via-yellow-400 to-secondary/90 text-white hover:from-secondary/90 hover:via-yellow-300 hover:to-secondary/80 font-medium shadow-xl border-2 border-white/30 transition-all duration-300 py-3 rounded-xl relative overflow-hidden group" onClick={() => navigate('/lawyer-register')}>
-                  <span className="relative z-10">انضم كمحامي</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-300/30 to-secondary/30 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-                </Button>
+                {!user ? (
+                  <>
+                    <Button variant="outline" className="w-full border-2 border-white/40 text-white hover:bg-white hover:text-primary font-medium backdrop-blur-sm transition-all duration-300 py-3 rounded-xl hover:border-white/80" onClick={() => navigate('/login')}>
+                      تسجيل الدخول
+                    </Button>
+                    
+                    <Button className="w-full bg-gradient-to-l from-secondary via-yellow-400 to-secondary/90 text-white hover:from-secondary/90 hover:via-yellow-300 hover:to-secondary/80 font-medium shadow-xl border-2 border-white/30 transition-all duration-300 py-3 rounded-xl relative overflow-hidden group" onClick={() => navigate('/lawyer-register')}>
+                      <span className="relative z-10">انضم كمحامي</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-300/30 to-secondary/30 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-2 border-white/40 text-white hover:bg-white hover:text-primary font-medium backdrop-blur-sm transition-all duration-300 py-3 rounded-xl hover:border-white/80" 
+                      onClick={() => {
+                        if (userProfile?.user_type === 'lawyer') {
+                          navigate('/lawyer-dashboard');
+                        } else {
+                          navigate('/client-dashboard');
+                        }
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <User className="h-4 w-4 ml-2" />
+                      {userProfile?.full_name || 'الملف الشخصي'}
+                    </Button>
+                    
+                    <Button 
+                      variant="outline"
+                      className="w-full border-2 border-red-400 text-white hover:bg-red-600 hover:text-white font-medium backdrop-blur-sm transition-all duration-300 py-3 rounded-xl"
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <LogOut className="h-4 w-4 ml-2" />
+                      تسجيل الخروج
+                    </Button>
+                  </>
+                )}
 
                 <Button variant="outline" className="w-full border-2 border-white/40 text-white hover:bg-white hover:text-primary font-medium backdrop-blur-sm transition-all duration-300 py-3 rounded-xl hover:border-white/80" onClick={() => navigate('/admin')}>
                   <Settings className="h-4 w-4 ml-2" />
