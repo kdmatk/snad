@@ -1,9 +1,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Star, Shield, Clock } from "lucide-react";
+import { Search, Star, Shield, Clock, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "./ui/badge";
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -31,6 +32,15 @@ const Hero = () => {
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
+          {/* Demo Badge */}
+          <Badge 
+            className="mb-4 text-base py-2 px-4 bg-amber-500 hover:bg-amber-600 cursor-pointer animate-pulse"
+            onClick={() => navigate('/demo')}
+          >
+            <Sparkles className="h-4 w-4 ml-1" />
+            جرب النسخة التجريبية الآن
+          </Badge>
+          
           {/* Main Title */}
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
             منصة <span className="text-secondary bg-gradient-to-r from-secondary to-yellow-400 bg-clip-text text-transparent">سند</span>

@@ -29,6 +29,7 @@ import Privacy from "./pages/Privacy";
 import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
+import Demo from "./pages/Demo";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +71,7 @@ const App = () => (
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/search" element={<Search />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/demo" element={<Demo />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
