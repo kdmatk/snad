@@ -45,9 +45,20 @@ const Demo = () => {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message === "Invalid login credentials") {
+          toast.error("الحساب التجريبي غير موجود. يرجى إنشاء الحساب أولاً من صفحة التسجيل.", {
+            duration: 5000,
+            className: "bg-destructive text-destructive-foreground font-bold"
+          });
+          return;
+        }
+        throw error;
+      }
 
-      toast.success("تم تسجيل الدخول بنجاح!");
+      toast.success("تم تسجيل الدخول بنجاح! 🎉", {
+        className: "bg-green-600 text-white font-bold"
+      });
       
       // Redirect based on account type
       if (accountType === 'client') {
@@ -57,7 +68,10 @@ const Demo = () => {
       }
     } catch (error: any) {
       console.error("Login error:", error);
-      toast.error("حدث خطأ في تسجيل الدخول");
+      toast.error("حدث خطأ في تسجيل الدخول. يرجى المحاولة مرة أخرى.", {
+        duration: 4000,
+        className: "bg-destructive text-destructive-foreground font-bold"
+      });
     } finally {
       setLoggingIn(null);
     }
@@ -313,12 +327,58 @@ const Demo = () => {
             </CardContent>
           </Card>
 
-          {/* Info Note */}
-          <div className="mt-8 text-center">
-            <div className="inline-flex items-center gap-2 text-sm text-muted-foreground bg-muted px-4 py-2 rounded-full">
-              <Clock className="h-4 w-4" />
-              <span>جميع البيانات في هذه النسخة تجريبية ولا تمثل معاملات حقيقية</span>
+          {/* Info Notes */}
+          <div className="mt-8 space-y-4">
+            <div className="text-center">
+              <div className="inline-flex items-center gap-2 text-sm text-muted-foreground bg-muted px-4 py-3 rounded-lg">
+                <Clock className="h-4 w-4" />
+                <span>جميع البيانات في هذه النسخة تجريبية ولا تمثل معاملات حقيقية</span>
+              </div>
             </div>
+            
+            <Card className="bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900">
+              <CardContent className="pt-4">
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0">
+                    <div className="p-2 bg-amber-500 rounded-lg">
+                      <Shield className="h-5 w-5 text-white" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-amber-900 dark:text-amber-100">
+                      ملاحظة هامة: إنشاء الحسابات التجريبية
+                    </h3>
+                    <p className="text-sm text-amber-800 dark:text-amber-200">
+                      للدخول بالحسابات التجريبية، يجب عليك أولاً إنشاء هذه الحسابات من خلال:
+                    </p>
+                    <ol className="text-sm text-amber-800 dark:text-amber-200 list-decimal list-inside space-y-1 mr-2">
+                      <li>انسخ البريد الإلكتروني وكلمة المرور من الأعلى</li>
+                      <li>انتقل إلى صفحة التسجيل (للعميل) أو صفحة تسجيل المحامي</li>
+                      <li>أنشئ الحساب باستخدام نفس البيانات</li>
+                      <li>ارجع لهذه الصفحة وسجل الدخول</li>
+                    </ol>
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate('/register')}
+                        className="bg-white dark:bg-amber-900 border-amber-300"
+                      >
+                        تسجيل عميل جديد
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate('/lawyer-register')}
+                        className="bg-white dark:bg-amber-900 border-amber-300"
+                      >
+                        تسجيل محامي جديد
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
