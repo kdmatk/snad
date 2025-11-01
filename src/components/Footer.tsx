@@ -4,7 +4,7 @@ const Footer = () => {
   return <footer className="bg-gradient-to-br from-blue-900 via-blue-800 to-slate-800 text-white py-12 relative">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-slate-800/60"></div>
       <div className="container mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Logo and Description */}
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center space-x-reverse space-x-3 mb-4">
@@ -44,6 +44,33 @@ const Footer = () => {
               <li>
                 <Link to="/faq" className="hover:text-secondary transition-colors">
                   مركز المساعدة
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Sanad Services */}
+          <div>
+            <h4 className="font-bold mb-4">خدمات سند</h4>
+            <ul className="space-y-2 text-slate-300">
+              <li>
+                <Link to="/quick-services" className="hover:text-secondary transition-colors">
+                  الخدمات السريعة
+                </Link>
+              </li>
+              <li>
+                <Link to="/legal-auctions" className="hover:text-secondary transition-colors">
+                  المزادات القانونية
+                </Link>
+              </li>
+              <li>
+                <Link to="/instant-consultation" className="hover:text-secondary transition-colors">
+                  استشارة فورية
+                </Link>
+              </li>
+              <li>
+                <Link to="/articles" className="hover:text-secondary transition-colors">
+                  المقالات القانونية
                 </Link>
               </li>
             </ul>
