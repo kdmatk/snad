@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Scale, Clock, DollarSign, Users, Search, Filter } from "lucide-react";
+import { Scale, Clock, DollarSign, Users, Search, Filter, Eye } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const LegalAuctions = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -96,7 +98,13 @@ const LegalAuctions = () => {
   });
 
   const handlePlaceBid = (auctionId: number) => {
-    alert(`سيتم توجيهك لصفحة تقديم العطاء للمزاد رقم ${auctionId}`);
+    // للمحامين: توجيه لصفحة تقديم العرض
+    navigate(`/lawyer-bids/${auctionId}`);
+  };
+
+  const handleViewBids = (auctionId: number) => {
+    // للعملاء: توجيه لصفحة عرض المزايدات
+    navigate(`/case-bids/${auctionId}`);
   };
 
   return (
@@ -228,8 +236,12 @@ const LegalAuctions = () => {
                     >
                       {auction.status === 'مفتوح' ? 'تقديم عطاء' : 'مغلق'}
                     </Button>
-                    <Button variant="outline" size="sm">
-                      تفاصيل
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleViewBids(auction.id)}
+                    >
+                      <Eye className="h-4 w-4 ml-2" />
+                      عرض المزايدات
                     </Button>
                   </div>
                 </CardContent>

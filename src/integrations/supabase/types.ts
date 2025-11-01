@@ -55,30 +55,45 @@ export type Database = {
           amount: number
           case_id: string | null
           created_at: string | null
+          delivery_days: number | null
+          discount_percentage: number | null
           estimated_duration: string | null
           id: string
+          is_accepted: boolean | null
           lawyer_id: string | null
           proposal: string | null
+          responded_at: string | null
+          score: number | null
           status: string | null
         }
         Insert: {
           amount: number
           case_id?: string | null
           created_at?: string | null
+          delivery_days?: number | null
+          discount_percentage?: number | null
           estimated_duration?: string | null
           id?: string
+          is_accepted?: boolean | null
           lawyer_id?: string | null
           proposal?: string | null
+          responded_at?: string | null
+          score?: number | null
           status?: string | null
         }
         Update: {
           amount?: number
           case_id?: string | null
           created_at?: string | null
+          delivery_days?: number | null
+          discount_percentage?: number | null
           estimated_duration?: string | null
           id?: string
+          is_accepted?: boolean | null
           lawyer_id?: string | null
           proposal?: string | null
+          responded_at?: string | null
+          score?: number | null
           status?: string | null
         }
         Relationships: [
@@ -1017,6 +1032,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_bid_score: {
+        Args: {
+          bid_amount: number
+          case_budget_max: number
+          delivery_days: number
+          lawyer_rating: number
+          total_cases: number
+        }
+        Returns: number
+      }
       check_connection_health: { Args: never; Returns: Json }
       is_admin: { Args: { user_email: string }; Returns: boolean }
       is_super_admin: { Args: { user_email: string }; Returns: boolean }
