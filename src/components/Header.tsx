@@ -58,6 +58,9 @@ const Header = () => {
     label: "الخدمات",
     href: "/services"
   }, {
+    label: "المزادات",
+    href: "/legal-auctions"
+  }, {
     label: "الخدمات السريعة",
     href: "/quick-services"
   }, {
