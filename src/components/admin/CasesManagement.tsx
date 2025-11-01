@@ -1,87 +1,97 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { 
-  Eye, 
-  Edit, 
-  Trash2,
-  Calendar,
-  DollarSign,
-  AlertTriangle,
-  CheckCircle
-} from "lucide-react";
-
+import { Eye, Edit, Trash2, Calendar, DollarSign, AlertTriangle, CheckCircle } from "lucide-react";
 const CasesManagement = () => {
-  const cases = [
-    {
-      id: 1,
-      title: "نزاع تجاري بين شركتين",
-      client: "شركة النور التجارية",
-      category: "تجاري",
-      budget: "5000-8000",
-      status: "open",
-      urgency: "high",
-      bids: 8,
-      createdAt: "2024-01-15"
-    },
-    {
-      id: 2,
-      title: "قضية طلاق وحضانة أطفال",
-      client: "فاطمة الأحمد",
-      category: "أسرة",
-      budget: "2000-3000",
-      status: "assigned",
-      urgency: "normal",
-      bids: 12,
-      createdAt: "2024-01-14"
-    },
-    {
-      id: 3,
-      title: "نزاع عقاري حول ملكية أرض",
-      client: "محمد السعدي",
-      category: "عقاري",
-      budget: "10000-15000",
-      status: "in_progress",
-      urgency: "urgent",
-      bids: 5,
-      createdAt: "2024-01-13"
-    }
-  ];
-
+  const cases = [{
+    id: 1,
+    title: "نزاع تجاري بين شركتين",
+    client: "شركة النور التجارية",
+    category: "تجاري",
+    budget: "5000-8000",
+    status: "open",
+    urgency: "high",
+    bids: 8,
+    createdAt: "2024-01-15"
+  }, {
+    id: 2,
+    title: "قضية طلاق وحضانة أطفال",
+    client: "فاطمة الأحمد",
+    category: "أسرة",
+    budget: "2000-3000",
+    status: "assigned",
+    urgency: "normal",
+    bids: 12,
+    createdAt: "2024-01-14"
+  }, {
+    id: 3,
+    title: "نزاع عقاري حول ملكية أرض",
+    client: "محمد السعدي",
+    category: "عقاري",
+    budget: "10000-15000",
+    status: "in_progress",
+    urgency: "urgent",
+    bids: 5,
+    createdAt: "2024-01-13"
+  }];
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      open: { label: "مفتوحة", variant: "default" as const, color: "text-blue-600" },
-      assigned: { label: "مُسندة", variant: "secondary" as const, color: "text-yellow-600" },
-      in_progress: { label: "قيد التنفيذ", variant: "outline" as const, color: "text-purple-600" },
-      completed: { label: "مكتملة", variant: "default" as const, color: "text-green-600" },
-      cancelled: { label: "ملغية", variant: "destructive" as const, color: "text-red-600" }
+      open: {
+        label: "مفتوحة",
+        variant: "default" as const,
+        color: "text-blue-600"
+      },
+      assigned: {
+        label: "مُسندة",
+        variant: "secondary" as const,
+        color: "text-yellow-600"
+      },
+      in_progress: {
+        label: "قيد التنفيذ",
+        variant: "outline" as const,
+        color: "text-purple-600"
+      },
+      completed: {
+        label: "مكتملة",
+        variant: "default" as const,
+        color: "text-green-600"
+      },
+      cancelled: {
+        label: "ملغية",
+        variant: "destructive" as const,
+        color: "text-red-600"
+      }
     };
-    
     const config = statusConfig[status as keyof typeof statusConfig];
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
-
   const getUrgencyBadge = (urgency: string) => {
     const urgencyConfig = {
-      low: { label: "منخفضة", color: "text-green-600 bg-green-50" },
-      normal: { label: "عادية", color: "text-blue-600 bg-blue-50" },
-      high: { label: "عالية", color: "text-yellow-600 bg-yellow-50" },
-      urgent: { label: "عاجلة", color: "text-red-600 bg-red-50" }
+      low: {
+        label: "منخفضة",
+        color: "text-green-600 bg-green-50"
+      },
+      normal: {
+        label: "عادية",
+        color: "text-blue-600 bg-blue-50"
+      },
+      high: {
+        label: "عالية",
+        color: "text-yellow-600 bg-yellow-50"
+      },
+      urgent: {
+        label: "عاجلة",
+        color: "text-red-600 bg-red-50"
+      }
     };
-    
     const config = urgencyConfig[urgency as keyof typeof urgencyConfig];
-    return (
-      <Badge className={config.color}>
+    return <Badge className={config.color}>
         {urgency === 'urgent' && <AlertTriangle className="h-3 w-3 ml-1" />}
         {config.label}
-      </Badge>
-    );
+      </Badge>;
   };
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">إدارة القضايا والمزادات</h2>
@@ -144,14 +154,13 @@ const CasesManagement = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cases.map((case_) => (
-                <TableRow key={case_.id}>
+              {cases.map(case_ => <TableRow key={case_.id}>
                   <TableCell>
                     <div className="font-medium">{case_.title}</div>
                   </TableCell>
                   <TableCell>{case_.client}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">{case_.category}</Badge>
+                    <Badge variant="outline" className="bg-blue-800">{case_.category}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
@@ -183,14 +192,11 @@ const CasesManagement = () => {
                       </Button>
                     </div>
                   </TableCell>
-                </TableRow>
-              ))}
+                </TableRow>)}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };
-
 export default CasesManagement;
