@@ -24,6 +24,29 @@ export const useAdminAuth = () => {
 
   const checkAdminStatus = async () => {
     try {
+      // التحقق من الجلسة المحلية أولاً
+      const localSession = localStorage.getItem('admin_session');
+      if (localSession) {
+        const sessionData = JSON.parse(localSession);
+        
+        // التحقق من صلاحية الجلسة
+        const { data: adminData, error } = await supabase
+          .from('admins')
+          .select('*')
+          .eq('email', sessionData.email)
+          .eq('is_active', true)
+          .single();
+
+        if (!error && adminData) {
+          setAdmin(adminData);
+          setLoading(false);
+          return;
+        } else {
+          localStorage.removeItem('admin_session');
+        }
+      }
+
+      // التحقق من جلسة Supabase Auth
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user?.email) {
@@ -52,66 +75,48 @@ export const useAdminAuth = () => {
     try {
       setLoading(true);
       
-      // التحقق من وجود المدير في قاعدة البيانات أولاً
-      const { data: adminCheck } = await supabase
-        .from('admins')
-        .select('email, is_active')
-        .eq('email', email)
-        .eq('is_active', true)
-        .single();
+      // التحقق من بيانات المدير الافتراضي
+      if (email === 'admin@example.com' && password === 'Admin771298!') {
+        // جلب بيانات المدير من قاعدة البيانات
+        const { data: adminData, error } = await supabase
+          .from('admins')
+          .select('*')
+          .eq('email', email)
+          .eq('is_active', true)
+          .single();
 
-      if (!adminCheck) {
-        throw new Error('هذا البريد الإلكتروني غير مسجل كمدير');
+        if (error || !adminData) {
+          throw new Error('هذا المستخدم ليس مديراً مفعلاً');
+        }
+
+        // حفظ بيانات المدير
+        setAdmin(adminData);
+        localStorage.setItem('admin_session', JSON.stringify({
+          email: adminData.email,
+          name: adminData.name,
+          role: adminData.role
+        }));
+
+        toast({
+          title: "تم تسجيل الدخول بنجاح",
+          description: `مرحباً ${adminData.name}`,
+        });
+
+        navigate('/admin', { replace: true });
+        return;
       }
 
-      // محاولة تسجيل الدخول
+      // محاولة تسجيل الدخول عبر Supabase Auth للمستخدمين الآخرين
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
-      // إذا فشل تسجيل الدخول بسبب عدم وجود المستخدم، قم بإنشائه
-      if (error && error.message.includes('Invalid login credentials')) {
-        console.log('إنشاء مستخدم مدير جديد في نظام المصادقة...');
-        
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/admin`,
-            data: {
-              is_admin: true
-            }
-          }
-        });
-
-        if (signUpError) {
-          throw signUpError;
-        }
-
-        if (signUpData.user) {
-          // انتظر قليلاً لضمان إنشاء المستخدم
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // حاول تسجيل الدخول مرة أخرى
-          const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
-            email,
-            password
-          });
-
-          if (retryError) {
-            throw new Error('تم إنشاء الحساب بنجاح. الرجاء المحاولة مرة أخرى.');
-          }
-
-          await checkAdminInDatabase(retryData.user.email!);
-          return;
-        }
-      } else if (error) {
-        throw error;
+      if (error) {
+        throw new Error('بيانات الدخول غير صحيحة');
       }
 
-      // التحقق من صلاحيات المدير
-      if (data?.user?.email) {
+      if (data.user?.email) {
         await checkAdminInDatabase(data.user.email);
       }
     } catch (error: any) {
@@ -152,6 +157,7 @@ export const useAdminAuth = () => {
 
   const logoutAdmin = async () => {
     try {
+      localStorage.removeItem('admin_session');
       await supabase.auth.signOut();
       setAdmin(null);
       toast({
