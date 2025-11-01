@@ -226,7 +226,7 @@ const QuickServicesManagement = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {service.is_popular ? <Badge className="bg-yellow-100 text-yellow-800">شائعة</Badge> : <Badge variant="outline">عادية</Badge>}
+                      {service.is_popular ? <Badge className="text-yellow-800 bg-neutral-100">شائعة</Badge> : <Badge variant="outline">عادية</Badge>}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleToggleStatus(service)}>
