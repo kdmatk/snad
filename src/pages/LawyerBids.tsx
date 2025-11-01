@@ -28,21 +28,24 @@ const LawyerBids = () => {
         return;
       }
 
-      setLawyerId(user.id);
-
-      // جلب بيانات المحامي من جدول lawyers
-      const { data: lawyer } = await supabase
+      // جلب بيانات المحامي من جدول lawyers باستخدام user_id
+      const { data: lawyer, error } = await supabase
         .from("lawyers")
-        .select("rating, total_cases")
+        .select("id, rating, total_cases")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
-      if (lawyer) {
-        setLawyerData({
-          rating: lawyer.rating || 0,
-          cases: lawyer.total_cases || 0
-        });
+      if (error || !lawyer) {
+        toast.error("لم يتم العثور على ملف المحامي. يرجى التسجيل كمحامي أولاً");
+        navigate("/lawyer-register");
+        return;
       }
+
+      setLawyerId(lawyer.id);
+      setLawyerData({
+        rating: lawyer.rating || 0,
+        cases: lawyer.total_cases || 0
+      });
     };
 
     fetchLawyerData();
