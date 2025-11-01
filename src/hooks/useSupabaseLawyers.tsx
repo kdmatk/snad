@@ -19,6 +19,8 @@ export interface SupabaseLawyer {
   experience_years?: number | null;
   hourly_rate?: number | null;
   license_verified: boolean;
+  is_online?: boolean;
+  last_seen?: string | null;
 }
 
 export const useSupabaseLawyers = () => {

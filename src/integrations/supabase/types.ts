@@ -294,6 +294,8 @@ export type Database = {
           experience_years: number | null
           hourly_rate: number | null
           id: string
+          is_online: boolean | null
+          last_seen: string | null
           license_number: string
           license_verified: boolean | null
           name: string
@@ -313,6 +315,8 @@ export type Database = {
           experience_years?: number | null
           hourly_rate?: number | null
           id?: string
+          is_online?: boolean | null
+          last_seen?: string | null
           license_number: string
           license_verified?: boolean | null
           name: string
@@ -332,6 +336,8 @@ export type Database = {
           experience_years?: number | null
           hourly_rate?: number | null
           id?: string
+          is_online?: boolean | null
+          last_seen?: string | null
           license_number?: string
           license_verified?: boolean | null
           name?: string

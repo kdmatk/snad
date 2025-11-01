@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Star, User, Shield, MapPin, Phone, MessageCircle, Award } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Lawyer } from "@/hooks/useLawyersData";
+import { formatLastSeen } from "@/utils/dateFormatter";
 
 interface LawyerCardProps {
   lawyer: Lawyer;
@@ -43,6 +44,10 @@ const LawyerCard = ({ lawyer }: LawyerCardProps) => {
               <Shield className="h-4 w-4 text-white" />
             </div>
           )}
+          {/* مؤشر حالة الاتصال */}
+          <div className={`absolute top-0 left-0 w-4 h-4 rounded-full border-2 border-white ${
+            lawyer.isOnline ? 'bg-green-500' : 'bg-gray-400'
+          }`} title={formatLastSeen(lawyer.lastSeen)} />
         </div>
         
         <div className="space-y-2">
@@ -64,6 +69,14 @@ const LawyerCard = ({ lawyer }: LawyerCardProps) => {
           <div className="flex items-center justify-center gap-1 text-muted-foreground">
             <MapPin className="h-3 w-3" />
             <span className="text-xs">{lawyer.location}</span>
+          </div>
+          
+          {/* حالة الاتصال */}
+          <div className="flex items-center justify-center gap-1 text-xs mt-2">
+            <div className={`w-2 h-2 rounded-full ${lawyer.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
+            <span className={lawyer.isOnline ? 'text-green-600 font-medium' : 'text-muted-foreground'}>
+              {formatLastSeen(lawyer.lastSeen)}
+            </span>
           </div>
         </div>
       </CardHeader>

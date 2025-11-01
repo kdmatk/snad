@@ -16,6 +16,8 @@ export interface Lawyer {
   phone: string;
   cases: number;
   successRate: number;
+  isOnline?: boolean;
+  lastSeen?: string | null;
 }
 
 // دالة لتحويل بيانات قاعدة البيانات إلى الواجهة المحلية
@@ -33,7 +35,9 @@ const transformSupabaseLawyer = (lawyer: SupabaseLawyer): Lawyer => {
     description: lawyer.bio || "محامي معتمد ومتخصص",
     phone: lawyer.phone || "",
     cases: lawyer.total_cases || 0,
-    successRate: Math.floor(Math.random() * 20) + 80 // مؤقت حتى نحسب النسبة الفعلية
+    successRate: Math.floor(Math.random() * 20) + 80, // مؤقت حتى نحسب النسبة الفعلية
+    isOnline: lawyer.is_online,
+    lastSeen: lawyer.last_seen
   };
 };
 
