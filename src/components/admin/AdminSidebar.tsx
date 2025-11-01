@@ -69,7 +69,9 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
               key={item.id}
               variant={isActive ? "default" : "ghost"}
               className={`w-full justify-start text-right h-12 ${
-                isActive ? "bg-primary text-white" : "hover:bg-gray-100"
+                isActive 
+                  ? "bg-primary text-white" 
+                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
               }`}
               onClick={() => onTabChange(item.id)}
             >
