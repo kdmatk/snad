@@ -1,5 +1,6 @@
 import { ExternalLink, FileText, TrendingUp, BookOpen } from "lucide-react";
 import { Button } from "./ui/button";
+import mojLogo from "@/assets/moj-logo.svg";
 
 const GovernmentPartner = () => {
   const features = [
@@ -15,11 +16,12 @@ const GovernmentPartner = () => {
           <div className="flex flex-col md:flex-row items-center gap-8 bg-card/50 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-primary/20">
             {/* Logo Section */}
             <div className="flex-shrink-0">
-              <div className="w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-primary to-primary/80 rounded-2xl shadow-xl flex items-center justify-center p-4 border-4 border-secondary/30">
-                <div className="text-center">
-                  <div className="text-4xl md:text-5xl mb-2">⚖️</div>
-                  <div className="text-white font-bold text-sm md:text-base">وزارة العدل</div>
-                </div>
+              <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-2xl shadow-xl flex items-center justify-center p-4 border-4 border-secondary/30">
+                <img 
+                  src={mojLogo} 
+                  alt="شعار وزارة العدل السعودية" 
+                  className="w-full h-full object-contain"
+                />
               </div>
             </div>
 
