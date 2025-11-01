@@ -46,6 +46,15 @@ const Demo = () => {
         password,
       });
 
+      // Check for email provider disabled error
+      if (error && (error as any).code === "email_provider_disabled") {
+        toast.error("⚠️ تسجيل الدخول عبر البريد الإلكتروني معطل! يرجى تفعيل Email Provider من إعدادات Supabase (راجع الإرشادات في الأسفل)", {
+          duration: 10000,
+          className: "bg-red-600 text-white font-bold"
+        });
+        return;
+      }
+
       // If account doesn't exist, create it automatically
       if (error && error.message === "Invalid login credentials") {
         toast.info("جاري إنشاء الحساب التجريبي...", {
@@ -66,6 +75,13 @@ const Demo = () => {
         });
 
         if (signUpError) {
+          if ((signUpError as any).code === "email_provider_disabled") {
+            toast.error("⚠️ تسجيل الدخول عبر البريد الإلكتروني معطل! يرجى تفعيل Email Provider من إعدادات Supabase", {
+              duration: 10000,
+              className: "bg-red-600 text-white font-bold"
+            });
+            return;
+          }
           throw signUpError;
         }
 
@@ -109,10 +125,18 @@ const Demo = () => {
       }
     } catch (error: any) {
       console.error("Login error:", error);
-      toast.error("حدث خطأ في تسجيل الدخول. يرجى المحاولة مرة أخرى.", {
-        duration: 4000,
-        className: "bg-destructive text-destructive-foreground font-bold"
-      });
+      
+      if (error?.code === "email_provider_disabled") {
+        toast.error("⚠️ تسجيل الدخول عبر البريد الإلكتروني معطل! يرجى تفعيل Email Provider من إعدادات Supabase", {
+          duration: 10000,
+          className: "bg-red-600 text-white font-bold"
+        });
+      } else {
+        toast.error("حدث خطأ في تسجيل الدخول. يرجى المحاولة مرة أخرى.", {
+          duration: 4000,
+          className: "bg-destructive text-destructive-foreground font-bold"
+        });
+      }
     } finally {
       setLoggingIn(null);
     }
@@ -377,35 +401,46 @@ const Demo = () => {
               </div>
             </div>
             
-            <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900">
+            <Card className="bg-red-50 dark:bg-red-950/20 border-red-300 dark:border-red-900">
               <CardContent className="pt-4">
                 <div className="flex gap-3">
                   <div className="flex-shrink-0">
-                    <div className="p-2 bg-blue-500 rounded-lg">
+                    <div className="p-2 bg-red-500 rounded-lg">
                       <Mail className="h-5 w-5 text-white" />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <h3 className="font-bold text-blue-900 dark:text-blue-100">
-                      ⚙️ إعدادات مطلوبة للنسخة التجريبية
+                  <div className="space-y-3">
+                    <h3 className="font-bold text-red-900 dark:text-red-100 text-lg">
+                      ⚠️ إعدادات إلزامية للنسخة التجريبية
                     </h3>
-                    <p className="text-sm text-blue-800 dark:text-blue-200">
-                      لتشغيل النسخة التجريبية بنجاح، يجب تعطيل خيار "Confirm email" من إعدادات Supabase:
+                    <p className="text-sm text-red-800 dark:text-red-200 font-semibold">
+                      يجب إجراء الخطوات التالية في Supabase:
                     </p>
-                    <ol className="text-sm text-blue-800 dark:text-blue-200 list-decimal list-inside space-y-1 mr-2">
-                      <li>انتقل إلى لوحة تحكم Supabase</li>
-                      <li>اختر Authentication → Providers → Email</li>
-                      <li>قم بتعطيل "Confirm email"</li>
-                      <li>احفظ التغييرات وارجع لهذه الصفحة</li>
-                    </ol>
+                    <div className="bg-white dark:bg-red-950 p-3 rounded-lg border border-red-200 dark:border-red-800">
+                      <p className="text-sm font-bold text-red-900 dark:text-red-100 mb-2">الخطوة 1: تفعيل Email Provider</p>
+                      <ol className="text-sm text-red-800 dark:text-red-200 list-decimal list-inside space-y-1 mr-2">
+                        <li>افتح: Authentication → Providers</li>
+                        <li>اضغط على Email</li>
+                        <li>تأكد من تفعيل "Enable Email provider" ✓</li>
+                        <li>احفظ التغييرات</li>
+                      </ol>
+                    </div>
+                    <div className="bg-white dark:bg-red-950 p-3 rounded-lg border border-red-200 dark:border-red-800">
+                      <p className="text-sm font-bold text-red-900 dark:text-red-100 mb-2">الخطوة 2: تعطيل Confirm Email</p>
+                      <ol className="text-sm text-red-800 dark:text-red-200 list-decimal list-inside space-y-1 mr-2">
+                        <li>في نفس الصفحة (Email Provider)</li>
+                        <li>قم بإيقاف "Confirm email" ✗</li>
+                        <li>احفظ التغييرات</li>
+                      </ol>
+                    </div>
                     <Button
-                      variant="outline"
-                      size="sm"
+                      variant="default"
+                      size="lg"
                       onClick={() => window.open('https://supabase.com/dashboard/project/crdqvjbezdgjxqitwmns/auth/providers', '_blank')}
-                      className="bg-white dark:bg-blue-900 border-blue-300 mt-2"
+                      className="w-full bg-red-600 hover:bg-red-700 text-white mt-2"
                     >
-                      <Shield className="ml-2 h-4 w-4" />
-                      فتح إعدادات Supabase
+                      <Shield className="ml-2 h-5 w-5" />
+                      افتح إعدادات Supabase الآن
                     </Button>
                   </div>
                 </div>
