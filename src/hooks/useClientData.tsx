@@ -84,7 +84,7 @@ export const useClientData = () => {
         .order('created_at', { ascending: false });
 
       if (casesData) {
-        setRequests(casesData.map(case_ => ({
+        setRequests(casesData.map((case_: any) => ({
           id: case_.id,
           title: case_.title,
           description: case_.description || '',
@@ -94,7 +94,9 @@ export const useClientData = () => {
           status: case_.status,
           urgency: case_.urgency,
           created_at: case_.created_at,
-          lawyer: case_.lawyers ? { name: case_.lawyers.name } : undefined
+          lawyer: case_.lawyers && typeof case_.lawyers === 'object' && 'name' in case_.lawyers 
+            ? { name: case_.lawyers.name } 
+            : undefined
         })));
       }
 

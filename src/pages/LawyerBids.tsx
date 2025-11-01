@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -8,16 +8,45 @@ import BidForm from "@/components/bids/BidForm";
 import { useBidsData } from "@/hooks/useBidsData";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const LawyerBids = () => {
   const { caseId } = useParams<{ caseId: string }>();
   const navigate = useNavigate();
   const { addBid } = useBidsData(caseId);
+  const [lawyerId, setLawyerId] = useState<string | null>(null);
+  const [lawyerData, setLawyerData] = useState<{ rating: number; cases: number }>({ rating: 0, cases: 0 });
 
-  // بيانات وهمية للمحامي - في التطبيق الحقيقي يجب جلبها من auth
-  const lawyerId = "temp-lawyer-id";
-  const lawyerRating = 4.5;
-  const lawyerCases = 25;
+  // جلب بيانات المحامي الحالي
+  useEffect(() => {
+    const fetchLawyerData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("يجب تسجيل الدخول كمحامي");
+        navigate("/login");
+        return;
+      }
+
+      setLawyerId(user.id);
+
+      // جلب بيانات المحامي من جدول lawyers
+      const { data: lawyer } = await supabase
+        .from("lawyers")
+        .select("rating, total_cases")
+        .eq("user_id", user.id)
+        .single();
+
+      if (lawyer) {
+        setLawyerData({
+          rating: lawyer.rating || 0,
+          cases: lawyer.total_cases || 0
+        });
+      }
+    };
+
+    fetchLawyerData();
+  }, [navigate]);
 
   // جلب بيانات القضية
   const { data: legalCase, isLoading } = useQuery({
@@ -45,7 +74,7 @@ const LawyerBids = () => {
     });
   };
 
-  if (isLoading) {
+  if (isLoading || !lawyerId) {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-8">
@@ -99,8 +128,8 @@ const LawyerBids = () => {
             <BidForm
               caseId={caseId!}
               lawyerId={lawyerId}
-              lawyerRating={lawyerRating}
-              lawyerCases={lawyerCases}
+              lawyerRating={lawyerData.rating}
+              lawyerCases={lawyerData.cases}
               maxBudget={legalCase.budget_max || 10000}
               onSubmit={handleSubmit}
             />
