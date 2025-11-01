@@ -21,7 +21,8 @@ const LegalLibrary = () => {
       size: "2.4 MB",
       downloads: 1250,
       description: "النسخة المحدثة من نظام الشركات في المملكة العربية السعودية",
-      date: "2023-12-15"
+      date: "2023-12-15",
+      url: "/documents/companies-law-2023.pdf" // URL للملف - يجب استبداله بالرابط الحقيقي
     },
     {
       id: 2,
@@ -31,7 +32,8 @@ const LegalLibrary = () => {
       size: "1.8 MB",
       downloads: 890,
       description: "دليل شامل لقانون العمل في دولة الإمارات العربية المتحدة",
-      date: "2023-11-20"
+      date: "2023-11-20",
+      url: "/documents/uae-labor-law-guide.pdf"
     },
     {
       id: 3,
@@ -41,7 +43,8 @@ const LegalLibrary = () => {
       size: "450 KB",
       downloads: 2100,
       description: "مجموعة من نماذج العقود التجارية المعتمدة",
-      date: "2023-10-30"
+      date: "2023-10-30",
+      url: "/documents/commercial-contracts-templates.docx"
     },
     {
       id: 4,
@@ -51,7 +54,8 @@ const LegalLibrary = () => {
       size: "3.2 MB",
       downloads: 567,
       description: "مجموعة من أهم القرارات القضائية في المجال العقاري",
-      date: "2023-09-15"
+      date: "2023-09-15",
+      url: "/documents/real-estate-court-decisions.pdf"
     },
     {
       id: 5,
@@ -61,7 +65,8 @@ const LegalLibrary = () => {
       size: "1.1 MB",
       downloads: 432,
       description: "لائحة التحكيم المعتمدة في دول مجلس التعاون الخليجي",
-      date: "2023-08-25"
+      date: "2023-08-25",
+      url: "/documents/gcc-arbitration-regulation.pdf"
     },
     {
       id: 6,
@@ -71,7 +76,8 @@ const LegalLibrary = () => {
       size: "320 KB",
       downloads: 1456,
       description: "نموذج قانوني لرفع دعوى التعويض عن الأضرار",
-      date: "2023-07-10"
+      date: "2023-07-10",
+      url: "/documents/compensation-claim-template.docx"
     }
   ];
 
@@ -94,11 +100,27 @@ const LegalLibrary = () => {
   });
 
   const handleDownload = (documentId: number) => {
-    alert(`سيتم تحميل الملف رقم ${documentId}`);
+    const document = documents.find(doc => doc.id === documentId);
+    if (!document) return;
+
+    // إنشاء عنصر a للتحميل المباشر
+    const link = window.document.createElement('a');
+    link.href = document.url;
+    link.download = `${document.title}.${document.type.toLowerCase()}`;
+    link.target = '_blank';
+    
+    // تنشيط التحميل
+    window.document.body.appendChild(link);
+    link.click();
+    window.document.body.removeChild(link);
   };
 
   const handlePreview = (documentId: number) => {
-    alert(`سيتم عرض معاينة للملف رقم ${documentId}`);
+    const document = documents.find(doc => doc.id === documentId);
+    if (!document) return;
+
+    // فتح الملف في نافذة جديدة للمشاهدة
+    window.open(document.url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -193,6 +215,7 @@ const LegalLibrary = () => {
                       size="sm" 
                       className="flex-1"
                       onClick={() => handleDownload(document.id)}
+                      title="تحميل الملف مباشرة"
                     >
                       <Download className="h-4 w-4 ml-1" />
                       تحميل
@@ -201,6 +224,7 @@ const LegalLibrary = () => {
                       variant="outline" 
                       size="sm"
                       onClick={() => handlePreview(document.id)}
+                      title="معاينة الملف"
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
