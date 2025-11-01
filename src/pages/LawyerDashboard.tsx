@@ -82,12 +82,12 @@ const LawyerDashboard = () => {
   }];
   
   return (
-    <Layout>
-      <SidebarProvider defaultOpen={true}>
-        <div className="min-h-screen flex w-full flex-row-reverse">
-          <LawyerSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-          
-          <main className="flex-1 overflow-auto bg-gradient-to-br from-background via-background to-muted/20">
+    <SidebarProvider defaultOpen={true}>
+      <div className="min-h-screen flex w-full flex-row-reverse" dir="rtl">
+        <LawyerSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        
+        <main className="flex-1 overflow-auto bg-gradient-to-br from-background via-background to-muted/20">
+          <Layout>
             <div className="py-8">
               <div className="container mx-auto px-4">
                 {/* Header with Mobile Menu */}
@@ -379,10 +379,10 @@ const LawyerDashboard = () => {
                 )}
               </div>
             </div>
-          </main>
-        </div>
-      </SidebarProvider>
-    </Layout>
+          </Layout>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 };
 

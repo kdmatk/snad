@@ -65,7 +65,7 @@ export function LawyerSidebar({ activeTab, onTabChange }: LawyerSidebarProps) {
   return (
     <Sidebar
       side="right"
-      className={`border-l transition-all duration-300 ${
+      className={`border-l bg-card shadow-lg transition-all duration-300 ${
         collapsed ? "w-16" : "w-64"
       }`}
       collapsible="icon"
