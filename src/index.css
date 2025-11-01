@@ -171,3 +171,98 @@
   color: hsl(var(--secondary));
   filter: drop-shadow(0 2px 4px hsla(var(--secondary), 0.3));
 }
+
+/* Toast/Sonner notifications styling */
+[data-sonner-toast] {
+  background: white !important;
+  border: 1px solid hsl(214 32% 82%) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-sonner-toast][data-type="success"] {
+  background: hsl(142 76% 96%) !important;
+  border-color: hsl(142 76% 36%) !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+  background: hsl(0 84% 96%) !important;
+  border-color: hsl(0 84% 60%) !important;
+}
+
+[data-sonner-toast][data-type="warning"] {
+  background: hsl(45 93% 96%) !important;
+  border-color: hsl(45 93% 47%) !important;
+}
+
+[data-sonner-toast][data-type="info"] {
+  background: hsl(217 91% 96%) !important;
+  border-color: hsl(217 91% 26%) !important;
+}
+
+/* Toast text colors for better contrast */
+[data-sonner-toast] [data-title] {
+  color: hsl(222 84% 5%) !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+}
+
+[data-sonner-toast] [data-description] {
+  color: hsl(215 25% 27%) !important;
+  font-size: 0.875rem !important;
+}
+
+/* Success toast text */
+[data-sonner-toast][data-type="success"] [data-title] {
+  color: hsl(142 76% 16%) !important;
+}
+
+[data-sonner-toast][data-type="success"] [data-description] {
+  color: hsl(142 50% 25%) !important;
+}
+
+/* Error toast text */
+[data-sonner-toast][data-type="error"] [data-title] {
+  color: hsl(0 84% 30%) !important;
+}
+
+[data-sonner-toast][data-type="error"] [data-description] {
+  color: hsl(0 70% 35%) !important;
+}
+
+/* Warning toast text */
+[data-sonner-toast][data-type="warning"] [data-title] {
+  color: hsl(45 93% 20%) !important;
+}
+
+[data-sonner-toast][data-type="warning"] [data-description] {
+  color: hsl(45 80% 25%) !important;
+}
+
+/* Info toast text */
+[data-sonner-toast][data-type="info"] [data-title] {
+  color: hsl(217 91% 16%) !important;
+}
+
+[data-sonner-toast][data-type="info"] [data-description] {
+  color: hsl(217 70% 25%) !important;
+}
+
+/* Toast icons styling */
+[data-sonner-toast] [data-icon] {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* Dark mode toast styling */
+.dark [data-sonner-toast] {
+  background: hsl(217 91% 15%) !important;
+  border-color: hsl(217 50% 30%) !important;
+}
+
+.dark [data-sonner-toast] [data-title] {
+  color: hsl(0 0% 100%) !important;
+}
+
+.dark [data-sonner-toast] [data-description] {
+  color: hsl(215 20% 75%) !important;
+}
