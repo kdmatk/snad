@@ -2,6 +2,7 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import DemoBanner from "./DemoBanner";
+import AICustomerSupport from "./AICustomerSupport";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,6 +15,7 @@ const Layout = ({ children }: LayoutProps) => {
       <Header />
       <main>{children}</main>
       <Footer />
+      <AICustomerSupport />
     </div>
   );
 };
