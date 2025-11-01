@@ -1,5 +1,7 @@
 import { useState } from "react";
-import Layout from "@/components/Layout";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import DemoBanner from "@/components/DemoBanner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,11 +19,14 @@ const LawyerDashboard = () => {
   
   if (loading) {
     return (
-      <Layout>
+      <div className="min-h-screen bg-background font-arabic" dir="rtl">
+        <DemoBanner />
+        <Header />
         <div className="flex items-center justify-center min-h-screen">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
-      </Layout>
+        <Footer />
+      </div>
     );
   }
   
@@ -82,12 +87,15 @@ const LawyerDashboard = () => {
   }];
   
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full flex-row-reverse" dir="rtl">
-        <LawyerSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        
-        <main className="flex-1 overflow-auto bg-gradient-to-br from-background via-background to-muted/20">
-          <Layout>
+    <div className="min-h-screen bg-background font-arabic" dir="rtl">
+      <DemoBanner />
+      <Header />
+      
+      <SidebarProvider defaultOpen={true}>
+        <div className="flex w-full flex-row-reverse">
+          <LawyerSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+          
+          <main className="flex-1 min-h-screen bg-gradient-to-br from-background via-background to-muted/20 transition-all duration-300">
             <div className="py-8">
               <div className="container mx-auto px-4">
                 {/* Header with Mobile Menu */}
@@ -379,10 +387,12 @@ const LawyerDashboard = () => {
                 )}
               </div>
             </div>
-          </Layout>
-        </main>
-      </div>
-    </SidebarProvider>
+          </main>
+        </div>
+      </SidebarProvider>
+      
+      <Footer />
+    </div>
   );
 };
 
