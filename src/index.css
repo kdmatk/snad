@@ -160,3 +160,14 @@
   background: #475569;
   color: white;
 }
+
+/* Golden theme utilities */
+.golden-ring {
+  border: 3px solid hsl(var(--secondary));
+  box-shadow: 0 0 15px hsla(var(--secondary), 0.3);
+}
+
+.star-golden {
+  color: hsl(var(--secondary));
+  filter: drop-shadow(0 2px 4px hsla(var(--secondary), 0.3));
+}
