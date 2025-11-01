@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import { Bot, X, Send, Loader2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -88,22 +88,24 @@ const AICustomerSupport = () => {
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 left-6 h-14 w-14 rounded-full shadow-lg z-50"
-          variant="secondary"
+          className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl z-50 animate-pulse hover:animate-none bg-gradient-to-br from-primary to-primary/80"
           size="icon"
         >
-          <MessageCircle className="h-6 w-6" />
+          <div className="relative">
+            <Bot className="h-7 w-7 text-primary-foreground" />
+            <Sparkles className="h-4 w-4 text-primary-foreground absolute -top-1 -right-1 animate-pulse" />
+          </div>
         </Button>
       )}
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-6 left-6 w-96 h-[500px] shadow-2xl z-50 flex flex-col">
+        <Card className="fixed bottom-6 right-6 w-96 h-[500px] shadow-2xl z-50 flex flex-col">
           {/* Header */}
           <div className="bg-primary text-primary-foreground p-4 rounded-t-lg flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5" />
-              <h3 className="font-semibold">خدمة العملاء الذكية</h3>
+              <Bot className="h-5 w-5" />
+              <h3 className="font-semibold">مساعد ذكي - خدمة العملاء</h3>
             </div>
             <Button
               variant="ghost"
