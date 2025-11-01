@@ -71,7 +71,7 @@ const CasesManagement = () => {
       }
     };
     const config = statusConfig[status as keyof typeof statusConfig];
-    return <Badge variant={config.variant} className="bg-red-700 rounded-sm">{config.label}</Badge>;
+    return <Badge variant={config.variant} className="bg-red-700 rounded-xl">{config.label}</Badge>;
   };
   const getUrgencyBadge = (urgency: string) => {
     const urgencyConfig = {
