@@ -1,61 +1,64 @@
-
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DollarSign, Users, Calendar, Star, TrendingUp, MessageCircle, FileText, Settings } from "lucide-react";
-
 const LawyerDashboard = () => {
-  const stats = [
-    { title: "الإيرادات الشهرية", value: "12,500 ريال", icon: DollarSign, change: "+15%" },
-    { title: "عدد العملاء", value: "48", icon: Users, change: "+8%" },
-    { title: "الاستشارات المكتملة", value: "156", icon: MessageCircle, change: "+12%" },
-    { title: "متوسط التقييم", value: "4.9", icon: Star, change: "+0.2" }
-  ];
-
-  const recentRequests = [
-    {
-      id: 1,
-      title: "استشارة حول قانون الشركات",
-      client: "أحمد محمد",
-      type: "استشارة فورية",
-      price: "500 ريال",
-      status: "جديد",
-      date: "منذ ساعتين"
-    },
-    {
-      id: 2,
-      title: "مراجعة عقد إيجار",
-      client: "فاطمة علي",
-      type: "مراجعة وثائق",
-      price: "300 ريال",
-      status: "قيد المراجعة",
-      date: "أمس"
-    }
-  ];
-
-  const upcomingAppointments = [
-    {
-      id: 1,
-      title: "استشارة قانونية",
-      client: "خالد الأحمد",
-      time: "14:00",
-      date: "اليوم",
-      type: "فيديو"
-    },
-    {
-      id: 2,
-      title: "جلسة تحكيم",
-      client: "شركة النور",
-      time: "10:00",
-      date: "غداً",
-      type: "حضوري"
-    }
-  ];
-
-  return (
-    <Layout>
+  const stats = [{
+    title: "الإيرادات الشهرية",
+    value: "12,500 ريال",
+    icon: DollarSign,
+    change: "+15%"
+  }, {
+    title: "عدد العملاء",
+    value: "48",
+    icon: Users,
+    change: "+8%"
+  }, {
+    title: "الاستشارات المكتملة",
+    value: "156",
+    icon: MessageCircle,
+    change: "+12%"
+  }, {
+    title: "متوسط التقييم",
+    value: "4.9",
+    icon: Star,
+    change: "+0.2"
+  }];
+  const recentRequests = [{
+    id: 1,
+    title: "استشارة حول قانون الشركات",
+    client: "أحمد محمد",
+    type: "استشارة فورية",
+    price: "500 ريال",
+    status: "جديد",
+    date: "منذ ساعتين"
+  }, {
+    id: 2,
+    title: "مراجعة عقد إيجار",
+    client: "فاطمة علي",
+    type: "مراجعة وثائق",
+    price: "300 ريال",
+    status: "قيد المراجعة",
+    date: "أمس"
+  }];
+  const upcomingAppointments = [{
+    id: 1,
+    title: "استشارة قانونية",
+    client: "خالد الأحمد",
+    time: "14:00",
+    date: "اليوم",
+    type: "فيديو"
+  }, {
+    id: 2,
+    title: "جلسة تحكيم",
+    client: "شركة النور",
+    time: "10:00",
+    date: "غداً",
+    type: "حضوري"
+  }];
+  return <Layout>
       <div className="py-8">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
@@ -72,9 +75,8 @@ const LawyerDashboard = () => {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             {stats.map((stat, index) => {
-              const IconComponent = stat.icon;
-              return (
-                <Card key={index}>
+            const IconComponent = stat.icon;
+            return <Card key={index}>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -88,9 +90,8 @@ const LawyerDashboard = () => {
                       <IconComponent className="h-8 w-8 text-primary" />
                     </div>
                   </CardContent>
-                </Card>
-              );
-            })}
+                </Card>;
+          })}
           </div>
 
           <Tabs defaultValue="requests" className="w-full">
@@ -110,8 +111,7 @@ const LawyerDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {recentRequests.map((request) => (
-                      <div key={request.id} className="p-4 border rounded-lg">
+                    {recentRequests.map(request => <div key={request.id} className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-bold">{request.title}</h3>
                           <Badge variant={request.status === 'جديد' ? 'default' : 'secondary'}>
@@ -129,8 +129,7 @@ const LawyerDashboard = () => {
                             <Button size="sm">قبول</Button>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </CardContent>
               </Card>
@@ -143,11 +142,10 @@ const LawyerDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {upcomingAppointments.map((appointment) => (
-                      <div key={appointment.id} className="p-4 border rounded-lg">
+                    {upcomingAppointments.map(appointment => <div key={appointment.id} className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-bold">{appointment.title}</h3>
-                          <Badge variant="outline">{appointment.type}</Badge>
+                          <Badge variant="outline" className="bg-blue-800">{appointment.type}</Badge>
                         </div>
                         <p className="text-sm text-muted-foreground mb-2">العميل: {appointment.client}</p>
                         <div className="flex items-center justify-between">
@@ -160,8 +158,7 @@ const LawyerDashboard = () => {
                           </div>
                           <Button size="sm" variant="outline">تفاصيل</Button>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </CardContent>
               </Card>
@@ -240,8 +237,6 @@ const LawyerDashboard = () => {
           </Tabs>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default LawyerDashboard;
