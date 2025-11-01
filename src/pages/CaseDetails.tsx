@@ -1,10 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Clock, DollarSign, Users, FileText, AlertCircle, Download, File } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ArrowRight, Clock, DollarSign, Users, FileText, AlertCircle, Download, File, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -13,6 +15,7 @@ import { toast } from "sonner";
 const CaseDetails = () => {
   const { caseId } = useParams<{ caseId: string }>();
   const navigate = useNavigate();
+  const [previewFile, setPreviewFile] = useState<{ url: string; name: string; type: string } | null>(null);
 
   const { data: legalCase, isLoading } = useQuery({
     queryKey: ["case-details", caseId],
@@ -67,6 +70,31 @@ const CaseDetails = () => {
     };
     
     return urgency ? urgencyMap[urgency] || urgencyMap.normal : null;
+  };
+
+  const getFileType = (fileName: string): string => {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) return 'image';
+    if (ext === 'pdf') return 'pdf';
+    return 'other';
+  };
+
+  const previewFileHandler = async (filePath: string) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('case-files')
+        .download(filePath);
+
+      if (error) throw error;
+
+      const fileName = filePath.split('/').pop() || 'file';
+      const fileType = getFileType(fileName);
+      const url = URL.createObjectURL(data);
+      
+      setPreviewFile({ url, name: fileName, type: fileType });
+    } catch (error: any) {
+      toast.error("فشل فتح الملف");
+    }
   };
 
   const downloadFile = async (filePath: string) => {
@@ -180,6 +208,7 @@ const CaseDetails = () => {
                       <div className="space-y-2">
                         {legalCase.attachments.map((filePath, index) => {
                           const fileName = filePath.split('/').pop() || `file-${index + 1}`;
+                          const fileType = getFileType(fileName);
                           return (
                             <div
                               key={index}
@@ -189,14 +218,26 @@ const CaseDetails = () => {
                                 <FileText className="h-5 w-5 text-primary flex-shrink-0" />
                                 <span className="text-sm truncate">{fileName}</span>
                               </div>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => downloadFile(filePath)}
-                              >
-                                <Download className="h-4 w-4 ml-1" />
-                                تحميل
-                              </Button>
+                              <div className="flex gap-2">
+                                {(fileType === 'image' || fileType === 'pdf') && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => previewFileHandler(filePath)}
+                                  >
+                                    <Eye className="h-4 w-4 ml-1" />
+                                    معاينة
+                                  </Button>
+                                )}
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => downloadFile(filePath)}
+                                >
+                                  <Download className="h-4 w-4 ml-1" />
+                                  تحميل
+                                </Button>
+                              </div>
                             </div>
                           );
                         })}
@@ -306,6 +347,31 @@ const CaseDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* نافذة معاينة الملف */}
+      <Dialog open={!!previewFile} onOpenChange={() => setPreviewFile(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>{previewFile?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-auto max-h-[calc(90vh-100px)]">
+            {previewFile?.type === 'image' && (
+              <img 
+                src={previewFile.url} 
+                alt={previewFile.name}
+                className="w-full h-auto rounded-lg"
+              />
+            )}
+            {previewFile?.type === 'pdf' && (
+              <iframe
+                src={previewFile.url}
+                className="w-full h-[calc(90vh-150px)] rounded-lg"
+                title={previewFile.name}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
