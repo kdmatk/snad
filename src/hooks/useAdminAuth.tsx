@@ -52,22 +52,36 @@ export const useAdminAuth = () => {
     try {
       setLoading(true);
       
+      // التحقق من وجود المدير في قاعدة البيانات أولاً
+      const { data: adminCheck } = await supabase
+        .from('admins')
+        .select('email, is_active')
+        .eq('email', email)
+        .eq('is_active', true)
+        .single();
+
+      if (!adminCheck) {
+        throw new Error('هذا البريد الإلكتروني غير مسجل كمدير');
+      }
+
       // محاولة تسجيل الدخول
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
-      // إذا فشل تسجيل الدخول وكانت البيانات للمدير الافتراضي، أنشئ المستخدم
-      if (error && error.message.includes('Invalid login credentials') && 
-          email === 'admin@example.com' && password === 'Admin771298!') {
+      // إذا فشل تسجيل الدخول بسبب عدم وجود المستخدم، قم بإنشائه
+      if (error && error.message.includes('Invalid login credentials')) {
+        console.log('إنشاء مستخدم مدير جديد في نظام المصادقة...');
         
-        console.log('إنشاء مستخدم مدير جديد...');
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/admin`
+            emailRedirectTo: `${window.location.origin}/admin`,
+            data: {
+              is_admin: true
+            }
           }
         });
 
@@ -76,7 +90,20 @@ export const useAdminAuth = () => {
         }
 
         if (signUpData.user) {
-          await checkAdminInDatabase(signUpData.user.email!);
+          // انتظر قليلاً لضمان إنشاء المستخدم
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // حاول تسجيل الدخول مرة أخرى
+          const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+
+          if (retryError) {
+            throw new Error('تم إنشاء الحساب بنجاح. الرجاء المحاولة مرة أخرى.');
+          }
+
+          await checkAdminInDatabase(retryData.user.email!);
           return;
         }
       } else if (error) {
@@ -84,16 +111,14 @@ export const useAdminAuth = () => {
       }
 
       // التحقق من صلاحيات المدير
-      if (data.user?.email) {
+      if (data?.user?.email) {
         await checkAdminInDatabase(data.user.email);
       }
     } catch (error: any) {
       console.error('خطأ في تسجيل الدخول:', error);
       toast({
         title: "خطأ في تسجيل الدخول",
-        description: error.message === 'Invalid login credentials' 
-          ? "بيانات الدخول غير صحيحة" 
-          : error.message || "فشل في تسجيل الدخول",
+        description: error.message || "فشل في تسجيل الدخول",
         variant: "destructive",
       });
       throw error;
