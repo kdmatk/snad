@@ -13,6 +13,7 @@ const LegalLibrary = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
 
   const documents = [
+    // قوانين ولوائح
     {
       id: 1,
       title: "نظام الشركات السعودي الجديد 2023",
@@ -22,7 +23,7 @@ const LegalLibrary = () => {
       downloads: 1250,
       description: "النسخة المحدثة من نظام الشركات في المملكة العربية السعودية",
       date: "2023-12-15",
-      url: "/documents/companies-law-2023.pdf" // URL للملف - يجب استبداله بالرابط الحقيقي
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
     },
     {
       id: 2,
@@ -33,18 +34,7 @@ const LegalLibrary = () => {
       downloads: 890,
       description: "دليل شامل لقانون العمل في دولة الإمارات العربية المتحدة",
       date: "2023-11-20",
-      url: "/documents/uae-labor-law-guide.pdf"
-    },
-    {
-      id: 3,
-      title: "نماذج العقود التجارية",
-      category: "نماذج",
-      type: "DOCX",
-      size: "450 KB",
-      downloads: 2100,
-      description: "مجموعة من نماذج العقود التجارية المعتمدة",
-      date: "2023-10-30",
-      url: "/documents/commercial-contracts-templates.docx"
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
     },
     {
       id: 4,
@@ -55,7 +45,7 @@ const LegalLibrary = () => {
       downloads: 567,
       description: "مجموعة من أهم القرارات القضائية في المجال العقاري",
       date: "2023-09-15",
-      url: "/documents/real-estate-court-decisions.pdf"
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
     },
     {
       id: 5,
@@ -66,10 +56,331 @@ const LegalLibrary = () => {
       downloads: 432,
       description: "لائحة التحكيم المعتمدة في دول مجلس التعاون الخليجي",
       date: "2023-08-25",
-      url: "/documents/gcc-arbitration-regulation.pdf"
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    
+    // نماذج العقود التجارية من Google Drive
+    {
+      id: 100,
+      title: "عقد إيجار سيارة",
+      category: "نماذج",
+      type: "PDF",
+      size: "151 KB",
+      downloads: 245,
+      description: "نموذج عقد إيجار سيارة مع كافة الشروط والبنود القانونية",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
     },
     {
-      id: 6,
+      id: 101,
+      title: "عقد بيع بشرط التجربة",
+      category: "نماذج",
+      type: "PDF",
+      size: "195 KB",
+      downloads: 312,
+      description: "عقد بيع مع شرط التجربة للمنتجات والخدمات",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 102,
+      title: "عقد بيع سيارة",
+      category: "نماذج",
+      type: "PDF",
+      size: "140 KB",
+      downloads: 523,
+      description: "نموذج عقد بيع سيارة معتمد وشامل",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 103,
+      title: "عقد تأجير مسكن",
+      category: "نماذج",
+      type: "PDF",
+      size: "203 KB",
+      downloads: 1834,
+      description: "عقد تأجير سكني شامل لجميع البنود والشروط",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 104,
+      title: "عقد تأسيس شركة ذات مسئولية محدودة",
+      category: "نماذج",
+      type: "PDF",
+      size: "184 KB",
+      downloads: 876,
+      description: "نموذج قانوني لتأسيس شركة ذات مسئولية محدودة",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 105,
+      title: "عقد تخزين بضائع",
+      category: "نماذج",
+      type: "PDF",
+      size: "44 KB",
+      downloads: 198,
+      description: "عقد تخزين بضائع في المستودعات",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 106,
+      title: "عقد تسويق",
+      category: "نماذج",
+      type: "PDF",
+      size: "223 KB",
+      downloads: 645,
+      description: "عقد تسويق منتجات وخدمات تجارية",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 107,
+      title: "عقد تصنيع وبيع بضائع",
+      category: "نماذج",
+      type: "PDF",
+      size: "20 KB",
+      downloads: 234,
+      description: "نموذج عقد تصنيع وبيع البضائع التجارية",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 108,
+      title: "عقد توريد",
+      category: "نماذج",
+      type: "PDF",
+      size: "53 KB",
+      downloads: 567,
+      description: "عقد توريد سلع ومنتجات",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 109,
+      title: "عقد توزيع",
+      category: "نماذج",
+      type: "PDF",
+      size: "76 KB",
+      downloads: 423,
+      description: "عقد توزيع منتجات تجارية",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 110,
+      title: "عقد توزيع إقليمي",
+      category: "نماذج",
+      type: "PDF",
+      size: "46 KB",
+      downloads: 312,
+      description: "عقد توزيع إقليمي حصري",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 111,
+      title: "عقد توزيع منتجات",
+      category: "نماذج",
+      type: "PDF",
+      size: "200 KB",
+      downloads: 489,
+      description: "نموذج شامل لعقد توزيع المنتجات",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 112,
+      title: "عقد حل وتصفية شركة بالاتفاق",
+      category: "نماذج",
+      type: "PDF",
+      size: "133 KB",
+      downloads: 276,
+      description: "عقد حل وتصفية الشركات بالتراضي",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 113,
+      title: "عقد رسمي لبيع حق انتفاع",
+      category: "نماذج",
+      type: "PDF",
+      size: "157 KB",
+      downloads: 198,
+      description: "عقد بيع حق الانتفاع العقاري",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 114,
+      title: "عقد شراكة",
+      category: "نماذج",
+      type: "PDF",
+      size: "55 KB",
+      downloads: 1245,
+      description: "نموذج عقد شراكة تجارية",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 115,
+      title: "عقد شركة تضامن",
+      category: "نماذج",
+      type: "PDF",
+      size: "158 KB",
+      downloads: 423,
+      description: "عقد تأسيس شركة تضامن",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 116,
+      title: "عقد شركة توصية بسيطة",
+      category: "نماذج",
+      type: "PDF",
+      size: "166 KB",
+      downloads: 334,
+      description: "عقد تأسيس شركة توصية بسيطة",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 117,
+      title: "عقد طبع ونشر",
+      category: "نماذج",
+      type: "PDF",
+      size: "157 KB",
+      downloads: 267,
+      description: "عقد طبع ونشر مطبوعات وكتب",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 118,
+      title: "عقد عمل",
+      category: "نماذج",
+      type: "PDF",
+      size: "158 KB",
+      downloads: 2134,
+      description: "نموذج عقد عمل معتمد",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 119,
+      title: "عقد عمل (نموذج 2)",
+      category: "نماذج",
+      type: "PDF",
+      size: "149 KB",
+      downloads: 1876,
+      description: "نموذج عقد عمل بديل",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 120,
+      title: "عقد فسخ عقد شراكة",
+      category: "نماذج",
+      type: "PDF",
+      size: "21 KB",
+      downloads: 345,
+      description: "نموذج فسخ عقد الشراكة",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 121,
+      title: "عقد قسمة بمعدل",
+      category: "نماذج",
+      type: "PDF",
+      size: "192 KB",
+      downloads: 289,
+      description: "عقد قسمة أملاك بالتعديل",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 122,
+      title: "عقد مشاركة لبناء عمارة سكنية",
+      category: "نماذج",
+      type: "PDF",
+      size: "227 KB",
+      downloads: 456,
+      description: "عقد مشاركة في مشاريع البناء السكنية",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 123,
+      title: "عقد مقاولة لإنشاء مبنى إداري",
+      category: "نماذج",
+      type: "PDF",
+      size: "253 KB",
+      downloads: 512,
+      description: "عقد مقاولة لإنشاء مبنى إداري لمصنع",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 124,
+      title: "عقد مقاولة مع مهندس",
+      category: "نماذج",
+      type: "PDF",
+      size: "197 KB",
+      downloads: 634,
+      description: "عقد مقاولة مع مهندس لعمل تصميم ومقايسة",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 125,
+      title: "عقد مقاولة",
+      category: "نماذج",
+      type: "PDF",
+      size: "233 KB",
+      downloads: 923,
+      description: "نموذج عقد مقاولة عام",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 126,
+      title: "عقد نشر كتاب",
+      category: "نماذج",
+      type: "PDF",
+      size: "148 KB",
+      downloads: 234,
+      description: "عقد نشر كتاب مع دار النشر",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 127,
+      title: "عقد هبة رسمي",
+      category: "نماذج",
+      type: "PDF",
+      size: "150 KB",
+      downloads: 445,
+      description: "عقد هبة موثق رسمياً",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 128,
+      title: "عقد وساطة",
+      category: "نماذج",
+      type: "PDF",
+      size: "23 KB",
+      downloads: 378,
+      description: "عقد وساطة تجارية",
+      date: "2020-03-03",
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
+    },
+    {
+      id: 129,
       title: "نموذج دعوى التعويض عن الأضرار",
       category: "نماذج",
       type: "DOCX",
@@ -77,7 +388,7 @@ const LegalLibrary = () => {
       downloads: 1456,
       description: "نموذج قانوني لرفع دعوى التعويض عن الأضرار",
       date: "2023-07-10",
-      url: "/documents/compensation-claim-template.docx"
+      url: "https://drive.google.com/drive/folders/1I3sXtJe5wEzi9siHbn2x1HbeZe_Ft1xT"
     }
   ];
 
