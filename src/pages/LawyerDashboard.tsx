@@ -84,7 +84,7 @@ const LawyerDashboard = () => {
   return (
     <Layout>
       <SidebarProvider defaultOpen={true}>
-        <div className="min-h-screen flex w-full">
+        <div className="min-h-screen flex w-full flex-row-reverse">
           <LawyerSidebar activeTab={activeTab} onTabChange={setActiveTab} />
           
           <main className="flex-1 overflow-auto bg-gradient-to-br from-background via-background to-muted/20">
