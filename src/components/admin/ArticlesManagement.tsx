@@ -149,7 +149,7 @@ const ArticlesManagement = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{article.category}</Badge>
+                    <Badge variant="outline" className="bg-yellow-300">{article.category}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
