@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DollarSign, Users, Calendar, Star, TrendingUp, MessageCircle, FileText, Settings, User, Phone, Mail, MapPin, Loader2, Briefcase } from "lucide-react";
+import { DollarSign, Users, Calendar, Star, TrendingUp, MessageCircle, FileText, Settings, User, Phone, Mail, MapPin, Loader2, Briefcase, Gavel } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useNavigate } from "react-router-dom";
 
 const LawyerDashboard = () => {
+  const navigate = useNavigate();
   const { profile, loading } = useUserProfile();
   
   if (loading) {
@@ -84,11 +86,37 @@ const LawyerDashboard = () => {
               <h1 className="text-3xl font-bold text-primary">لوحة تحكم المحامي</h1>
               <p className="text-muted-foreground">مرحباً {profile?.full_name || 'محامي'}</p>
             </div>
-            <Button>
-              <Settings className="h-4 w-4 ml-2" />
-              إعدادات الملف الشخصي
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => navigate('/legal-auctions')} variant="outline">
+                <Gavel className="h-4 w-4 ml-2" />
+                المزادات القانونية
+              </Button>
+              <Button>
+                <Settings className="h-4 w-4 ml-2" />
+                إعدادات الملف الشخصي
+              </Button>
+            </div>
           </div>
+
+          {/* بطاقة المزادات القانونية */}
+          <Card className="mb-8 bg-gradient-to-l from-primary/5 to-secondary/5 border-primary/20">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <Gavel className="h-8 w-8 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-2">المزادات القانونية - فرص جديدة</h3>
+                  <p className="text-muted-foreground mb-4">
+                    تصفح القضايا المتاحة وقدم عروضك! كلما كان عرضك أفضل (سعر + سرعة + خبرتك)، كلما زادت فرصة قبوله.
+                  </p>
+                  <Button onClick={() => navigate('/legal-auctions')} className="bg-primary">
+                    تصفح المزادات المتاحة
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

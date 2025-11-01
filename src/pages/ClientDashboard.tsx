@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Calendar, MessageCircle, Star, Clock, User, Phone, Plus, Loader2, Mail, MapPin, Gavel } from "lucide-react";
+import { FileText, Calendar, MessageCircle, Star, Clock, User, Phone, Plus, Loader2, Mail, MapPin, Scale } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useClientData } from "@/hooks/useClientData";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -45,9 +45,9 @@ const ClientDashboard = () => {
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold text-primary">لوحة التحكم</h1>
             <div className="flex gap-2">
-              <Button onClick={() => navigate('/legal-auctions')} variant="outline">
-                <Gavel className="h-4 w-4 ml-2" />
-                المزادات القانونية
+              <Button onClick={() => navigate('/my-cases')} variant="outline">
+                <Scale className="h-4 w-4 ml-2" />
+                قضاياي
               </Button>
               <Button onClick={() => navigate('/request-service')}>
                 <Plus className="h-4 w-4 ml-2" />
@@ -88,24 +88,24 @@ const ClientDashboard = () => {
             </Card>
           </div>
 
-          {/* المزادات القانونية - بطاقة إعلانية */}
+          {/* قضاياي - بطاقة إعلانية */}
           <Card className="mb-8 bg-gradient-to-l from-primary/5 to-secondary/5 border-primary/20">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-primary/10 rounded-lg">
-                  <Gavel className="h-8 w-8 text-primary" />
+                  <Scale className="h-8 w-8 text-primary" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-bold mb-2">نظام المزادات القانونية الذكي</h3>
                   <p className="text-muted-foreground mb-4">
-                    احصل على أفضل العروض من المحامين! يتم ترتيب العروض تلقائياً حسب نظام التقييم الذكي (السعر 40% + التقييم 35% + السرعة 15% + الخبرة 10%)
+                    أنشئ قضية وافتح مزاد لها، واحصل على أفضل العروض من المحامين! يتم ترتيب العروض تلقائياً حسب نظام التقييم الذكي (السعر 40% + التقييم 35% + السرعة 15% + الخبرة 10%)
                   </p>
                   <div className="flex gap-2">
-                    <Button onClick={() => navigate('/legal-auctions')} className="bg-primary">
-                      تصفح المزادات
+                    <Button onClick={() => navigate('/my-cases')} className="bg-primary">
+                      عرض قضاياي
                     </Button>
-                    <Button onClick={() => navigate('/request-service')} variant="outline">
-                      إنشاء مزاد جديد
+                    <Button onClick={() => navigate('/my-cases')} variant="outline">
+                      إنشاء قضية/مزاد جديد
                     </Button>
                   </div>
                 </div>

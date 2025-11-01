@@ -32,6 +32,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Demo from "./pages/Demo";
 import CaseBids from "./pages/CaseBids";
 import LawyerBids from "./pages/LawyerBids";
+import MyCases from "./pages/MyCases";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,6 +77,7 @@ const App = () => (
             <Route path="/demo" element={<Demo />} />
             <Route path="/case-bids/:caseId" element={<CaseBids />} />
             <Route path="/lawyer-bids/:caseId" element={<LawyerBids />} />
+            <Route path="/my-cases" element={<MyCases />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
