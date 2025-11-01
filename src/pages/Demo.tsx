@@ -437,15 +437,38 @@ const Demo = () => {
                         ⚠️ إذا كان "Confirm email" مفعّلاً، سيظهر خطأ "Email not confirmed"
                       </p>
                     </div>
-                    <Button
-                      variant="default"
-                      size="lg"
-                      onClick={() => window.open('https://supabase.com/dashboard/project/crdqvjbezdgjxqitwmns/auth/providers', '_blank')}
-                      className="w-full bg-red-600 hover:bg-red-700 text-white mt-2"
-                    >
-                      <Shield className="ml-2 h-5 w-5" />
-                      افتح إعدادات Supabase الآن
-                    </Button>
+                    <div className="bg-white dark:bg-red-950 p-3 rounded-lg border border-red-200 dark:border-red-800">
+                      <p className="text-sm font-bold text-red-900 dark:text-red-100 mb-2">الخطوة 3: حذف المستخدمين غير المؤكدين (إذا لزم الأمر)</p>
+                      <ol className="text-sm text-red-800 dark:text-red-200 list-decimal list-inside space-y-1 mr-2">
+                        <li>افتح: Authentication → Users</li>
+                        <li>ابحث عن demo@client.com أو demo@lawyer.com</li>
+                        <li>إذا وجدت المستخدم وكان غير مؤكد (Unconfirmed)، احذفه</li>
+                        <li>عُد للصفحة التجريبية وحاول تسجيل الدخول مرة أخرى</li>
+                      </ol>
+                      <p className="text-xs text-red-700 dark:text-red-300 mt-2 font-bold bg-red-100 dark:bg-red-900 p-2 rounded">
+                        💡 المنصة ستقوم بإنشاء الحساب تلقائياً عند تسجيل الدخول
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      <Button
+                        variant="default"
+                        size="lg"
+                        onClick={() => window.open('https://supabase.com/dashboard/project/crdqvjbezdgjxqitwmns/auth/providers', '_blank')}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                      >
+                        <Shield className="ml-2 h-5 w-5" />
+                        إعدادات المصادقة
+                      </Button>
+                      <Button
+                        variant="default"
+                        size="lg"
+                        onClick={() => window.open('https://supabase.com/dashboard/project/crdqvjbezdgjxqitwmns/auth/users', '_blank')}
+                        className="bg-amber-600 hover:bg-amber-700 text-white"
+                      >
+                        <User className="ml-2 h-5 w-5" />
+                        حذف المستخدمين
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardContent>
