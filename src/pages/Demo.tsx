@@ -22,16 +22,45 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Demo = () => {
   const navigate = useNavigate();
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [loggingIn, setLoggingIn] = useState<string | null>(null);
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     toast.success("تم النسخ إلى الحافظة");
     setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const handleDemoLogin = async (email: string, password: string, accountType: string) => {
+    try {
+      setLoggingIn(accountType);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      toast.success("تم تسجيل الدخول بنجاح!");
+      
+      // Redirect based on account type
+      if (accountType === 'client') {
+        navigate('/client-dashboard');
+      } else if (accountType === 'lawyer') {
+        navigate('/lawyer-dashboard');
+      }
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast.error("حدث خطأ في تسجيل الدخول");
+    } finally {
+      setLoggingIn(null);
+    }
   };
 
   const demoAccounts = [
@@ -202,10 +231,11 @@ const Demo = () => {
                     <Button 
                       className={`w-full bg-gradient-to-r ${account.color} text-white`}
                       size="lg"
-                      onClick={() => navigate('/login')}
+                      onClick={() => handleDemoLogin(account.email, account.password, account.type)}
+                      disabled={loggingIn === account.type}
                     >
                       <UserCheck className="ml-2 h-5 w-5" />
-                      تسجيل الدخول الآن
+                      {loggingIn === account.type ? "جاري تسجيل الدخول..." : "تسجيل الدخول الآن"}
                     </Button>
                   </CardContent>
                 </Card>
