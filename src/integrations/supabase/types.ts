@@ -465,22 +465,7 @@ export type Database = {
           updated_at?: string | null
           urgency?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "legal_cases_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "legal_cases_lawyer_id_fkey"
-            columns: ["lawyer_id"]
-            isOneToOne: false
-            referencedRelation: "lawyers"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       legal_services: {
         Row: {
