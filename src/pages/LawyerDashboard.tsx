@@ -6,21 +6,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DollarSign, Users, Calendar, Star, TrendingUp, MessageCircle, FileText, Settings, User, Phone, Mail, MapPin, Loader2, Briefcase, Gavel } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useNavigate } from "react-router-dom";
-
 const LawyerDashboard = () => {
   const navigate = useNavigate();
-  const { profile, loading } = useUserProfile();
-  
+  const {
+    profile,
+    loading
+  } = useUserProfile();
   if (loading) {
-    return (
-      <Layout>
+    return <Layout>
         <div className="flex items-center justify-center min-h-screen">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
-      </Layout>
-    );
+      </Layout>;
   }
-  
   const stats = [{
     title: "الإيرادات الشهرية",
     value: "12,500 ريال",
@@ -42,7 +40,6 @@ const LawyerDashboard = () => {
     icon: Star,
     change: "+0.2"
   }];
-  
   const recentRequests = [{
     id: 1,
     title: "استشارة حول قانون الشركات",
@@ -60,7 +57,6 @@ const LawyerDashboard = () => {
     status: "قيد المراجعة",
     date: "أمس"
   }];
-  
   const upcomingAppointments = [{
     id: 1,
     title: "استشارة قانونية",
@@ -76,9 +72,7 @@ const LawyerDashboard = () => {
     date: "غداً",
     type: "حضوري"
   }];
-  
-  return (
-    <Layout>
+  return <Layout>
       <div className="py-8">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
@@ -87,10 +81,7 @@ const LawyerDashboard = () => {
               <p className="text-muted-foreground">مرحباً {profile?.full_name || 'محامي'}</p>
             </div>
             <div className="flex gap-2">
-              <Button onClick={() => navigate('/legal-auctions')} variant="outline">
-                <Gavel className="h-4 w-4 ml-2" />
-                المزادات القانونية
-              </Button>
+              
               <Button>
                 <Settings className="h-4 w-4 ml-2" />
                 إعدادات الملف الشخصي
@@ -121,9 +112,8 @@ const LawyerDashboard = () => {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             {stats.map((stat, index) => {
-              const IconComponent = stat.icon;
-              return (
-                <Card key={index}>
+            const IconComponent = stat.icon;
+            return <Card key={index}>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -137,9 +127,8 @@ const LawyerDashboard = () => {
                       <IconComponent className="h-8 w-8 text-primary" />
                     </div>
                   </CardContent>
-                </Card>
-              );
-            })}
+                </Card>;
+          })}
           </div>
 
           <Tabs defaultValue="requests" className="w-full">
@@ -261,15 +250,7 @@ const LawyerDashboard = () => {
                       <CardContent className="p-6">
                         <div className="flex items-start gap-6">
                           <div className="w-24 h-24 bg-secondary/10 rounded-full flex items-center justify-center flex-shrink-0 border-4 border-white shadow-lg">
-                            {profile?.avatar_url ? (
-                              <img 
-                                src={profile.avatar_url} 
-                                alt={profile.full_name}
-                                className="w-full h-full rounded-full object-cover"
-                              />
-                            ) : (
-                              <Briefcase className="h-12 w-12 text-secondary" />
-                            )}
+                            {profile?.avatar_url ? <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full rounded-full object-cover" /> : <Briefcase className="h-12 w-12 text-secondary" />}
                           </div>
                           <div className="flex-1 space-y-4">
                             <div>
@@ -279,11 +260,9 @@ const LawyerDashboard = () => {
                               <Badge variant="secondary" className="mb-2">محامي معتمد</Badge>
                             </div>
                             
-                            {profile?.bio && (
-                              <p className="text-muted-foreground bg-white/50 p-3 rounded-lg">
+                            {profile?.bio && <p className="text-muted-foreground bg-white/50 p-3 rounded-lg">
                                 {profile.bio}
-                              </p>
-                            )}
+                              </p>}
                           </div>
                         </div>
                       </CardContent>
@@ -378,8 +357,6 @@ const LawyerDashboard = () => {
           </Tabs>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default LawyerDashboard;
