@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +40,12 @@ interface CaseEditDialogProps {
 
 const CaseEditDialog = ({ case_, open, onOpenChange, onSave }: CaseEditDialogProps) => {
   const [formData, setFormData] = useState<CaseData | null>(case_);
+
+  useEffect(() => {
+    if (case_) {
+      setFormData(case_);
+    }
+  }, [case_]);
 
   const handleSave = () => {
     if (formData) {
