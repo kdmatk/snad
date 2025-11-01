@@ -426,12 +426,16 @@ const Demo = () => {
                       </ol>
                     </div>
                     <div className="bg-white dark:bg-red-950 p-3 rounded-lg border border-red-200 dark:border-red-800">
-                      <p className="text-sm font-bold text-red-900 dark:text-red-100 mb-2">الخطوة 2: تعطيل Confirm Email</p>
+                      <p className="text-sm font-bold text-red-900 dark:text-red-100 mb-2">الخطوة 2: تعطيل Confirm Email (مهم جداً!)</p>
                       <ol className="text-sm text-red-800 dark:text-red-200 list-decimal list-inside space-y-1 mr-2">
-                        <li>في نفس الصفحة (Email Provider)</li>
-                        <li>قم بإيقاف "Confirm email" ✗</li>
-                        <li>احفظ التغييرات</li>
+                        <li>في نفس الصفحة (Email Provider Settings)</li>
+                        <li>ابحث عن "Confirm email" في الأسفل</li>
+                        <li>تأكد من إيقاف تفعيله تماماً (يجب أن يكون OFF)</li>
+                        <li>اضغط Save في أسفل الصفحة</li>
                       </ol>
+                      <p className="text-xs text-red-700 dark:text-red-300 mt-2 font-bold bg-red-100 dark:bg-red-900 p-2 rounded">
+                        ⚠️ إذا كان "Confirm email" مفعّلاً، سيظهر خطأ "Email not confirmed"
+                      </p>
                     </div>
                     <Button
                       variant="default"
