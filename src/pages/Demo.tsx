@@ -52,11 +52,12 @@ const Demo = () => {
           duration: 2000,
         });
 
-        // Create the demo account
+        // Create the demo account with auto-confirm
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
+            emailRedirectTo: `${window.location.origin}/`,
             data: {
               full_name: accountType === 'client' ? 'عميل تجريبي' : 'محامي تجريبي',
               user_type: accountType
@@ -68,6 +69,15 @@ const Demo = () => {
           throw signUpError;
         }
 
+        // Check if email confirmation is required
+        if (signUpData?.user && !signUpData.user.confirmed_at) {
+          toast.error("يتطلب تأكيد البريد الإلكتروني. يرجى تعطيل 'Confirm email' من إعدادات Supabase لتشغيل النسخة التجريبية.", {
+            duration: 8000,
+            className: "bg-amber-600 text-white font-bold"
+          });
+          return;
+        }
+
         // Now login with the newly created account
         const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
           email,
@@ -77,6 +87,12 @@ const Demo = () => {
         if (loginError) throw loginError;
         
         data = loginData;
+      } else if (error && error.message === "Email not confirmed") {
+        toast.error("يتطلب تأكيد البريد الإلكتروني. يرجى تعطيل 'Confirm email' من إعدادات Supabase.", {
+          duration: 8000,
+          className: "bg-amber-600 text-white font-bold"
+        });
+        return;
       } else if (error) {
         throw error;
       }
@@ -352,12 +368,49 @@ const Demo = () => {
             </CardContent>
           </Card>
 
-          {/* Info Note */}
-          <div className="mt-8 text-center">
-            <div className="inline-flex items-center gap-2 text-sm text-muted-foreground bg-muted px-4 py-3 rounded-lg">
-              <Clock className="h-4 w-4" />
-              <span>جميع البيانات في هذه النسخة تجريبية ولا تمثل معاملات حقيقية</span>
+          {/* Info Notes */}
+          <div className="mt-8 space-y-4">
+            <div className="text-center">
+              <div className="inline-flex items-center gap-2 text-sm text-muted-foreground bg-muted px-4 py-3 rounded-lg">
+                <Clock className="h-4 w-4" />
+                <span>جميع البيانات في هذه النسخة تجريبية ولا تمثل معاملات حقيقية</span>
+              </div>
             </div>
+            
+            <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900">
+              <CardContent className="pt-4">
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0">
+                    <div className="p-2 bg-blue-500 rounded-lg">
+                      <Mail className="h-5 w-5 text-white" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-blue-900 dark:text-blue-100">
+                      ⚙️ إعدادات مطلوبة للنسخة التجريبية
+                    </h3>
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      لتشغيل النسخة التجريبية بنجاح، يجب تعطيل خيار "Confirm email" من إعدادات Supabase:
+                    </p>
+                    <ol className="text-sm text-blue-800 dark:text-blue-200 list-decimal list-inside space-y-1 mr-2">
+                      <li>انتقل إلى لوحة تحكم Supabase</li>
+                      <li>اختر Authentication → Providers → Email</li>
+                      <li>قم بتعطيل "Confirm email"</li>
+                      <li>احفظ التغييرات وارجع لهذه الصفحة</li>
+                    </ol>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open('https://supabase.com/dashboard/project/crdqvjbezdgjxqitwmns/auth/providers', '_blank')}
+                      className="bg-white dark:bg-blue-900 border-blue-300 mt-2"
+                    >
+                      <Shield className="ml-2 h-4 w-4" />
+                      فتح إعدادات Supabase
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
