@@ -138,7 +138,7 @@ const ServiceDialog = ({
 
           {mode === 'view' && <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">عدد الحجوزات</Label>
-              <div className="col-span-3 p-2 bg-gray-50 rounded">
+              <div className="col-span-3 p-2 rounded bg-blue-800">
                 {formData.bookings || 0}
               </div>
             </div>}
