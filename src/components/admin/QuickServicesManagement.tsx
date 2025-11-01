@@ -8,7 +8,6 @@ import { Search, Plus, Eye, Edit, Trash2, Clock, DollarSign, ToggleLeft, ToggleR
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import QuickServiceDialog from "./QuickServiceDialog";
-
 interface QuickService {
   id: string;
   title: string;
@@ -23,7 +22,6 @@ interface QuickService {
   is_active: boolean;
   order_index: number;
 }
-
 const QuickServicesManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [services, setServices] = useState<QuickService[]>([]);
@@ -31,19 +29,20 @@ const QuickServicesManagement = () => {
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   useEffect(() => {
     fetchServices();
   }, []);
-
   const fetchServices = async () => {
     try {
-      const { data, error } = await supabase
-        .from('quick_services')
-        .select('*')
-        .order('order_index', { ascending: true });
-
+      const {
+        data,
+        error
+      } = await supabase.from('quick_services').select('*').order('order_index', {
+        ascending: true
+      });
       if (error) throw error;
       setServices(data || []);
     } catch (error) {
@@ -57,35 +56,28 @@ const QuickServicesManagement = () => {
       setLoading(false);
     }
   };
-
   const handleViewService = (service: QuickService) => {
     setSelectedService(service);
     setDialogMode('view');
     setIsDialogOpen(true);
   };
-
   const handleEditService = (service: QuickService) => {
     setSelectedService(service);
     setDialogMode('edit');
     setIsDialogOpen(true);
   };
-
   const handleCreateService = () => {
     setSelectedService(null);
     setDialogMode('create');
     setIsDialogOpen(true);
   };
-
   const handleDeleteService = async (service: QuickService) => {
     if (confirm(`هل أنت متأكد من حذف الخدمة "${service.title}"؟`)) {
       try {
-        const { error } = await supabase
-          .from('quick_services')
-          .delete()
-          .eq('id', service.id);
-
+        const {
+          error
+        } = await supabase.from('quick_services').delete().eq('id', service.id);
         if (error) throw error;
-
         await fetchServices();
         toast({
           title: "تم الحذف بنجاح",
@@ -101,16 +93,14 @@ const QuickServicesManagement = () => {
       }
     }
   };
-
   const handleToggleStatus = async (service: QuickService) => {
     try {
-      const { error } = await supabase
-        .from('quick_services')
-        .update({ is_active: !service.is_active })
-        .eq('id', service.id);
-
+      const {
+        error
+      } = await supabase.from('quick_services').update({
+        is_active: !service.is_active
+      }).eq('id', service.id);
       if (error) throw error;
-
       await fetchServices();
       toast({
         title: "تم تحديث الحالة",
@@ -125,23 +115,15 @@ const QuickServicesManagement = () => {
       });
     }
   };
-
   const handleSaveService = async () => {
     await fetchServices();
     setIsDialogOpen(false);
   };
-
-  const filteredServices = services.filter(service =>
-    service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    service.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+  const filteredServices = services.filter(service => service.title.toLowerCase().includes(searchTerm.toLowerCase()) || service.category.toLowerCase().includes(searchTerm.toLowerCase()));
   if (loading) {
     return <div className="text-center py-8">جاري التحميل...</div>;
   }
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-600">إدارة الخدمات السريعة</h2>
@@ -158,12 +140,7 @@ const QuickServicesManagement = () => {
         <CardContent className="p-6">
           <div className="relative">
             <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="البحث في الخدمات..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pr-10"
-            />
+            <Input placeholder="البحث في الخدمات..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pr-10" />
           </div>
         </CardContent>
       </Card>
@@ -223,13 +200,12 @@ const QuickServicesManagement = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredServices.map((service) => (
-                  <TableRow key={service.id}>
+                {filteredServices.map(service => <TableRow key={service.id}>
                     <TableCell>
                       <div className="font-medium">{service.title}</div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="bg-blue-50">{service.category}</Badge>
+                      <Badge variant="outline" className="bg-blue-800">{service.category}</Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
@@ -250,76 +226,40 @@ const QuickServicesManagement = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {service.is_popular ? (
-                        <Badge className="bg-yellow-100 text-yellow-800">شائعة</Badge>
-                      ) : (
-                        <Badge variant="outline">عادية</Badge>
-                      )}
+                      {service.is_popular ? <Badge className="bg-yellow-100 text-yellow-800">شائعة</Badge> : <Badge variant="outline">عادية</Badge>}
                     </TableCell>
                     <TableCell>
-                      <div
-                        className="flex items-center gap-2 cursor-pointer"
-                        onClick={() => handleToggleStatus(service)}
-                      >
-                        {service.is_active ? (
-                          <>
+                      <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleToggleStatus(service)}>
+                        {service.is_active ? <>
                             <ToggleRight className="h-5 w-5 text-green-600" />
                             <Badge className="bg-green-100 text-green-800">نشطة</Badge>
-                          </>
-                        ) : (
-                          <>
+                          </> : <>
                             <ToggleLeft className="h-5 w-5 text-gray-400" />
                             <Badge variant="secondary">معطلة</Badge>
-                          </>
-                        )}
+                          </>}
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleViewService(service)}
-                          title="عرض التفاصيل"
-                        >
+                        <Button variant="ghost" size="icon" onClick={() => handleViewService(service)} title="عرض التفاصيل">
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEditService(service)}
-                          title="تعديل"
-                        >
+                        <Button variant="ghost" size="icon" onClick={() => handleEditService(service)} title="تعديل">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-red-600 hover:text-red-700"
-                          onClick={() => handleDeleteService(service)}
-                          title="حذف"
-                        >
+                        <Button variant="ghost" size="icon" className="text-red-600 hover:text-red-700" onClick={() => handleDeleteService(service)} title="حذف">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
-                  </TableRow>
-                ))}
+                  </TableRow>)}
               </TableBody>
             </Table>
           </div>
         </CardContent>
       </Card>
 
-      <QuickServiceDialog
-        service={selectedService}
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        onSave={handleSaveService}
-        mode={dialogMode}
-      />
-    </div>
-  );
+      <QuickServiceDialog service={selectedService} isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} onSave={handleSaveService} mode={dialogMode} />
+    </div>;
 };
-
 export default QuickServicesManagement;
