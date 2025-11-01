@@ -1,10 +1,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Star, Shield, Clock, Sparkles } from "lucide-react";
+import { Search, Star, Shield, Clock, Sparkles, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "./ui/badge";
+import najizLogo from "@/assets/najiz-logo.svg";
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -51,6 +52,19 @@ const Hero = () => {
           <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto text-slate-200">
             اعثر على أفضل المحامين المتخصصين في الوطن العربي واحصل على استشارات قانونية موثوقة
           </p>
+
+          {/* Najiz Button */}
+          <div className="mb-8">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold text-lg py-6 px-8 shadow-2xl border-2 border-white/40 transition-all hover:scale-105"
+              onClick={() => window.open('https://najiz.sa/applications/landing', '_blank')}
+            >
+              <img src={najizLogo} alt="ناجز" className="h-8 ml-3" />
+              دخول منصة ناجز
+              <ExternalLink className="mr-2 h-5 w-5" />
+            </Button>
+          </div>
 
           {/* Search Bar */}
           <div className="max-w-2xl mx-auto mb-8">
