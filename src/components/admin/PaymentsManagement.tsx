@@ -1,4 +1,4 @@
-
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,8 +12,13 @@ import {
   TrendingUp,
   Clock
 } from "lucide-react";
+import PaymentViewDialog from "./PaymentViewDialog";
+import { toast } from "sonner";
 
 const PaymentsManagement = () => {
+  const [selectedPayment, setSelectedPayment] = useState<any | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+
   const payments = [
     {
       id: 1,
@@ -83,6 +88,15 @@ const PaymentsManagement = () => {
       wallet: "محفظة إلكترونية"
     };
     return methods[method as keyof typeof methods] || method;
+  };
+
+  const handleView = (payment: any) => {
+    setSelectedPayment(payment);
+    setViewDialogOpen(true);
+  };
+
+  const handleDownload = (payment: any) => {
+    toast.success(`جاري تحميل فاتورة ${payment.transactionId}`);
   };
 
   return (
@@ -215,10 +229,18 @@ const PaymentsManagement = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleView(payment)}
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleDownload(payment)}
+                      >
                         <Download className="h-4 w-4" />
                       </Button>
                     </div>
@@ -229,6 +251,12 @@ const PaymentsManagement = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <PaymentViewDialog
+        payment={selectedPayment}
+        open={viewDialogOpen}
+        onOpenChange={setViewDialogOpen}
+      />
     </div>
   );
 };

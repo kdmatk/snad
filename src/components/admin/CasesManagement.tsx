@@ -1,10 +1,18 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Eye, Edit, Trash2, Calendar, DollarSign, AlertTriangle, CheckCircle } from "lucide-react";
+import CaseViewDialog from "./CaseViewDialog";
+import CaseEditDialog from "./CaseEditDialog";
+import { toast } from "sonner";
+
 const CasesManagement = () => {
-  const cases = [{
+  const [selectedCase, setSelectedCase] = useState<any | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [cases, setCases] = useState([{
     id: 1,
     title: "نزاع تجاري بين شركتين",
     client: "شركة النور التجارية",
@@ -34,7 +42,7 @@ const CasesManagement = () => {
     urgency: "urgent",
     bids: 5,
     createdAt: "2024-01-13"
-  }];
+  }]);
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       open: {
@@ -91,6 +99,26 @@ const CasesManagement = () => {
         {config.label}
       </Badge>;
   };
+
+  const handleView = (case_: any) => {
+    setSelectedCase(case_);
+    setViewDialogOpen(true);
+  };
+
+  const handleEdit = (case_: any) => {
+    setSelectedCase(case_);
+    setEditDialogOpen(true);
+  };
+
+  const handleDelete = (case_: any) => {
+    toast.success(`تم حذف القضية: ${case_.title}`);
+    setCases(cases.filter(c => c.id !== case_.id));
+  };
+
+  const handleSave = (updatedCase: any) => {
+    setCases(cases.map(c => c.id === updatedCase.id ? updatedCase : c));
+  };
+
   return <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -181,13 +209,26 @@ const CasesManagement = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleView(case_)}
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleEdit(case_)}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="text-red-600">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-red-600"
+                        onClick={() => handleDelete(case_)}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -197,6 +238,19 @@ const CasesManagement = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <CaseViewDialog
+        case_={selectedCase}
+        open={viewDialogOpen}
+        onOpenChange={setViewDialogOpen}
+      />
+
+      <CaseEditDialog
+        case_={selectedCase}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onSave={handleSave}
+      />
     </div>;
 };
 export default CasesManagement;
