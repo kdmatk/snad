@@ -1,13 +1,7 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, DollarSign, User, Briefcase, AlertTriangle } from "lucide-react";
-
 interface CaseData {
   id: number;
   title: string;
@@ -19,16 +13,17 @@ interface CaseData {
   bids: number;
   createdAt: string;
 }
-
 interface CaseViewDialogProps {
   case_: CaseData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const CaseViewDialog = ({ case_, open, onOpenChange }: CaseViewDialogProps) => {
+const CaseViewDialog = ({
+  case_,
+  open,
+  onOpenChange
+}: CaseViewDialogProps) => {
   if (!case_) return null;
-
   const getStatusLabel = (status: string) => {
     const statusConfig: Record<string, string> = {
       open: "مفتوحة",
@@ -39,7 +34,6 @@ const CaseViewDialog = ({ case_, open, onOpenChange }: CaseViewDialogProps) => {
     };
     return statusConfig[status] || status;
   };
-
   const getUrgencyLabel = (urgency: string) => {
     const urgencyConfig: Record<string, string> = {
       low: "منخفضة",
@@ -49,9 +43,7 @@ const CaseViewDialog = ({ case_, open, onOpenChange }: CaseViewDialogProps) => {
     };
     return urgencyConfig[urgency] || urgency;
   };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+  return <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>تفاصيل القضية</DialogTitle>
@@ -61,7 +53,7 @@ const CaseViewDialog = ({ case_, open, onOpenChange }: CaseViewDialogProps) => {
           <div>
             <h3 className="text-lg font-semibold mb-2">{case_.title}</h3>
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="outline">{case_.category}</Badge>
+              <Badge variant="outline" className="bg-amber-500">{case_.category}</Badge>
               <Badge>{getStatusLabel(case_.status)}</Badge>
               <Badge className="bg-yellow-100 text-yellow-800">
                 {case_.urgency === 'urgent' && <AlertTriangle className="h-3 w-3 ml-1" />}
@@ -118,8 +110,6 @@ const CaseViewDialog = ({ case_, open, onOpenChange }: CaseViewDialogProps) => {
           </div>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
-
 export default CaseViewDialog;
