@@ -4,7 +4,8 @@ import { Card } from "./ui/card";
 
 const PlatformSaleBanner = () => {
   const handleContact = () => {
-    window.open('https://t.me/Mram2030', '_blank');
+    const message = encodeURIComponent('طلب تواصل منصة سند القانونية');
+    window.open(`https://t.me/Mram2030?text=${message}`, '_blank');
   };
 
   return (
