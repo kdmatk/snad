@@ -13,7 +13,8 @@ import {
   FileText,
   Settings,
   LogOut,
-  Shield
+  Shield,
+  Clock
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -29,6 +30,7 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
     { id: "lawyers", label: "المحامين", icon: UserCheck, badge: "جديد" },
     { id: "clients", label: "العملاء", icon: Users },
     { id: "services", label: "الخدمات", icon: Briefcase },
+    { id: "quick-services", label: "الخدمات السريعة", icon: Clock },
     { id: "cases", label: "القضايا", icon: Scale },
     { id: "payments", label: "المدفوعات", icon: CreditCard },
     { id: "articles", label: "المقالات", icon: FileText },

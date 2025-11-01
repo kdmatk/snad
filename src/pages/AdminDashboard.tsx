@@ -7,6 +7,7 @@ import AdminCharts from "@/components/admin/AdminCharts";
 import LawyersManagement from "@/components/admin/LawyersManagement";
 import ClientsManagement from "@/components/admin/ClientsManagement";
 import ServicesManagement from "@/components/admin/ServicesManagement";
+import QuickServicesManagement from "@/components/admin/QuickServicesManagement";
 import CasesManagement from "@/components/admin/CasesManagement";
 import PaymentsManagement from "@/components/admin/PaymentsManagement";
 import ArticlesManagement from "@/components/admin/ArticlesManagement";
@@ -65,6 +66,8 @@ const AdminDashboard = () => {
           return <ClientsManagement />;
         case "services":
           return <ServicesManagement />;
+        case "quick-services":
+          return <QuickServicesManagement />;
         case "cases":
           return <CasesManagement />;
         case "payments":

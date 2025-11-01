@@ -1,5 +1,7 @@
 
+import { useEffect, useState } from "react";
 import { FileText, MessageCircle, Scale, Edit, Users, Clock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface QuickService {
   id: number;
@@ -15,120 +17,54 @@ export interface QuickService {
   popular?: boolean;
 }
 
+const iconMap: Record<string, any> = {
+  FileText,
+  MessageCircle,
+  Scale,
+  Edit,
+  Users,
+  Clock
+};
+
 export const useQuickServicesData = () => {
-  const services: QuickService[] = [
-    {
-      id: 1,
-      title: "مراجعة عقد عمل",
-      description: "مراجعة شاملة لعقد عمل مكون من 3 صفحات وتقديم ملاحظات قانونية",
-      duration: "خلال 12 ساعة",
-      durationHours: 12,
-      price: 149,
-      rating: 4.9,
-      lawyer: "محامي معتمد",
-      category: "مراجعة عقود",
-      icon: FileText,
-      popular: true
-    },
-    {
-      id: 2,
-      title: "استشارة أحوال شخصية",
-      description: "استشارة مفصلة في قضايا الزواج والطلاق والحضانة",
-      duration: "خلال 6 ساعات",
-      durationHours: 6,
-      price: 199,
-      rating: 4.8,
-      lawyer: "محامي معتمد",
-      category: "استشارات",
-      icon: MessageCircle
-    },
-    {
-      id: 3,
-      title: "صياغة مذكرة قانونية",
-      description: "إعداد مذكرة قانونية احترافية للدفوع والمرافعات",
-      duration: "خلال 24 ساعة",
-      durationHours: 24,
-      price: 299,
-      rating: 4.7,
-      lawyer: "محامي معتمد",
-      category: "صياغة قانونية",
-      icon: Edit
-    },
-    {
-      id: 4,
-      title: "مراجعة عقد إيجار",
-      description: "مراجعة بنود عقد الإيجار وتقديم التوصيات اللازمة",
-      duration: "خلال 8 ساعات",
-      durationHours: 8,
-      price: 129,
-      rating: 4.9,
-      lawyer: "محامي معتمد",
-      category: "مراجعة عقود",
-      icon: FileText,
-      popular: true
-    },
-    {
-      id: 5,
-      title: "صياغة شكوى رسمية",
-      description: "إعداد شكوى قانونية رسمية للجهات المختصة",
-      duration: "خلال 18 ساعة",
-      durationHours: 18,
-      price: 249,
-      rating: 4.6,
-      lawyer: "محامي معتمد",
-      category: "شكاوى",
-      icon: Scale
-    },
-    {
-      id: 6,
-      title: "توجيه قانوني سريع",
-      description: "إرشاد قانوني فوري للإجراءات الواجب اتخاذها",
-      duration: "خلال 3 ساعات",
-      durationHours: 3,
-      price: 99,
-      rating: 4.8,
-      lawyer: "محامي معتمد",
-      category: "توجيه قانوني سريع",
-      icon: Clock
-    },
-    {
-      id: 7,
-      title: "مراجعة عقد شراكة",
-      description: "تحليل شامل لعقد الشراكة التجارية وتقييم المخاطر",
-      duration: "خلال 24 ساعة",
-      durationHours: 24,
-      price: 399,
-      rating: 4.9,
-      lawyer: "محامي معتمد",
-      category: "مراجعة عقود",
-      icon: Users
-    },
-    {
-      id: 8,
-      title: "استشارة قانون العمل",
-      description: "استشارة متخصصة في حقوق العمال والقضايا العمالية",
-      duration: "خلال 4 ساعات",
-      durationHours: 4,
-      price: 179,
-      rating: 4.7,
-      lawyer: "محامي معتمد",
-      category: "استشارات",
-      icon: MessageCircle,
-      popular: true
-    },
-    {
-      id: 9,
-      title: "صياغة عقد خدمات",
-      description: "إعداد عقد تقديم خدمات احترافي وشامل",
-      duration: "خلال 16 ساعات",
-      durationHours: 16,
-      price: 279,
-      rating: 4.8,
-      lawyer: "محامي معتمد",
-      category: "صياغة قانونية",
-      icon: Edit
+  const [services, setServices] = useState<QuickService[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  const fetchServices = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('quick_services')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index', { ascending: true });
+
+      if (error) throw error;
+
+      const formattedServices: QuickService[] = (data || []).map((service: any) => ({
+        id: parseInt(service.id.split('-')[0], 16), // Convert UUID to number for compatibility
+        title: service.title,
+        description: service.description || '',
+        duration: `خلال ${service.duration_hours} ساعة`,
+        durationHours: service.duration_hours,
+        price: service.price,
+        rating: service.rating,
+        lawyer: service.lawyer || 'محامي معتمد',
+        category: service.category,
+        icon: iconMap[service.icon] || FileText,
+        popular: service.is_popular
+      }));
+
+      setServices(formattedServices);
+    } catch (error) {
+      console.error('Error fetching quick services:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const categories = [
     { name: "استشارات", value: "استشارات" },
@@ -140,6 +76,7 @@ export const useQuickServicesData = () => {
 
   return {
     services,
-    categories
+    categories,
+    loading
   };
 };

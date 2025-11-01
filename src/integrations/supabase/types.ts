@@ -649,6 +649,57 @@ export type Database = {
         }
         Relationships: []
       }
+      quick_services: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          duration_hours: number
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          is_popular: boolean | null
+          lawyer: string | null
+          order_index: number | null
+          price: number
+          rating: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          duration_hours: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          lawyer?: string | null
+          order_index?: number | null
+          price: number
+          rating?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          duration_hours?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          lawyer?: string | null
+          order_index?: number | null
+          price?: number
+          rating?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       session_events: {
         Row: {
           event_data: Json | null
