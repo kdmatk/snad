@@ -6,6 +6,7 @@ import { Star, User, Clock, Phone, Shield, MapPin, Award, MessageCircle } from "
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSupabaseLawyers } from "@/hooks/useSupabaseLawyers";
+import { formatLastSeen } from "@/utils/dateFormatter";
 
 const FeaturedLawyers = () => {
   const [selectedLawyer, setSelectedLawyer] = useState<string | null>(null);
@@ -30,7 +31,9 @@ const FeaturedLawyers = () => {
       description: lawyer.bio || "محامي معتمد ومتخصص",
       phone: lawyer.phone || "+966501234567",
       cases: lawyer.total_cases || 0,
-      successRate: 95 // نسبة نجاح افتراضية للمحامين المميزين
+      successRate: 95, // نسبة نجاح افتراضية للمحامين المميزين
+      isOnline: lawyer.is_online,
+      lastSeen: lawyer.last_seen
     }));
 
   const handleConsultation = (lawyer: typeof featuredLawyers[0]) => {
@@ -112,6 +115,10 @@ const FeaturedLawyers = () => {
                       <Shield className="h-4 w-4 text-white" />
                     </div>
                   )}
+                  {/* مؤشر حالة الاتصال */}
+                  <div className={`absolute top-0 left-0 w-4 h-4 rounded-full border-2 border-white ${
+                    lawyer.isOnline ? 'bg-green-500' : 'bg-gray-400'
+                  }`} title={formatLastSeen(lawyer.lastSeen)} />
                 </div>
                 
                 <div className="space-y-2">
@@ -133,6 +140,14 @@ const FeaturedLawyers = () => {
                   <div className="flex items-center justify-center gap-1 text-muted-foreground">
                     <MapPin className="h-3 w-3" />
                     <span className="text-xs">{lawyer.location}</span>
+                  </div>
+                  
+                  {/* حالة الاتصال */}
+                  <div className="flex items-center justify-center gap-1 text-xs mt-2">
+                    <div className={`w-2 h-2 rounded-full ${lawyer.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
+                    <span className={lawyer.isOnline ? 'text-green-600 font-medium' : 'text-muted-foreground'}>
+                      {formatLastSeen(lawyer.lastSeen)}
+                    </span>
                   </div>
                 </div>
               </CardHeader>
