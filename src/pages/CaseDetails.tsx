@@ -4,10 +4,11 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Clock, DollarSign, Users, FileText, AlertCircle } from "lucide-react";
+import { ArrowRight, Clock, DollarSign, Users, FileText, AlertCircle, Download, File } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 const CaseDetails = () => {
   const { caseId } = useParams<{ caseId: string }>();
@@ -66,6 +67,28 @@ const CaseDetails = () => {
     };
     
     return urgency ? urgencyMap[urgency] || urgencyMap.normal : null;
+  };
+
+  const downloadFile = async (filePath: string) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('case-files')
+        .download(filePath);
+
+      if (error) throw error;
+
+      const fileName = filePath.split('/').pop() || 'file';
+      const url = URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error: any) {
+      toast.error("فشل تحميل الملف");
+    }
   };
 
   if (isLoading) {
@@ -146,12 +169,60 @@ const CaseDetails = () => {
                       {legalCase.description || "لا يوجد وصف"}
                     </p>
                   </div>
+
+                  {/* الملفات المرفقة */}
+                  {legalCase.attachments && legalCase.attachments.length > 0 && (
+                    <div className="pt-6 border-t">
+                      <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                        <File className="h-5 w-5 text-primary" />
+                        الملفات المرفقة ({legalCase.attachments.length})
+                      </h3>
+                      <div className="space-y-2">
+                        {legalCase.attachments.map((filePath, index) => {
+                          const fileName = filePath.split('/').pop() || `file-${index + 1}`;
+                          return (
+                            <div
+                              key={index}
+                              className="flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+                            >
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <FileText className="h-5 w-5 text-primary flex-shrink-0" />
+                                <span className="text-sm truncate">{fileName}</span>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => downloadFile(filePath)}
+                              >
+                                <Download className="h-4 w-4 ml-1" />
+                                تحميل
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
 
             {/* معلومات جانبية */}
             <div className="space-y-6">
+              {/* رقم القضية */}
+              {legalCase.case_number && (
+                <Card className="bg-primary/5 border-primary/20">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-primary">رقم القضية</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold font-mono text-center py-2">
+                      {legalCase.case_number}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* الميزانية */}
               {(legalCase.budget_min || legalCase.budget_max) && (
                 <Card>

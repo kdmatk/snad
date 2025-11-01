@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, DollarSign, Eye, Users } from "lucide-react";
+import { Clock, DollarSign, Eye, Users, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface CaseCardProps {
@@ -16,6 +16,8 @@ interface CaseCardProps {
     urgency?: string;
     created_at: string;
     is_auction: boolean;
+    case_number?: string;
+    attachments?: string[];
   };
   bidsCount?: number;
   isOwner?: boolean;
@@ -55,6 +57,13 @@ const CaseCard = ({ caseData, bidsCount = 0, isOwner = false }: CaseCardProps) =
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              {caseData.case_number && (
+                <Badge variant="secondary" className="font-mono text-xs">
+                  {caseData.case_number}
+                </Badge>
+              )}
+            </div>
             <CardTitle className="text-lg mb-2">{caseData.title}</CardTitle>
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="outline" className="border-primary/20 text-primary">
@@ -93,6 +102,12 @@ const CaseCard = ({ caseData, bidsCount = 0, isOwner = false }: CaseCardProps) =
             <div className="flex items-center gap-1">
               <Users className="h-4 w-4" />
               <span>{bidsCount} عرض</span>
+            </div>
+          )}
+          {caseData.attachments && caseData.attachments.length > 0 && (
+            <div className="flex items-center gap-1">
+              <FileText className="h-4 w-4" />
+              <span>{caseData.attachments.length} ملف</span>
             </div>
           )}
         </div>

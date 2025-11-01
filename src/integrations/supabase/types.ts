@@ -418,9 +418,11 @@ export type Database = {
       }
       legal_cases: {
         Row: {
+          attachments: string[] | null
           auction_end_date: string | null
           budget_max: number | null
           budget_min: number | null
+          case_number: string | null
           category: string
           client_id: string | null
           created_at: string | null
@@ -434,9 +436,11 @@ export type Database = {
           urgency: string | null
         }
         Insert: {
+          attachments?: string[] | null
           auction_end_date?: string | null
           budget_max?: number | null
           budget_min?: number | null
+          case_number?: string | null
           category: string
           client_id?: string | null
           created_at?: string | null
@@ -450,9 +454,11 @@ export type Database = {
           urgency?: string | null
         }
         Update: {
+          attachments?: string[] | null
           auction_end_date?: string | null
           budget_max?: number | null
           budget_min?: number | null
+          case_number?: string | null
           category?: string
           client_id?: string | null
           created_at?: string | null
@@ -1028,6 +1034,7 @@ export type Database = {
         Returns: number
       }
       check_connection_health: { Args: never; Returns: Json }
+      generate_case_number: { Args: never; Returns: string }
       is_admin: { Args: { user_email: string }; Returns: boolean }
       is_super_admin: { Args: { user_email: string }; Returns: boolean }
     }
