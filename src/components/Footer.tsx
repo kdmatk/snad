@@ -105,7 +105,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-white/20 mt-8 pt-8 text-center text-slate-300">
-          <p>منصة سند للخدمات القانونية. جميع الحقوق محفوظة © 2025 </p>
+          <p>منصة سند للخدمات القانونية. جميع الحقوق محفوظة © 2025 -2026 (النسخة التجارية)</p>
         </div>
       </div>
     </footer>;
