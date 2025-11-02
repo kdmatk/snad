@@ -105,7 +105,7 @@ const AICustomerSupport = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 w-96 h-[500px] shadow-2xl z-50 flex flex-col">
+        <Card className="fixed bottom-6 right-6 w-96 h-[500px] shadow-2xl z-50 flex flex-col bg-gradient-to-b from-background to-muted/30">
           {/* Header */}
           <div className="bg-primary text-primary-foreground p-4 rounded-t-lg flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -123,7 +123,7 @@ const AICustomerSupport = () => {
           </div>
 
           {/* Messages */}
-          <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+          <ScrollArea className="flex-1 p-4 bg-transparent" ref={scrollRef}>
             <div className="space-y-4">
               {messages.map((message, index) => (
                 <div
