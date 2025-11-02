@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, X, Send, Loader2, Sparkles } from "lucide-react";
+import { MessageCircle, X, Send, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -90,16 +90,22 @@ const AICustomerSupport = () => {
           <div className="bg-card/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-border">
             <p className="text-sm font-medium text-foreground">تواصل معنا</p>
           </div>
-          <Button
-            onClick={() => setIsOpen(true)}
-            className="h-14 w-14 rounded-full shadow-2xl bg-gradient-to-br from-[#d4af37] to-[#b8941f] hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] transition-all duration-300 hover:scale-110"
-            size="icon"
-          >
-            <div className="relative">
-              <Bot className="h-6 w-6 text-white" />
-              <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white animate-pulse" />
-            </div>
-          </Button>
+          <div className="relative">
+            {/* Ripple effect layers */}
+            <div className="absolute inset-0 rounded-full bg-[#d4af37] opacity-20 animate-ping" />
+            <div className="absolute inset-0 rounded-full bg-[#d4af37] opacity-10 animate-pulse" />
+            
+            <Button
+              onClick={() => setIsOpen(true)}
+              className="relative h-14 w-14 rounded-full shadow-2xl bg-gradient-to-br from-[#d4af37] via-[#f4d03f] to-[#b8941f] hover:shadow-[0_0_40px_rgba(212,175,55,0.7)] transition-all duration-500 hover:scale-110 hover:rotate-12"
+              size="icon"
+            >
+              <div className="relative">
+                <MessageCircle className="h-7 w-7 text-white drop-shadow-lg" />
+                <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-400 rounded-full border-2 border-white shadow-lg animate-pulse" />
+              </div>
+            </Button>
+          </div>
         </div>
       )}
 
@@ -109,7 +115,7 @@ const AICustomerSupport = () => {
           {/* Header */}
           <div className="bg-primary text-primary-foreground p-4 rounded-t-lg flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Bot className="h-5 w-5" />
+              <MessageCircle className="h-5 w-5" />
               <h3 className="font-semibold">مساعد ذكي - خدمة العملاء</h3>
             </div>
             <Button
