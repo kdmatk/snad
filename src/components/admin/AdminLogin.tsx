@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Lock, Mail, AlertCircle, Info } from "lucide-react";
-import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');

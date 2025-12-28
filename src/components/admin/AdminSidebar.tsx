@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import {
   BarChart3,
   Users,

@@ -13,7 +13,7 @@ import PaymentsManagement from "@/components/admin/PaymentsManagement";
 import ArticlesManagement from "@/components/admin/ArticlesManagement";
 import SettingsManagement from "@/components/admin/SettingsManagement";
 import AdminLogin from "@/components/admin/AdminLogin";
-import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
