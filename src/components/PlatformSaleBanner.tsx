@@ -2,34 +2,8 @@ import { Sparkles, Rocket, MessageCircle, Clock, Zap } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { useState, useEffect } from "react";
+
 const PlatformSaleBanner = () => {
-  // Countdown timer - 7 days from now
-  const [timeLeft, setTimeLeft] = useState({
-    days: 7,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  });
-  useEffect(() => {
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 7);
-    const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = targetDate.getTime() - now;
-      if (distance < 0) {
-        clearInterval(timer);
-        return;
-      }
-      setTimeLeft({
-        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor(distance % (1000 * 60 * 60 * 24) / (1000 * 60 * 60)),
-        minutes: Math.floor(distance % (1000 * 60 * 60) / (1000 * 60)),
-        seconds: Math.floor(distance % (1000 * 60) / 1000)
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
   const handleContact = () => {
     const message = encodeURIComponent('طلب تواصل منصة سند القانونية');
     window.open(`https://t.me/Mram2030?text=${message}`, '_blank');
@@ -92,29 +66,12 @@ const PlatformSaleBanner = () => {
               </p>
             </div>
 
-            {/* Countdown Timer */}
+            {/* Limited Time Notice */}
             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border-2 border-amber-400/50 shadow-[0_0_40px_rgba(251,191,36,0.4)] w-full max-w-2xl">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Clock className="h-6 w-6 text-amber-300 animate-pulse" />
-                <span className="text-amber-300 font-bold text-lg">ينتهي العرض خلال:</span>
-              </div>
-              <div className="grid grid-cols-4 gap-4 text-center" dir="ltr">
-                <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl p-4 shadow-lg">
-                  <div className="text-3xl md:text-4xl font-black text-slate-900">{timeLeft.days}</div>
-                  <div className="text-xs md:text-sm font-bold text-slate-800 mt-1">يوم</div>
-                </div>
-                <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl p-4 shadow-lg">
-                  <div className="text-3xl md:text-4xl font-black text-slate-900">{timeLeft.hours}</div>
-                  <div className="text-xs md:text-sm font-bold text-slate-800 mt-1">ساعة</div>
-                </div>
-                <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl p-4 shadow-lg">
-                  <div className="text-3xl md:text-4xl font-black text-slate-900">{timeLeft.minutes}</div>
-                  <div className="text-xs md:text-sm font-bold text-slate-800 mt-1">دقيقة</div>
-                </div>
-                <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl p-4 shadow-lg animate-pulse">
-                  <div className="text-3xl md:text-4xl font-black text-slate-900">{timeLeft.seconds}</div>
-                  <div className="text-xs md:text-sm font-bold text-slate-800 mt-1">ثانية</div>
-                </div>
+              <div className="flex items-center justify-center gap-3">
+                <Clock className="h-8 w-8 text-amber-300" />
+                <span className="text-amber-300 font-black text-2xl md:text-3xl">عرض لمدة محددة</span>
+                <Clock className="h-8 w-8 text-amber-300" />
               </div>
             </div>
 
