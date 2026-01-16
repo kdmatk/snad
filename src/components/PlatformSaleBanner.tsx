@@ -1,4 +1,4 @@
-import { MessageCircle, Sparkles, Check } from "lucide-react";
+import { MessageCircle, Sparkles, Check, Scale } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 
@@ -17,12 +17,27 @@ const PlatformSaleBanner = () => {
 
   return (
     <div className="container mx-auto px-4 -mt-8 mb-12">
-      <Card className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-950 border border-blue-400/20 shadow-xl">
+      <Card className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-950 border border-blue-400/20 shadow-xl transition-all duration-500 hover:shadow-[0_0_60px_rgba(59,130,246,0.3)] hover:border-blue-400/40">
         {/* Subtle gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-400/5 via-transparent to-indigo-400/5" />
         
+        {/* For Sale Badge */}
+        <div className="absolute top-4 left-4 bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg animate-pulse">
+          للبيع
+        </div>
+        
         <div className="relative p-8 md:p-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            {/* Justice Scale Icon */}
+            <div className="hidden md:flex items-center justify-center">
+              <div className="relative">
+                <div className="absolute inset-0 bg-blue-400/20 rounded-full blur-2xl" />
+                <div className="relative bg-gradient-to-br from-blue-800/50 to-indigo-800/50 p-6 rounded-full border border-blue-400/30">
+                  <Scale className="h-16 w-16 text-blue-300" />
+                </div>
+              </div>
+            </div>
+
             {/* Content Section */}
             <div className="text-center md:text-right space-y-6 flex-1">
               {/* Badge */}
