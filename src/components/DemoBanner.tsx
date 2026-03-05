@@ -16,7 +16,7 @@ const DemoBanner = () => {
           <AlertCircle className="h-5 w-5 flex-shrink-0" />
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-1">
             <p className="text-sm font-medium">
-              🎯 نسخة تجريبية - جرب جميع مميزات المنصة
+              🎯 نسخة تجريبية - 
             </p>
             <Button
               variant="secondary"
