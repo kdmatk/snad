@@ -35,8 +35,9 @@ Workers AI answered an Arabic platform-services question successfully.
 ## Source and deployment
 
 The GitHub App now has access to kdmatk/snad. Migration changes are stored in GitHub.
-A Cloudflare repository connection record was created. Automatic builds are not yet enabled:
-no build token or build trigger has been configured. Completing dashboard sign-in is required.
+Cloudflare Workers Builds is connected to kdmatk/snad on branch `main`.
+Automatic builds are enabled, with a registered build token and production trigger.
+The first pipeline validation was started on 2026-10-27; deployment success must be checked in build history.
 Use build command `npm run build` and deployment command `npx wrangler deploy`, with root `/`.
 Supabase credentials and database content are unchanged.
 
