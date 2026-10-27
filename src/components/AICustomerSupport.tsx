@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, X, Send, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface Message {
@@ -40,25 +39,28 @@ const AICustomerSupport = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke("ai-customer-support", {
-        body: { messages: [...messages, userMessage] }
+      const response = await fetch("/api/customer-support", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: [...messages, userMessage].slice(-20) })
       });
+      const data = await response.json();
 
-      if (error) {
-        if (error.message?.includes("429")) {
+      if (!response.ok) {
+        if (response.status === 429) {
           toast({
             title: "عذراً",
             description: "تم تجاوز الحد المسموح من الطلبات. يرجى المحاولة لاحقاً.",
             variant: "destructive"
           });
-        } else if (error.message?.includes("402")) {
+        } else if (response.status === 402 || response.status === 503) {
           toast({
             title: "خطأ في الخدمة",
             description: "الرجاء التواصل مع الدعم الفني.",
             variant: "destructive"
           });
         } else {
-          throw error;
+          throw new Error(data.error || "Customer support request failed");
         }
         return;
       }

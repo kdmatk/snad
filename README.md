@@ -1,73 +1,38 @@
-# Welcome to your Lovable project
+# سند — منصة الخدمات القانونية
 
-## Project info
+React + Vite frontend with Supabase project `crdqvjbezdgjxqitwmns`.
+Hosting: Cloudflare Workers Static Assets. Production domain: https://snadlegal.org.
+Worker address: https://snad-legal.mdyafalarabia.workers.dev.
 
-**URL**: https://lovable.dev/projects/dae3c43e-6a50-40bd-bf63-0c02f2b88973
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/dae3c43e-6a50-40bd-bf63-0c02f2b88973) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Development and deployment
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm ci
 npm run dev
+npm run deploy
 ```
 
-**Edit a file directly in GitHub**
+`npm run deploy` builds `dist/` and deploys using the authenticated Cloudflare account.
+The deployment configuration is in `wrangler.jsonc`. The root directory is this repository root.
+Cloudflare Builds can use build command `npm run build` and deploy command `npx wrangler deploy`.
+Do not commit Cloudflare API tokens; use the Cloudflare dashboard or authenticated Wrangler.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Backend
 
-**Use GitHub Codespaces**
+Supabase continues to provide authentication, database and storage; no data migration is needed.
+`/api/health` reports Worker availability. `/api/customer-support` uses Workers AI with a per-IP
+limit of 10 requests per minute. The existing support component is not mounted in the current
+application layout; this migration does not add UI. Its API is ready independently of Lovable.
+The Supabase `ai-customer-support` function (version 9) is a compatibility proxy to this Worker, and preserves the legacy endpoint without a Lovable API key.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Domain cutover
 
-## What technologies are used for this project?
+The Cloudflare zone must be active before custom domains can finish certificate provisioning.
+Assigned authoritative nameservers:
 
-This project is built with:
+- deborah.ns.cloudflare.com
+- kareem.ns.cloudflare.com
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/dae3c43e-6a50-40bd-bf63-0c02f2b88973) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+The nameserver change was saved in Namecheap. There were no configured email forwards.
+Existing MX and SPF records were copied; zone activation and custom-domain HTTPS are pending.
+Keep the original hosting available until the domain and login flows have been checked.
