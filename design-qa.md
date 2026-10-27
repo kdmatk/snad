@@ -1,53 +1,52 @@
-# Snad — selected design 3
+# Snad client dashboard — selected design 1
 
-Source visual truth: `/workspace/scratch/10dab1f5e471/generated_images/exec-bc930e84-7985-499f-96b1-ab2eaada892d.png`.
-Source presentation: 1536 × 1024 pixels, containing a desktop artboard and a mobile artboard. It is a concept board, not a literal 1440 × 1024 viewport capture.
-Comparison normalization: source desktop region x=66,y=4,width=1068,height=1015; real browser iframe 1440 × 1368 CSS px scaled 0.7416667 to the same visible width. Desktop screenshot density 1. Mobile iframe 390 × 844 CSS px, inner content 382px due to the 8px scrollbar.
-State: public home, live services and approved lawyers loaded, no authenticated customer data.
+Source visual truth: `/workspace/scratch/10dab1f5e471/generated_images/exec-2a0381de-bf8b-4eb3-ba5b-cd35f647c521.png` (1488 × 1056 pixels).
+Implementation: browser-rendered React dashboard, `http://terminal.local:4173/client-dashboard`.
+Same-state comparison: isolated, git-ignored development entry renders the actual `ClientDashboardView` with two illustrative requests and a confirmed future consultation; no customer records read or created for this fixture. This entry is not imported into the production application or committed.
+Viewport: desktop iframe 1488 × 1056 CSS pixels, density 1; source displayed at the same dimensions without scaling. Mobile iframe 390 × 844 CSS pixels (382px content width plus scrollbar). Full comparison capture is 2990 × 2016 pixels including source, implementation, labels and mobile artboard.
 
-## Comparison history
+## Findings and comparison history
 
-1. `/workspace/scratch/snad-design-comparison.jpg` and `/workspace/scratch/snad-responsive-qa.jpg`.
-   - P2: desktop container and UI typography too small relative to selected design. Fix: max container 1320, readable 14–16px body, increased heading and metadata hierarchy.
-   - P2: mobile search icon sat at the input's lower edge. Fix: positioned relative to the search container with explicit top/right.
-   - P2: mobile service cards too tall compared with compact target rows. Fix: mobile home rows use the clickable service title, price and timeframe; supporting description and duplicate CTA removed at that breakpoint.
-   - P2: hero photograph reduced text contrast. Fix: subdued background opacity; maintain visible legal imagery without obscuring text.
-
-## Intentional production differences
-
-- Actual service titles, prices, durations and approved lawyer records replace generated sample copy.
-- No generated person portraits are attributed to real lawyer names. Stored stock/demo avatar URLs are suppressed; initials used when no valid portrait is present.
-- Platform-sale, demo credentials, invented success metrics, fabricated reviews and government endorsement emphasis are removed.
-- Order flow submits a service request. It does not claim to charge a payment or start a real-time session.
+1. Initial combined browser capture: `/workspace/scratch/snad-client-comparison-1.jpg`.
+   - P2: table text and metadata noticeably undersized relative to the source. Increased table typography to 15px, metadata to 12px and restored clearer status/link weights.
+   - P2: mobile desktop-table scrolling concealed request status in the initial view. Changed mobile rows to two-column cards with service, lawyer, status, date and details visible together.
+   - P2: closed off-canvas mobile sidebar remained available to keyboard/accessibility navigation. Added visibility gating when closed.
+   - P3: active sidebar edge placed on the wrong side. Moved it to the left, matching the visual source.
+2. Revised combined capture: `/workspace/scratch/snad-client-comparison-2.jpg`.
+3. Final combined source + browser evidence: `/workspace/scratch/snad-client-comparison-final.jpg`.
+   Focused source/implementation table-and-appointment comparison: `/workspace/scratch/snad-client-focused.jpg`.
+   Earlier findings resolved. No actionable P0/P1/P2 visual issues remain.
 
 ## Required fidelity surfaces
 
-Post-fix full comparison: `/workspace/scratch/snad-design-comparison-final.jpg`.
-Browser-rendered desktop home: `/workspace/scratch/snad-home-final-preview.jpg` (1363px CSS viewport, full page).
-Responsive evidence: `/workspace/scratch/snad-responsive-final.jpg`; mobile-only viewport: `/workspace/scratch/snad-mobile-final.jpg` (390 × 844).
-Focused regions: source and implementation hero, service rows and lawyer cards are readable together in the normalized comparison; mobile search and card treatment inspected in the dedicated mobile capture.
+- Typography: Cairo retained; navy 800-weight heading, 15px table data and 12px supporting metadata reviewed in the focused comparison. Minor natural raster-versus-browser font differences accepted.
+- Spacing/layout: fixed right navy sidebar, pale toolbar, welcome/action row, gold-tinted action banner, left request table and right appointment/update column preserved. Single-column mobile view uses cards and an off-canvas navigation menu. Mobile content/scroll widths both 382px; no horizontal page overflow.
+- Colors/tokens: navy #17384f, muted gold #b2934d, warm action background, blue appointment tint and amber/green status labels reviewed. Focus outlines remain visible.
+- Images/icons: supplied existing Brand retained and outline Lucide icons reused. The source contains no photographic assets requiring generation; initials intentionally avoid attributing generated portraits to lawyers.
+- Copy: heading and section labels follow the selected design. Real account data, absolute dates, actual case numbers, current state and device timezone replace illustrative source content. Latest update describes recorded state, without inventing an activity event or an unread count.
 
-- Typography: Cairo family retained; heading weight 800 and increased body/UI sizes restore the selected hierarchy. Production copy differs intentionally.
-- Spacing: full-width navy header, split hero, three service cards, two compact lawyer previews and navy footer match the selected structure. Mobile single-column hierarchy and compact service rows verified.
-- Colors: navy, muted gold, white and restrained blue/teal card tints checked. Subdued hero image protects contrast.
-- Images: generated desk/scale background and contract thumbnail placed and optimized as WebP (about 90KB combined). Portrait fallback is intentional as above.
-- Copy: selected service IDs remain UUIDs; actual prices/timeframes used. No fake reviews or case-success claims.
-- P2 React duplicate footer link keys found during console inspection, corrected with a unique href-plus-label key. New preview tab reports no application-origin error logs; extension-origin metadata messages excluded.
+## Production data behavior
 
-## Primary interactions verified in cloud browser
+- Requests filter legal_cases.client_id by auth user ID; lawyer display resolves lawyer.user_id rather than an invalid join.
+- Consultations filter by clients.id, after resolving clients.user_id. No automatic client creation on dashboard read.
+- No scheduled_at column exists. Only explicitly scheduled/confirmed consultations with future started_at can appear as upcoming; created_at is never used as a meeting time. No new scheduling backend is claimed.
+- Profile reads authenticated email; editing updates allowlisted own user-profile fields.
+- Existing private case-files upload/download support is connected in the request dialog. Up to three allowed files, maximum 10MB each; ownership checked and errors visible. No production files were transferred during QA.
+- Existing database RLS policies are unchanged. This implementation does not constitute the separate access-control remediation previously identified.
 
-1. Home service search `مراجعة` produces three matching services; nonexistent query shows resettable empty state.
-2. Featured contract opens the correct service dialog, with a real service UUID.
-3. Continue opens request with service title and price populated; review step shows entered sample description and selected specialty. No production request was submitted.
-4. Lawyer search finds د. نورة المطيري; profile renders that exact name and specialty rather than a fixed mock profile.
-5. Consultation and request links preserve the same UUID; request summary shows that lawyer and default legal consultation type.
-6. Mobile navigation opens/closes with accessible state; the 390px iframe has 382px content/scroll width (8px scrollbar), no horizontal overflow.
-7. Focus outlines, form labels, semantic service title buttons, responsive grids, loading and empty states checked.
+## Browser interactions checked
 
-## Limits and production differences
+- Real signed-out dashboard: guest action banner, truthful empty requests/appointments, profile sign-in state.
+- Illustrative populated view: document-action opens matching request details; attachment upload disabled before selection; close works.
+- Search by SN-1042 filters to one request. Unknown search displays a resettable empty state.
+- Upcoming appointment opens its detail dialog with status, lawyer, method, time, request creation date and duration.
+- Mobile menu opens, selecting requests changes the section and closes the menu; all key request data remains visible in the card layout.
+- Browser console checked on actual preview and comparison tabs: no application-origin errors; extension metadata transport errors excluded.
+- TypeScript app check, changed-file ESLint and production Vite build passed. Existing bundle-size and Browserslist age warnings remain.
+- Pure data assertions passed: future-confirmed filtering, chronological sorting, rejecting missing/invalid dates, case number display and waiting-document labels.
 
-No authenticated customer submission, file transfer, payment, voice/video call or real customer transaction was executed. Existing database RLS policies remain unchanged and need a separate access-control review before handling sensitive legal records. Stored selected-lawyer reference is a requested preference in the case description, not a claim of accepted assignment; the existing lawyer_id FK points to auth.users, so it is not filled with a lawyers-row UUID.
+## Limits and follow-up polish
 
-No actionable P0/P1/P2 visual issues remain in the reviewed public flow. P3: fine-tune typography further when real approved lawyer portraits and final commercial copy are supplied.
+Authenticated profile save, private upload/download and real client transactions were not executed against production customer data. Populated visual evidence is explicitly illustrative. P3: refine icon variations and display initials after final real-data review; no additional design approval is needed for this implementation.
 
 final result: passed

@@ -1,374 +1,843 @@
-import Layout from "@/components/Layout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Calendar, MessageCircle, Star, Clock, User, Phone, Plus, Loader2, Mail, MapPin, Scale } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useClientData } from "@/hooks/useClientData";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import {
+  Home,
+  FileText,
+  CalendarDays,
+  MessageSquare,
+  UserRound,
+  CircleHelp,
+  Search,
+  Bell,
+  Plus,
+  ArrowLeft,
+  ChevronLeft,
+  Clock3,
+  Menu,
+  X,
+  RefreshCw,
+  LogOut,
+  CheckCircle2,
+} from "lucide-react";
+import Brand from "@/components/Brand";
+import {
+  useClientData,
+  type ServiceRequest,
+  type ClientConsultation,
+} from "@/hooks/useClientData";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import RequestDetails from "@/components/client/RequestDetails";
+import {
+  consultationTitle,
+  consultationType,
+  dateLabel,
+  documentStatuses,
+  futureAppointments,
+  shortId,
+  statusInfo,
+} from "@/components/client/clientUtils";
+import "./client-dashboard.css";
 
-const ClientDashboard = () => {
-  const navigate = useNavigate();
-  const { requests, consultations, loading: dataLoading } = useClientData();
-  const { profile, loading: profileLoading } = useUserProfile();
-
-  const loading = dataLoading || profileLoading;
-
-  if (loading) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      </Layout>
-    );
-  }
-
-  const getStatusBadge = (status: string) => {
-    const statusMap: { [key: string]: { label: string; variant: any } } = {
-      open: { label: 'مفتوحة', variant: 'default' },
-      assigned: { label: 'معينة', variant: 'secondary' },
-      in_progress: { label: 'قيد التنفيذ', variant: 'default' },
-      completed: { label: 'مكتملة', variant: 'default' },
-      cancelled: { label: 'ملغية', variant: 'destructive' }
-    };
-    
-    const statusInfo = statusMap[status] || { label: status, variant: 'secondary' };
-    return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
-  };
-
+type Workspace = ReturnType<typeof useClientData>;
+const navigation = [
+  { id: "overview", title: "نظرة عامة", Icon: Home },
+  { id: "requests", title: "طلباتي", Icon: FileText },
+  { id: "appointments", title: "المواعيد", Icon: CalendarDays },
+  { id: "consultations", title: "الاستشارات", Icon: MessageSquare },
+  { id: "profile", title: "الملف الشخصي", Icon: UserRound },
+];
+function Status({ value }: { value: string | null }) {
+  const s = statusInfo(value);
   return (
-    <Layout>
-      <div className="py-8">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-primary">لوحة التحكم</h1>
-            <div className="flex gap-2">
-              <Button onClick={() => navigate('/my-cases')} variant="outline">
-                <Scale className="h-4 w-4 ml-2" />
-                قضاياي
-              </Button>
-              <Button onClick={() => navigate('/request-service')}>
-                <Plus className="h-4 w-4 ml-2" />
-                طلب خدمة جديدة
-              </Button>
-            </div>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card>
-              <CardContent className="p-6 text-center">
-                <FileText className="h-8 w-8 text-primary mx-auto mb-2" />
-                <div className="text-2xl font-bold">{requests.length}</div>
-                <div className="text-sm text-muted-foreground">إجمالي الطلبات</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6 text-center">
-                <Calendar className="h-8 w-8 text-secondary mx-auto mb-2" />
-                <div className="text-2xl font-bold">{consultations.filter(c => c.status === 'pending').length}</div>
-                <div className="text-sm text-muted-foreground">مواعيد قادمة</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6 text-center">
-                <MessageCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold">{consultations.filter(c => c.status === 'completed').length}</div>
-                <div className="text-sm text-muted-foreground">استشارات مكتملة</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6 text-center">
-                <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                <div className="text-2xl font-bold">{consultations.filter(c => c.rating).length}</div>
-                <div className="text-sm text-muted-foreground">تقييمات مكتملة</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* قضاياي - بطاقة إعلانية */}
-          <Card className="mb-8 bg-gradient-to-l from-primary/5 to-secondary/5 border-primary/20">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <Scale className="h-8 w-8 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-2">نظام المزادات القانونية الذكي</h3>
-                  <p className="text-muted-foreground mb-4">
-                    أنشئ قضية وافتح مزاد لها، واحصل على أفضل العروض من المحامين! يتم ترتيب العروض تلقائياً حسب نظام التقييم الذكي (السعر 40% + التقييم 35% + السرعة 15% + الخبرة 10%)
-                  </p>
-                  <div className="flex gap-2">
-                    <Button onClick={() => navigate('/my-cases')} className="bg-primary">
-                      عرض قضاياي
-                    </Button>
-                    <Button onClick={() => navigate('/my-cases')} variant="outline">
-                      إنشاء قضية/مزاد جديد
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Tabs defaultValue="requests" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="requests">طلباتي</TabsTrigger>
-              <TabsTrigger value="appointments">المواعيد</TabsTrigger>
-              <TabsTrigger value="consultations">الاستشارات</TabsTrigger>
-              <TabsTrigger value="profile">الملف الشخصي</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="requests" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>الطلبات الحديثة</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {requests.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">
-                        لا توجد طلبات حتى الآن
-                      </p>
-                    ) : (
-                      requests.map((request) => (
-                        <div key={request.id} className="p-4 border rounded-lg">
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="font-bold">{request.title}</h3>
-                            {getStatusBadge(request.status)}
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            الفئة: {request.category}
-                          </p>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">
-                              {new Date(request.created_at).toLocaleDateString('ar-SA')}
-                            </span>
-                            <span className="font-medium text-primary">
-                              {request.budget_min}-{request.budget_max} ريال
-                            </span>
-                          </div>
-                          {request.lawyer && (
-                            <p className="text-sm text-green-600 mt-2">
-                              المحامي المعين: {request.lawyer.name}
-                            </p>
-                          )}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="appointments" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>المواعيد القادمة</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {consultations.filter(c => c.status === 'pending').length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">
-                        لا توجد مواعيد قادمة
-                      </p>
-                    ) : (
-                      consultations
-                        .filter(c => c.status === 'pending')
-                        .map((consultation) => (
-                          <div key={consultation.id} className="p-4 border rounded-lg">
-                            <h3 className="font-bold mb-2">{consultation.legal_services?.name}</h3>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              المحامي: {consultation.lawyers?.name}
-                            </p>
-                            <div className="flex items-center gap-4 text-sm">
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-4 w-4" />
-                                <span>{new Date(consultation.created_at).toLocaleDateString('ar-SA')}</span>
-                              </div>
-                              <Badge variant="outline">{consultation.type}</Badge>
-                            </div>
-                          </div>
-                        ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="consultations" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>الاستشارات السابقة</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {consultations.filter(c => c.status === 'completed').length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">
-                        لا توجد استشارات مكتملة حتى الآن
-                      </p>
-                    ) : (
-                      consultations
-                        .filter(c => c.status === 'completed')
-                        .map((consultation) => (
-                          <div key={consultation.id} className="p-4 border rounded-lg">
-                            <h3 className="font-bold mb-2">{consultation.legal_services?.name}</h3>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              المحامي: {consultation.lawyers?.name}
-                            </p>
-                            <div className="flex items-center justify-between text-sm">
-                              <span>{new Date(consultation.created_at).toLocaleDateString('ar-SA')}</span>
-                              {consultation.rating && (
-                                <div className="flex items-center gap-1">
-                                  <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                                  <span>{consultation.rating}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="profile" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>الملف الشخصي</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {/* Profile Card */}
-                    <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-2">
-                      <CardContent className="p-6">
-                        <div className="flex items-start gap-6">
-                          <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 border-4 border-white shadow-lg">
-                            {profile?.avatar_url ? (
-                              <img 
-                                src={profile.avatar_url} 
-                                alt={profile.full_name}
-                                className="w-full h-full rounded-full object-cover"
-                              />
-                            ) : (
-                              <User className="h-12 w-12 text-primary" />
-                            )}
-                          </div>
-                          <div className="flex-1 space-y-4">
-                            <div>
-                              <h3 className="text-2xl font-bold text-primary mb-1">
-                                {profile?.full_name || 'غير محدد'}
-                              </h3>
-                              <p className="text-muted-foreground flex items-center gap-2">
-                                <Clock className="h-4 w-4" />
-                                عميل منذ {profile?.created_at ? new Date(profile.created_at).toLocaleDateString('ar-SA', { year: 'numeric', month: 'long' }) : 'غير محدد'}
-                              </p>
-                            </div>
-                            
-                            {profile?.bio && (
-                              <p className="text-muted-foreground bg-white/50 p-3 rounded-lg">
-                                {profile.bio}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Contact Information */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">معلومات الاتصال</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
-                            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                              <Mail className="h-5 w-5 text-primary" />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium text-muted-foreground mb-1">البريد الإلكتروني</label>
-                              <p className="font-medium">{profile?.user_id || 'غير محدد'}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
-                            <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center">
-                              <Phone className="h-5 w-5 text-secondary" />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium text-muted-foreground mb-1">رقم الهاتف</label>
-                              <p className="font-medium">{profile?.phone || 'غير محدد'}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
-                            <div className="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center">
-                              <MapPin className="h-5 w-5 text-green-600" />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium text-muted-foreground mb-1">المدينة</label>
-                              <p className="font-medium">{profile?.city || 'غير محدد'}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
-                            <div className="w-10 h-10 bg-blue-500/10 rounded-full flex items-center justify-center">
-                              <User className="h-5 w-5 text-blue-600" />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium text-muted-foreground mb-1">نوع الحساب</label>
-                              <p className="font-medium">
-                                <Badge variant="outline">{profile?.user_type === 'client' ? 'عميل' : 'محامي'}</Badge>
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Statistics */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">الإحصائيات</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="text-center p-4 bg-primary/5 rounded-lg">
-                            <FileText className="h-8 w-8 text-primary mx-auto mb-2" />
-                            <div className="text-2xl font-bold">{requests.length}</div>
-                            <div className="text-sm text-muted-foreground">إجمالي الطلبات</div>
-                          </div>
-                          <div className="text-center p-4 bg-secondary/5 rounded-lg">
-                            <MessageCircle className="h-8 w-8 text-secondary mx-auto mb-2" />
-                            <div className="text-2xl font-bold">{consultations.length}</div>
-                            <div className="text-sm text-muted-foreground">الاستشارات</div>
-                          </div>
-                          <div className="text-center p-4 bg-green-50 rounded-lg">
-                            <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                            <div className="text-2xl font-bold">{consultations.filter(c => c.status === 'completed').length}</div>
-                            <div className="text-sm text-muted-foreground">مكتملة</div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <div className="flex gap-3">
-                      <Button className="flex-1">تعديل الملف الشخصي</Button>
-                      <Button variant="outline" className="flex-1">تغيير كلمة المرور</Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-    </Layout>
+    <span className={`cd-status ${s.tone}`}>
+      <Clock3 size={14} />
+      {s.label}
+    </span>
   );
-};
-
-export default ClientDashboard;
+}
+function Empty({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="cd-empty">
+      <FileText size={28} aria-hidden="true" />
+      <h3>{title}</h3>
+      <p>{text}</p>
+    </div>
+  );
+}
+function ClientProfile({ data }: { data: Workspace }) {
+  const p = data.userProfile;
+  const [editing, setEditing] = useState(false);
+  const [fields, setFields] = useState({
+    full_name: p?.full_name ?? "",
+    phone: p?.phone ?? "",
+    city: p?.city ?? "",
+    bio: p?.bio ?? "",
+  });
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!data.user || !p) return;
+    setBusy(true);
+    setMessage("");
+    try {
+      const { error } = await supabase
+        .from("user_profiles")
+        .update({
+          full_name: fields.full_name.trim(),
+          phone: fields.phone.trim() || null,
+          city: fields.city.trim() || null,
+          bio: fields.bio.trim() || null,
+        })
+        .eq("user_id", data.user.id)
+        .select("id")
+        .single();
+      if (error) throw error;
+      await data.reloadData();
+      setEditing(false);
+      setMessage("تم تحديث بيانات ملفك.");
+    } catch {
+      setMessage("تعذّر حفظ البيانات. يرجى المحاولة مرة أخرى.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <section className="cd-panel cd-profile-panel">
+      <div className="cd-panel-heading">
+        <h2>الملف الشخصي</h2>
+        {data.user && p && !editing && (
+          <button
+            className="cd-link"
+            onClick={() => {
+              setFields({
+                full_name: p.full_name,
+                phone: p.phone ?? "",
+                city: p.city ?? "",
+                bio: p.bio ?? "",
+              });
+              setEditing(true);
+            }}
+          >
+            تعديل البيانات
+          </button>
+        )}
+      </div>
+      {!data.user ? (
+        <Empty
+          title="سجّل الدخول لعرض ملفك"
+          text="ستظهر هنا بيانات الحساب المرتبطة بك."
+        />
+      ) : editing ? (
+        <form onSubmit={save} className="cd-profile-form">
+          {(
+            [
+              ["full_name", "الاسم الكامل"],
+              ["phone", "رقم الهاتف"],
+              ["city", "المدينة"],
+            ] as const
+          ).map(([key, label]) => (
+            <div key={key}>
+              <label htmlFor={`cd-${key}`}>{label}</label>
+              <input
+                id={`cd-${key}`}
+                value={fields[key]}
+                maxLength={key === "phone" ? 25 : 120}
+                type={key === "phone" ? "tel" : "text"}
+                required={key === "full_name"}
+                onChange={(e) =>
+                  setFields((f) => ({ ...f, [key]: e.target.value }))
+                }
+              />
+            </div>
+          ))}
+          <div>
+            <label htmlFor="cd-bio">نبذة (اختياري)</label>
+            <textarea
+              id="cd-bio"
+              maxLength={1000}
+              value={fields.bio}
+              onChange={(e) =>
+                setFields((f) => ({ ...f, bio: e.target.value }))
+              }
+            />
+          </div>
+          <div className="cd-form-actions">
+            <button className="navy-button" disabled={busy}>
+              {busy ? "جاري الحفظ..." : "حفظ التعديلات"}
+            </button>
+            <button
+              type="button"
+              className="outline-button"
+              disabled={busy}
+              onClick={() => setEditing(false)}
+            >
+              إلغاء
+            </button>
+          </div>
+        </form>
+      ) : (
+        <dl className="cd-profile-values">
+          <div>
+            <dt>الاسم</dt>
+            <dd>{p?.full_name || data.profile?.name || "لم يُضف"}</dd>
+          </div>
+          <div>
+            <dt>البريد الإلكتروني</dt>
+            <dd>
+              <bdi>{data.user.email || "لم يُضف"}</bdi>
+            </dd>
+          </div>
+          <div>
+            <dt>رقم الهاتف</dt>
+            <dd>
+              <bdi>{p?.phone || data.profile?.phone || "لم يُضف"}</bdi>
+            </dd>
+          </div>
+          <div>
+            <dt>المدينة</dt>
+            <dd>{p?.city || "لم تُضف"}</dd>
+          </div>
+          {p?.bio && (
+            <div>
+              <dt>نبذة</dt>
+              <dd>{p.bio}</dd>
+            </div>
+          )}
+        </dl>
+      )}
+      {message && (
+        <p className="cd-inline-message" role="status">
+          {message}
+        </p>
+      )}
+    </section>
+  );
+}
+export function ClientDashboardView({ data }: { data: Workspace }) {
+  const [params, setParams] = useSearchParams();
+  const rawView = params.get("view") ?? "overview";
+  const view = navigation.some((n) => n.id === rawView) ? rawView : "overview";
+  const query = params.get("q") ?? "";
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<string | null>(null);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<ClientConsultation | null>(null);
+  const [showUpdates, setShowUpdates] = useState(false);
+  const [dismissed, setDismissed] = useState<string | null>(null);
+  const choose = (next: string) => {
+    setParams(next === "overview" ? {} : { view: next });
+    setMenuOpen(false);
+  };
+  const currentTitle = navigation.find((n) => n.id === view)!.title;
+  const selected = data.requests.find((r) => r.id === selectedRequest) ?? null;
+  const needsDocuments = data.requests.find((r) =>
+    documentStatuses.has(r.status ?? ""),
+  );
+  const activeRequest = data.requests.find(
+    (r) => !["completed", "closed", "cancelled"].includes(r.status ?? ""),
+  );
+  const next = futureAppointments(data.consultations)[0];
+  const search = (text: string) =>
+    text.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase());
+  const requests = data.requests.filter((r) =>
+    search(
+      `${r.title} ${r.case_number || ""} ${r.category} ${r.lawyer?.name ?? ""}`,
+    ),
+  );
+  const shownRequests = view === "overview" ? requests.slice(0, 5) : requests;
+  const consultationRows = data.consultations
+    .filter((c) => search(`${consultationTitle(c)} ${c.lawyers?.name ?? ""}`))
+    .filter((c) =>
+      view === "appointments"
+        ? ["pending", "scheduled", "confirmed"].includes(c.status ?? "")
+        : true,
+    );
+  const updates = [
+    ...data.requests.map((r) => ({
+      id: `request-${r.id}`,
+      title: r.title,
+      text: `${statusInfo(r.status).label} • طلب ${shortId(r)}`,
+      at: r.updated_at || r.created_at,
+      requestId: r.id,
+    })),
+    ...data.consultations.map((c) => ({
+      id: `consultation-${c.id}`,
+      title: consultationTitle(c),
+      text: `${statusInfo(c.status).label} • ${consultationType(c.type)}`,
+      at: c.created_at,
+      requestId: null,
+    })),
+  ].sort(
+    (a, b) => (Date.parse(b.at || "") || 0) - (Date.parse(a.at || "") || 0),
+  );
+  const bannerKey = !data.user
+    ? "signin"
+    : needsDocuments?.id || activeRequest?.id || "start";
+  const actionTitle = !data.user
+    ? "كل خدماتك القانونية تبدأ من حسابك"
+    : needsDocuments
+      ? "طلبك يحتاج مستندًا لاستكمال المراجعة"
+      : activeRequest
+        ? "تابع آخر مستجدات طلبك"
+        : "ابدأ خدمتك القانونية الأولى";
+  const actionText = !data.user
+    ? "سجّل الدخول لعرض طلباتك ومواعيدك ومتابعة تحديثاتها."
+    : needsDocuments
+      ? `${needsDocuments.title} • طلب ${shortId(needsDocuments)}`
+      : activeRequest
+        ? `${activeRequest.title} • ${statusInfo(activeRequest.status).label}`
+        : "اختر الخدمة المناسبة، وأرسل تفاصيل احتياجك في خطوات واضحة.";
+  return (
+    <div className="client-dashboard" dir="rtl">
+      <a className="skip-link" href="#client-main">
+        انتقل إلى المحتوى
+      </a>
+      <aside
+        className={`cd-sidebar ${menuOpen ? "is-open" : ""}`}
+        aria-label="تنقل حساب العميل"
+      >
+        <Brand />
+        <nav aria-label="قائمة حسابي">
+          {navigation.map(({ id, title, Icon }) => (
+            <button
+              key={id}
+              aria-current={view === id ? "page" : undefined}
+              onClick={() => choose(id)}
+              className={view === id ? "active" : ""}
+            >
+              <Icon size={23} />
+              <span>{title}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="cd-sidebar-bottom">
+          <Link to="/contact">
+            <CircleHelp size={22} />
+            دعم ومساعدة
+          </Link>
+          <Link to="/">
+            العودة إلى الموقع <ArrowLeft size={16} />
+          </Link>
+          {data.user && (
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+                choose("overview");
+              }}
+            >
+              <LogOut size={17} />
+              تسجيل الخروج
+            </button>
+          )}
+        </div>
+      </aside>
+      {menuOpen && (
+        <button
+          className="cd-menu-backdrop"
+          aria-label="إغلاق القائمة"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+      <div className="cd-workspace">
+        <header className="cd-topbar">
+          <div className="cd-breadcrumb">
+            <button
+              className="cd-menu-toggle"
+              aria-label={menuOpen ? "إغلاق قائمة الحساب" : "فتح قائمة الحساب"}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? <X /> : <Menu />}
+            </button>
+            <span>حسابي</span>
+            <span aria-hidden="true">/</span>
+            <strong>{currentTitle}</strong>
+          </div>
+          <div className="cd-top-actions">
+            <div className="cd-search">
+              <Search size={20} />
+              <input
+                aria-label="البحث في طلباتك وخدماتك"
+                placeholder="البحث في طلباتك وخدماتك..."
+                value={query}
+                onChange={(e) => {
+                  const p = new URLSearchParams(params);
+                  if (e.target.value) p.set("q", e.target.value);
+                  else p.delete("q");
+                  setParams(p, { replace: true });
+                }}
+              />
+              {query && (
+                <button
+                  aria-label="مسح البحث"
+                  onClick={() => {
+                    const p = new URLSearchParams(params);
+                    p.delete("q");
+                    setParams(p, { replace: true });
+                  }}
+                >
+                  <X size={15} />
+                </button>
+              )}
+            </div>
+            <button
+              className="cd-notification"
+              aria-label="عرض آخر التحديثات"
+              onClick={() => setShowUpdates(true)}
+            >
+              <Bell size={23} />
+              {needsDocuments && <span className="cd-notification-dot" />}
+            </button>
+          </div>
+        </header>
+        <main id="client-main" className="cd-main">
+          <div className="cd-welcome">
+            <div>
+              <p>
+                مرحبًا{" "}
+                {data.userProfile?.full_name
+                  ? `بك، ${data.userProfile.full_name.split(" ")[0]}`
+                  : "بك في سند"}
+              </p>
+              <h1>
+                {view === "overview"
+                  ? "كل ما يخص خدماتك، في مكان واحد"
+                  : currentTitle}
+              </h1>
+              <p className="cd-welcome-description">
+                تابع طلباتك ومواعيدك واستشاراتك القانونية بسهولة، ومن مكان واحد.
+              </p>
+            </div>
+            <Link to="/request-service" className="gold-button">
+              <Plus size={20} />
+              طلب خدمة جديدة
+            </Link>
+          </div>
+          {data.error && (
+            <div className="cd-load-error" role="alert">
+              <span>{data.error}</span>
+              <button
+                className="cd-link"
+                onClick={() => data.reloadData()}
+                disabled={data.refreshing}
+              >
+                <RefreshCw size={16} />
+                إعادة المحاولة
+              </button>
+            </div>
+          )}
+          {view === "overview" && dismissed !== bannerKey && !data.loading && (
+            <section className="cd-action-banner">
+              <span className="cd-action-icon">
+                <FileText size={25} />
+              </span>
+              <div>
+                <h2>{actionTitle}</h2>
+                <p>{actionText}</p>
+              </div>
+              {!data.user ? (
+                <Link className="navy-button" to="/login">
+                  تسجيل الدخول
+                </Link>
+              ) : needsDocuments || activeRequest ? (
+                <button
+                  className="navy-button"
+                  onClick={() =>
+                    setSelectedRequest((needsDocuments || activeRequest)!.id)
+                  }
+                >
+                  {needsDocuments ? "استكمال المستندات" : "عرض الطلب"}
+                  <FileText size={17} />
+                </button>
+              ) : (
+                <Link className="navy-button" to="/quick-services">
+                  استعرض الخدمات <ArrowLeft size={16} />
+                </Link>
+              )}
+              <button
+                className="cd-dismiss"
+                aria-label="إخفاء التنبيه"
+                onClick={() => setDismissed(bannerKey)}
+              >
+                <X size={18} />
+              </button>
+            </section>
+          )}
+          {data.loading ? (
+            <div className="cd-loading" role="status">
+              <RefreshCw className="animate-spin" size={24} />
+              جاري تحميل بيانات حسابك...
+            </div>
+          ) : view === "profile" ? (
+            <ClientProfile key={data.user?.id || "guest"} data={data} />
+          ) : view === "overview" || view === "requests" ? (
+            <div className={view === "overview" ? "cd-overview-grid" : ""}>
+              <section className="cd-panel cd-requests">
+                <div className="cd-panel-heading">
+                  <h2>
+                    {view === "overview" ? "طلباتي الأخيرة" : "جميع طلباتي"}
+                  </h2>
+                  {view === "overview" && (
+                    <button
+                      className="cd-link"
+                      onClick={() => choose("requests")}
+                    >
+                      عرض كل الطلبات <ArrowLeft size={17} />
+                    </button>
+                  )}
+                </div>
+                {shownRequests.length ? (
+                  <div className="cd-table-scroll">
+                    <table className="cd-request-table">
+                      <thead>
+                        <tr>
+                          <th scope="col">الخدمة</th>
+                          <th scope="col">المحامي</th>
+                          <th scope="col">الحالة</th>
+                          <th scope="col">آخر تحديث</th>
+                          <th scope="col">
+                            <span className="sr-only">التفاصيل</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {shownRequests.map((r) => (
+                          <tr key={r.id}>
+                            <td>
+                              <div className="cd-table-service">
+                                <span className="cd-file-icon">
+                                  <FileText size={22} />
+                                </span>
+                                <div>
+                                  <button
+                                    onClick={() => setSelectedRequest(r.id)}
+                                  >
+                                    {r.title}
+                                  </button>
+                                  <small>
+                                    طلب <bdi>{shortId(r)}</bdi>
+                                  </small>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              {r.lawyer ? (
+                                <div className="cd-table-lawyer">
+                                  <span aria-hidden="true">
+                                    {r.lawyer.name[0]}
+                                  </span>
+                                  <div>
+                                    {r.lawyer.name}
+                                    <small>المحامي المعين</small>
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="cd-muted">لم يُعيّن بعد</span>
+                              )}
+                            </td>
+                            <td>
+                              <Status value={r.status} />
+                            </td>
+                            <td>
+                              <time
+                                dateTime={
+                                  r.updated_at || r.created_at || undefined
+                                }
+                              >
+                                {dateLabel(r.updated_at || r.created_at)}
+                              </time>
+                            </td>
+                            <td>
+                              <button
+                                className="cd-row-action"
+                                aria-label={`عرض تفاصيل ${r.title}`}
+                                onClick={() => setSelectedRequest(r.id)}
+                              >
+                                <ChevronLeft size={21} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <Empty
+                    title={
+                      query
+                        ? "لا توجد طلبات تطابق بحثك"
+                        : "لا توجد طلبات حتى الآن"
+                    }
+                    text={
+                      query
+                        ? "جرّب اسم الخدمة أو رقم الطلب."
+                        : data.user
+                          ? "عند تقديم أول طلب، ستظهر تفاصيله وحالته هنا."
+                          : "سجّل الدخول لتظهر هنا الطلبات المرتبطة بحسابك."
+                    }
+                  />
+                )}
+              </section>
+              {view === "overview" && (
+                <aside className="cd-summary">
+                  <section className="cd-panel cd-appointment">
+                    <h2>
+                      <span className="cd-heading-icon">
+                        <CalendarDays size={22} />
+                      </span>
+                      موعدك القادم
+                    </h2>
+                    {next ? (
+                      <>
+                        <div className="cd-appointment-body">
+                          <p>
+                            {new Intl.DateTimeFormat("ar-AE", {
+                              weekday: "long",
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                              calendar: "gregory",
+                            }).format(new Date(next.started_at!))}
+                          </p>
+                          <strong>
+                            <Clock3 size={21} />
+                            {new Intl.DateTimeFormat("ar-AE", {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            }).format(new Date(next.started_at!))}
+                          </strong>
+                          <small>
+                            بتوقيت جهازك (
+                            {Intl.DateTimeFormat().resolvedOptions().timeZone})
+                          </small>
+                          <hr />
+                          <h3>{consultationTitle(next)}</h3>
+                          <p>
+                            {next.duration_minutes
+                              ? `${next.duration_minutes} دقيقة`
+                              : consultationType(next.type)}
+                          </p>
+                        </div>
+                        <button
+                          className="outline-button"
+                          onClick={() => setSelectedAppointment(next)}
+                        >
+                          عرض التفاصيل
+                        </button>
+                      </>
+                    ) : (
+                      <div className="cd-no-appointment">
+                        <CalendarDays size={28} />
+                        <h3>لم يُحدد موعد قادم</h3>
+                        <p>سيظهر هنا الموعد بعد تأكيد وقته.</p>
+                        <button
+                          className="outline-button"
+                          onClick={() => choose("appointments")}
+                        >
+                          عرض المواعيد
+                        </button>
+                      </div>
+                    )}
+                  </section>
+                  <section className="cd-panel cd-latest">
+                    <h2>
+                      <span className="cd-heading-icon">
+                        <FileText size={22} />
+                      </span>
+                      آخر تحديث
+                    </h2>
+                    {updates[0] ? (
+                      <>
+                        <p>{updates[0].title}</p>
+                        <span>{updates[0].text}</span>
+                        <time>{dateLabel(updates[0].at, true)}</time>
+                        <button
+                          className="cd-link"
+                          onClick={() =>
+                            updates[0].requestId
+                              ? setSelectedRequest(updates[0].requestId)
+                              : choose("consultations")
+                          }
+                        >
+                          عرض التفاصيل <ArrowLeft size={14} />
+                        </button>
+                      </>
+                    ) : (
+                      <p className="cd-muted">لا توجد تحديثات لعرضها بعد.</p>
+                    )}
+                  </section>
+                </aside>
+              )}
+            </div>
+          ) : (
+            <section className="cd-panel">
+              <div className="cd-panel-heading">
+                <h2>
+                  {view === "appointments"
+                    ? "مواعيد الاستشارات"
+                    : "استشاراتي القانونية"}
+                </h2>
+              </div>
+              {consultationRows.length ? (
+                <div className="cd-consultation-list">
+                  {consultationRows.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => setSelectedAppointment(c)}
+                    >
+                      <span className="cd-file-icon">
+                        <MessageSquare size={21} />
+                      </span>
+                      <span>
+                        <strong>{consultationTitle(c)}</strong>
+                        <small>
+                          {c.lawyers?.name || "لم يُحدد المحامي"} •{" "}
+                          {consultationType(c.type)}
+                        </small>
+                      </span>
+                      <Status value={c.status} />
+                      <ChevronLeft size={19} />
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <Empty
+                  title={
+                    query
+                      ? "لا توجد نتائج مطابقة"
+                      : view === "appointments"
+                        ? "لا توجد مواعيد لعرضها"
+                        : "لا توجد استشارات حتى الآن"
+                  }
+                  text={
+                    view === "appointments"
+                      ? "تظهر أوقات المواعيد المؤكدة عند تسجيلها، وتبقى الطلبات غير المجدولة قيد التنسيق."
+                      : "ستظهر هنا الاستشارات المرتبطة بحسابك."
+                  }
+                />
+              )}
+            </section>
+          )}
+          <p className="cd-page-footnote">
+            سند — خدمات قانونية واضحة، من محامين متخصصين.
+          </p>
+        </main>
+      </div>
+      <RequestDetails
+        key={selectedRequest || "closed"}
+        request={selected}
+        userId={data.user?.id}
+        onClose={() => setSelectedRequest(null)}
+        onUpdated={data.reloadData}
+      />
+      <Dialog open={showUpdates} onOpenChange={setShowUpdates}>
+        <DialogContent className="cd-request-dialog" dir="rtl">
+          <DialogTitle>آخر التحديثات</DialogTitle>
+          <DialogDescription>
+            آخر الحالات المسجلة لطلباتك واستشاراتك.
+          </DialogDescription>
+          {updates.length ? (
+            <ul className="cd-updates-list">
+              {updates.slice(0, 10).map((u) => (
+                <li key={u.id}>
+                  <CheckCircle2 size={19} />
+                  <div>
+                    <strong>{u.title}</strong>
+                    <p>{u.text}</p>
+                    <time>{dateLabel(u.at, true)}</time>
+                    {u.requestId && (
+                      <button
+                        className="cd-link"
+                        onClick={() => {
+                          setShowUpdates(false);
+                          setSelectedRequest(u.requestId);
+                        }}
+                      >
+                        عرض الطلب
+                      </button>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <Empty
+              title="لا توجد تحديثات"
+              text="ستظهر الحالات المسجلة لطلباتك هنا."
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={!!selectedAppointment}
+        onOpenChange={(open) => {
+          if (!open) setSelectedAppointment(null);
+        }}
+      >
+        <DialogContent className="cd-request-dialog" dir="rtl">
+          {selectedAppointment && (
+            <>
+              <DialogTitle>
+                {consultationTitle(selectedAppointment)}
+              </DialogTitle>
+              <DialogDescription>
+                تفاصيل الاستشارة المسجلة في حسابك.
+              </DialogDescription>
+              <dl className="cd-profile-values">
+                <div>
+                  <dt>المحامي</dt>
+                  <dd>{selectedAppointment.lawyers?.name || "لم يُحدد"}</dd>
+                </div>
+                <div>
+                  <dt>الحالة</dt>
+                  <dd>
+                    <Status value={selectedAppointment.status} />
+                  </dd>
+                </div>
+                <div>
+                  <dt>طريقة الاستشارة</dt>
+                  <dd>{consultationType(selectedAppointment.type)}</dd>
+                </div>
+                <div>
+                  <dt>وقت الجلسة</dt>
+                  <dd>
+                    {[
+                      "scheduled",
+                      "confirmed",
+                      "in_progress",
+                      "completed",
+                    ].includes(selectedAppointment.status || "") &&
+                    selectedAppointment.started_at
+                      ? dateLabel(selectedAppointment.started_at, true)
+                      : "بانتظار تنسيق الوقت"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>تاريخ الطلب</dt>
+                  <dd>{dateLabel(selectedAppointment.created_at)}</dd>
+                </div>
+                {selectedAppointment.duration_minutes !== null && (
+                  <div>
+                    <dt>المدة</dt>
+                    <dd>{selectedAppointment.duration_minutes} دقيقة</dd>
+                  </div>
+                )}
+              </dl>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+export default function ClientDashboard() {
+  const data = useClientData();
+  return <ClientDashboardView data={data} />;
+}
