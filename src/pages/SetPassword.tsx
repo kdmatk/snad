@@ -4,17 +4,14 @@ import { LockKeyhole, Loader2, CheckCircle2 } from "lucide-react";
 import Brand from "@/components/Brand";
 import { supabase } from "@/integrations/supabase/client";
 
-// Tokens stay in the URL fragment until the page loads, then only in memory.
-// No token is verified on page load: email scanners cannot consume the invite.
+import { parseActivationLink } from "@/components/admin/activationLink";
+
+// Keep the fragment through reloads until setup succeeds. It is never sent to
+// the server or verified on page load, so email scanners cannot consume it.
 export default function SetPassword() {
-  const [link] = useState<{ token: string | null; type: "invite" | "recovery" | null }>(() => {
-    const params = new URLSearchParams(window.location.hash.slice(1));
-    const type = params.get("type");
-    return {
-      token: params.get("token_hash"),
-      type: type === "invite" || type === "recovery" ? type : null,
-    };
-  });
+  const [link, setLink] = useState(() =>
+    parseActivationLink(window.location.hash),
+  );
   const verified = useRef(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -22,12 +19,23 @@ export default function SetPassword() {
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   useEffect(() => {
-    window.history.replaceState(null, "", window.location.pathname);
     const meta = document.createElement("meta");
     meta.name = "referrer";
     meta.content = "no-referrer";
     document.head.appendChild(meta);
-    return () => meta.remove();
+    const updateLink = () => {
+      setLink(parseActivationLink(window.location.hash));
+      verified.current = false;
+      setError("");
+      setDone(false);
+      setPassword("");
+      setConfirm("");
+    };
+    window.addEventListener("hashchange", updateLink);
+    return () => {
+      meta.remove();
+      window.removeEventListener("hashchange", updateLink);
+    };
   }, []);
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -65,6 +73,7 @@ export default function SetPassword() {
       }
       setPassword("");
       setConfirm("");
+      window.history.replaceState(null, "", window.location.pathname);
       setDone(true);
     } catch {
       setError("تعذّر الاتصال بخدمة الدخول. يرجى المحاولة مرة أخرى.");
