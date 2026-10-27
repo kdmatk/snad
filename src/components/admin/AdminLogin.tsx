@@ -1,32 +1,37 @@
-
-import { useState } from 'react';
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Lock, Mail, AlertCircle, Info } from "lucide-react";
-import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { Loader2, Lock, Mail, AlertCircle } from "lucide-react";
+import { useAdminAuth } from "@/contexts/AdminAuthContext";
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const { loginAdmin, loading } = useAdminAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    
+    setError("");
+
     if (!email || !password) {
-      setError('الرجاء إدخال البريد الإلكتروني وكلمة المرور');
+      setError("الرجاء إدخال البريد الإلكتروني وكلمة المرور");
       return;
     }
-    
+
     try {
       await loginAdmin(email, password);
-    } catch (error: any) {
-      setError(error.message || 'فشل في تسجيل الدخول');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "فشل في تسجيل الدخول");
     }
   };
 
@@ -38,7 +43,9 @@ const AdminLogin = () => {
             <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
               <Lock className="w-6 h-6 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold">تسجيل دخول المدير</CardTitle>
+            <CardTitle className="text-2xl font-bold">
+              تسجيل دخول المدير
+            </CardTitle>
             <CardDescription>
               أدخل بياناتك للوصول إلى لوحة التحكم
             </CardDescription>
@@ -59,6 +66,8 @@ const AdminLogin = () => {
                   <Input
                     id="email"
                     type="email"
+                    autoComplete="username"
+                    dir="ltr"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="البريد الإلكتروني"
@@ -68,7 +77,7 @@ const AdminLogin = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="password">كلمة المرور</Label>
                 <div className="relative">
@@ -76,6 +85,8 @@ const AdminLogin = () => {
                   <Input
                     id="password"
                     type="password"
+                    autoComplete="current-password"
+                    dir="ltr"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
@@ -86,9 +97,9 @@ const AdminLogin = () => {
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full" 
+              <Button
+                type="submit"
+                className="w-full"
                 disabled={loading || !email || !password}
               >
                 {loading ? (
@@ -97,7 +108,7 @@ const AdminLogin = () => {
                     جاري تسجيل الدخول...
                   </>
                 ) : (
-                  'تسجيل الدخول'
+                  "تسجيل الدخول"
                 )}
               </Button>
             </form>

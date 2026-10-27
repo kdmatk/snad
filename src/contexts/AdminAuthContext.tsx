@@ -1,7 +1,13 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface Admin {
   id: string;
@@ -19,7 +25,9 @@ interface AdminAuthContextType {
   isAuthenticated: boolean;
 }
 
-const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
+const AdminAuthContext = createContext<AdminAuthContextType | undefined>(
+  undefined,
+);
 
 export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
   const [admin, setAdmin] = useState<Admin | null>(null);
@@ -33,15 +41,17 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
 
   const checkAdminStatus = async () => {
     try {
-      localStorage.removeItem('admin_session');
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      localStorage.removeItem("admin_session");
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (session?.user?.email) {
         const { data: adminData, error } = await supabase
-          .from('admins')
-          .select('*')
-          .eq('email', session.user.email)
-          .eq('is_active', true)
+          .from("admins")
+          .select("*")
+          .eq("email", session.user.email)
+          .eq("is_active", true)
           .single();
 
         if (!error && adminData) {
@@ -49,7 +59,7 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     } catch (error) {
-      console.error('خطأ في فحص حالة المدير:', error);
+      console.error("خطأ في فحص حالة المدير:", error);
     } finally {
       setLoading(false);
     }
@@ -58,28 +68,28 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
   const loginAdmin = async (email: string, password: string) => {
     try {
       setLoading(true);
-      
+
       // محاولة تسجيل الدخول عبر Supabase Auth
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
+        email: email.trim().toLowerCase(),
+        password,
       });
 
       if (error) {
-        throw new Error('بيانات الدخول غير صحيحة');
+        throw new Error("بيانات الدخول غير صحيحة");
       }
 
       if (data.user?.email) {
         const { data: adminData, error: adminError } = await supabase
-          .from('admins')
-          .select('*')
-          .eq('email', data.user.email)
-          .eq('is_active', true)
+          .from("admins")
+          .select("*")
+          .eq("email", data.user.email)
+          .eq("is_active", true)
           .single();
 
         if (adminError || !adminData) {
           await supabase.auth.signOut();
-          throw new Error('هذا المستخدم ليس مديراً مفعلاً');
+          throw new Error("هذا المستخدم ليس مديراً مفعلاً");
         }
 
         setAdmin(adminData);
@@ -88,11 +98,11 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
           description: `مرحباً ${adminData.name}`,
         });
       }
-    } catch (error: any) {
-      console.error('خطأ في تسجيل الدخول:', error);
+    } catch (error: unknown) {
+      console.error("خطأ في تسجيل الدخول:", error);
       toast({
         title: "خطأ في تسجيل الدخول",
-        description: error.message || "فشل في تسجيل الدخول",
+        description: error instanceof Error ? error.message : "فشل في تسجيل الدخول",
         variant: "destructive",
       });
       throw error;
@@ -103,16 +113,16 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logoutAdmin = async () => {
     try {
-      localStorage.removeItem('admin_session');
+      localStorage.removeItem("admin_session");
       await supabase.auth.signOut();
       setAdmin(null);
       toast({
         title: "تم تسجيل الخروج",
         description: "تم تسجيل الخروج بنجاح",
       });
-      navigate('/admin');
+      navigate("/admin");
     } catch (error) {
-      console.error('خطأ في تسجيل الخروج:', error);
+      console.error("خطأ في تسجيل الخروج:", error);
       toast({
         title: "خطأ",
         description: "فشل في تسجيل الخروج",
@@ -122,13 +132,15 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AdminAuthContext.Provider value={{
-      admin,
-      loading,
-      loginAdmin,
-      logoutAdmin,
-      isAuthenticated: !!admin
-    }}>
+    <AdminAuthContext.Provider
+      value={{
+        admin,
+        loading,
+        loginAdmin,
+        logoutAdmin,
+        isAuthenticated: !!admin,
+      }}
+    >
       {children}
     </AdminAuthContext.Provider>
   );
@@ -137,7 +149,7 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAdminAuth = () => {
   const context = useContext(AdminAuthContext);
   if (context === undefined) {
-    throw new Error('useAdminAuth must be used within an AdminAuthProvider');
+    throw new Error("useAdminAuth must be used within an AdminAuthProvider");
   }
   return context;
 };

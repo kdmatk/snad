@@ -14,6 +14,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import SetPassword from "./pages/SetPassword";
 import ClientDashboard from "./pages/ClientDashboard";
 import LawyerDashboard from "./pages/LawyerDashboard";
 import LawyerRegister from "./pages/LawyerRegister";
@@ -62,11 +63,15 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/set-password" element={<SetPassword />} />
               <Route path="/client-dashboard" element={<ClientDashboard />} />
               <Route path="/lawyer-dashboard" element={<LawyerDashboard />} />
               <Route path="/lawyer-register" element={<LawyerRegister />} />
               <Route path="/request-service" element={<RequestService />} />
-              <Route path="/instant-consultation" element={<InstantConsultation />} />
+              <Route
+                path="/instant-consultation"
+                element={<InstantConsultation />}
+              />
               <Route path="/voice-call" element={<VoiceCall />} />
               <Route path="/legal-auctions" element={<LegalAuctions />} />
               <Route path="/legal-library" element={<LegalLibrary />} />
