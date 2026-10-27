@@ -1,4 +1,3 @@
-
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,14 +16,14 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -34,7 +33,7 @@ const Login = () => {
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
 
@@ -48,37 +47,35 @@ const Login = () => {
           description: "مرحباً بك في منصة سند القانونية",
         });
 
-        // التحقق من نوع المستخدم وإعادة التوجيه المناسبة
-        const { data: profile } = await supabase
-          .from('clients')
-          .select('id')
-          .eq('user_id', data.user.id)
-          .single();
-
-        if (profile) {
-          navigate('/client-dashboard');
-        } else {
-          // التحقق من كونه محامي
-          const { data: lawyer } = await supabase
-            .from('lawyers')
-            .select('id')
-            .eq('user_id', data.user.id)
-            .single();
-
-          if (lawyer) {
-            navigate('/lawyer-dashboard');
-          } else {
-            navigate('/client-dashboard');
-          }
-        }
+        const [profileResult, lawyerResult] = await Promise.all([
+          supabase
+            .from("user_profiles")
+            .select("user_type")
+            .eq("user_id", data.user.id)
+            .maybeSingle(),
+          supabase
+            .from("lawyers")
+            .select("id")
+            .eq("user_id", data.user.id)
+            .maybeSingle(),
+        ]);
+        if (profileResult.error || lawyerResult.error)
+          throw new Error("تعذّر تحميل نوع الحساب. أعد المحاولة.");
+        navigate(
+          lawyerResult.data || profileResult.data?.user_type === "lawyer"
+            ? "/lawyer-dashboard"
+            : "/client-dashboard",
+        );
       }
-    } catch (error: any) {
-      console.error('Login error:', error);
+    } catch (error: unknown) {
+      console.error("Login error:", error);
       toast({
         title: "خطأ في تسجيل الدخول",
-        description: error.message === 'Invalid login credentials' 
-          ? "بيانات الدخول غير صحيحة" 
-          : "حدث خطأ أثناء تسجيل الدخول",
+        description:
+          error instanceof Error &&
+          error.message === "Invalid login credentials"
+            ? "بيانات الدخول غير صحيحة"
+            : "حدث خطأ أثناء تسجيل الدخول",
         variant: "destructive",
       });
     } finally {
@@ -96,17 +93,28 @@ const Login = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <span className="text-white font-bold text-2xl">س</span>
                 </div>
-                <CardTitle className="text-2xl text-primary">تسجيل الدخول</CardTitle>
-                <p className="text-muted-foreground">مرحباً بك في منصة سند القانونية</p>
+                <CardTitle className="text-2xl text-primary">
+                  تسجيل الدخول
+                </CardTitle>
+                <p className="text-muted-foreground">
+                  مرحباً بك في منصة سند القانونية
+                </p>
               </CardHeader>
 
               <CardContent className="space-y-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">البريد الإلكتروني</label>
+                    <label
+                      htmlFor="login-email"
+                      className="block text-sm font-medium mb-2"
+                    >
+                      البريد الإلكتروني
+                    </label>
                     <div className="relative">
                       <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                       <Input
+                        id="login-email"
+                        autoComplete="username"
                         name="email"
                         type="email"
                         value={formData.email}
@@ -120,10 +128,17 @@ const Login = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">كلمة المرور</label>
+                    <label
+                      htmlFor="login-password"
+                      className="block text-sm font-medium mb-2"
+                    >
+                      كلمة المرور
+                    </label>
                     <div className="relative">
                       <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                       <Input
+                        id="login-password"
+                        autoComplete="current-password"
                         name="password"
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
@@ -136,26 +151,46 @@ const Login = () => {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                        aria-label={
+                          showPassword
+                            ? "إخفاء كلمة المرور"
+                            : "إظهار كلمة المرور"
+                        }
                         className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                         disabled={loading}
                       >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" disabled={loading} />
+                      <input
+                        type="checkbox"
+                        className="rounded"
+                        disabled={loading}
+                      />
                       <span>تذكرني</span>
                     </label>
-                    <Link to="/forgot-password" className="text-primary hover:underline">
+                    <Link
+                      to="/forgot-password"
+                      className="text-primary hover:underline"
+                    >
                       نسيت كلمة المرور؟
                     </Link>
                   </div>
 
-                  <Button type="submit" size="lg" className="w-full" disabled={loading}>
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full"
+                    disabled={loading}
+                  >
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -172,21 +207,30 @@ const Login = () => {
                 <div className="text-center space-y-4">
                   <p className="text-muted-foreground">
                     ليس لديك حساب؟{" "}
-                    <Link to="/register" className="text-primary hover:underline font-medium">
+                    <Link
+                      to="/register"
+                      className="text-primary hover:underline font-medium"
+                    >
                       إنشاء حساب جديد
                     </Link>
                   </p>
-                  
+
                   <p className="text-muted-foreground">
                     هل أنت محامي؟{" "}
-                    <Link to="/lawyer-register" className="text-secondary hover:underline font-medium">
+                    <Link
+                      to="/lawyer-register"
+                      className="text-secondary hover:underline font-medium"
+                    >
                       انضم كمحامي
                     </Link>
                   </p>
 
                   <p className="text-muted-foreground">
                     دخول المدير:{" "}
-                    <Link to="/admin" className="text-secondary hover:underline font-medium">
+                    <Link
+                      to="/admin"
+                      className="text-secondary hover:underline font-medium"
+                    >
                       لوحة التحكم
                     </Link>
                   </p>

@@ -97,10 +97,10 @@ export default function SetPassword() {
         {done ? (
           <>
             <p className="text-center text-slate-600 text-sm leading-7 mb-6">
-              حُفظت كلمة المرور. يمكنك الآن المتابعة إلى لوحة الإدارة.
+              حُفظت كلمة المرور. يمكنك الآن تسجيل الدخول إلى حسابك.
             </p>
-            <a className="navy-button w-full" href="/admin">
-              الدخول إلى لوحة الإدارة
+            <a className="navy-button w-full" href="/login">
+              تسجيل الدخول إلى حسابك
             </a>
           </>
         ) : !link.token || !link.type ? (
@@ -109,8 +109,8 @@ export default function SetPassword() {
               افتح رابط التفعيل الذي أُرسل إلى بريدك الإلكتروني. هذه الصفحة
               تحتاج رابطًا صالحًا لتعيين كلمة المرور.
             </p>
-            <Link to="/admin" className="navy-button w-full">
-              العودة إلى دخول الإدارة
+            <Link to="/login" className="navy-button w-full">
+              العودة إلى تسجيل الدخول
             </Link>
           </>
         ) : (
