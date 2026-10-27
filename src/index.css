@@ -8,32 +8,32 @@
 
 @layer base {
   :root {
-    --background: 214 31% 91%;
-    --foreground: 0 0% 100%;
+    --background: 210 25% 98%;
+    --foreground: 208 48% 19%;
 
-    --card: 214 100% 95%;
+    --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
 
-    --popover: 214 100% 95%;
+    --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 217 91% 26%;
+    --primary: 208 53% 22%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 45 93% 47%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 41 42% 55%;
+    --secondary-foreground: 209 51% 15%;
 
-    --muted: 214 32% 85%;
-    --muted-foreground: 215 25% 27%;
+    --muted: 210 25% 95%;
+    --muted-foreground: 213 17% 40%;
 
-    --accent: 214 32% 85%;
+    --accent: 210 25% 94%;
     --accent-foreground: 217 91% 26%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214 32% 82%;
-    --input: 214 32% 82%;
+    --border: 210 24% 89%;
+    --input: 210 24% 84%;
     --ring: 217 91% 26%;
 
     --radius: 0.5rem;
@@ -58,11 +58,11 @@
     --popover: 217 91% 15%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 217 91% 26%;
+    --primary: 208 53% 22%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 45 93% 47%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 41 42% 55%;
+    --secondary-foreground: 209 51% 15%;
 
     --muted: 217 50% 20%;
     --muted-foreground: 215 20% 65%;
@@ -93,7 +93,7 @@
   }
 
   body {
-    @apply bg-gradient-to-br from-blue-900 via-blue-800 to-slate-800 text-foreground font-arabic min-h-screen;
+    @apply bg-background text-foreground font-arabic min-h-screen;
     font-feature-settings: "rlig" 1, "calt" 1;
     direction: rtl;
   }

@@ -17,8 +17,8 @@ const Services = () => {
 
   return (
     <Layout>
-      <div className="py-8">
-        <div className="container mx-auto px-4">
+      <div className="page-content">
+        <div className="site-container">
           <ServicesHeader />
           
           <ServicesCategories

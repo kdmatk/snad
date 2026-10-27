@@ -90,9 +90,9 @@ const LegalAuctions = () => {
       <div className="py-8">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-primary mb-4">المزادات القانونية</h1>
+            <h1 className="text-4xl font-bold text-primary mb-4">طلبات عروض المحامين</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-              شارك في مزادات القضايا والخدمات القانونية واعرض خدماتك المهنية
+              تصفح طلبات الخدمات القانونية واطلع على متطلباتها
             </p>
           </div>
 
@@ -150,7 +150,7 @@ const LegalAuctions = () => {
             <div className="text-center py-12">
               <p className="text-muted-foreground text-lg mb-4">
                 {auctions?.length === 0 
-                  ? "لا توجد مزادات متاحة حالياً"
+                  ? "لا توجد طلبات عروض متاحة حاليًا"
                   : "لم يتم العثور على مزادات تطابق البحث"
                 }
               </p>
@@ -172,7 +172,7 @@ const LegalAuctions = () => {
           <div className="mt-12 bg-gradient-to-r from-primary to-primary/90 text-white rounded-lg p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h2 className="text-2xl font-bold mb-4">كيف تعمل المزادات؟</h2>
+                <h2 className="text-2xl font-bold mb-4">كيف تعمل عروض المحامين؟</h2>
                 <ul className="space-y-2 text-sm opacity-90">
                   <li>1. تصفح المزادات المتاحة</li>
                   <li>2. اقرأ تفاصيل القضية والمتطلبات</li>
@@ -182,7 +182,7 @@ const LegalAuctions = () => {
                 </ul>
               </div>
               <div>
-                <h2 className="text-2xl font-bold mb-4">لماذا المزادات؟</h2>
+                <h2 className="text-2xl font-bold mb-4">لماذا طلب عروض؟</h2>
                 <ul className="space-y-2 text-sm opacity-90">
                   <li>• منافسة عادلة وشفافة</li>
                   <li>• أسعار تنافسية</li>

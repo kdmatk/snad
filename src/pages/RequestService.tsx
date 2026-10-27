@@ -1,332 +1,495 @@
+import { useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { CheckCircle2, ArrowLeft, ArrowRight, Upload, X } from "lucide-react";
 import Layout from "@/components/Layout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { FileText, Clock, DollarSign, Upload } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useClientData } from "@/hooks/useClientData";
-import { useToast } from "@/hooks/use-toast";
-
-const RequestService = () => {
-  const navigate = useNavigate();
-  const { createServiceRequest } = useClientData();
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    serviceType: "",
+import { useLawyersData, matchesLawyerId } from "@/hooks/useLawyersData";
+import { useQuickServicesData } from "@/hooks/useQuickServicesData";
+import { supabase } from "@/integrations/supabase/client";
+const types = [
+  "استشارة قانونية",
+  "التمثيل القضائي",
+  "صياغة عقود",
+  "التحكيم والوساطة",
+  "استشارة متخصصة",
+  "متابعة قانونية",
+];
+const specialties = [
+  "القانون التجاري",
+  "قانون الأسرة",
+  "القانون الجنائي",
+  "القانون العقاري",
+  "قانون العمل",
+  "القانون الإداري",
+  "خدمات قانونية أخرى",
+];
+export default function RequestService() {
+  const [params] = useSearchParams();
+  const { lawyers, loading: lawyersLoading } = useLawyersData();
+  const { services, loading: servicesLoading } = useQuickServicesData();
+  const chosenLawyer = lawyers.find((l) =>
+    matchesLawyerId(l, params.get("lawyer")),
+  );
+  const quick = services.find((s) => s.id === params.get("quick_service"));
+  const general = Number(params.get("service"));
+  const [step, setStep] = useState(1);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [authRequired, setAuthRequired] = useState(false);
+  const [created, setCreated] = useState<{
+    id: string;
+    case_number: string | null;
+  } | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [attachmentError, setAttachmentError] = useState("");
+  const [form, setForm] = useState({
+    serviceType: types[general - 1] ?? "",
     specialty: "",
-    urgency: "",
-    budget: "",
     title: "",
     description: "",
-    preferredLawyer: "",
-    contactMethod: "",
-    phone: "",
-    email: ""
+    urgency: "normal",
+    budget: "",
+    contactMethod: params.get("method") ?? "platform",
   });
-
-  const serviceTypes = [
-    "استشارة قانونية",
-    "التمثيل القضائي",
-    "صياغة عقود",
-    "مراجعة وثائق",
-    "التحكيم والوساطة",
-    "خدمات قانونية أخرى"
-  ];
-
-  const specialties = [
-    "القانون التجاري",
-    "قانون الأسرة",
-    "القانون الجنائي",
-    "القانون العقاري",
-    "قانون العمل",
-    "القانون المالي",
-    "القانون الإداري",
-    "قانون الضرائب"
-  ];
-
-  const urgencyLevels = [
-    { value: "urgent", label: "عاجل (خلال 24 ساعة)", extra: "+50% من التكلفة" },
-    { value: "normal", label: "عادي (خلال 3-5 أيام)", extra: "التكلفة العادية" },
-    { value: "flexible", label: "مرن (خلال أسبوع)", extra: "-10% من التكلفة" }
-  ];
-
-  const budgetRanges = [
-    "أقل من 500 ريال",
-    "500 - 1000 ريال",
-    "1000 - 2000 ريال",
-    "2000 - 5000 ريال",
-    "أكثر من 5000 ريال",
-    "مفتوح للتفاوض"
-  ];
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const seeded = useRef(false);
+  useEffect(() => {
+    if (quick && !seeded.current) {
+      setForm((f) => ({ ...f, serviceType: quick.title, title: quick.title }));
+      seeded.current = true;
+    }
+  }, [quick]);
+  useEffect(() => {
+    if (chosenLawyer)
+      setForm((f) => ({ ...f, specialty: chosenLawyer.specialty }));
+  }, [chosenLawyer]);
+  const update = (name: string, value: string) => {
+    setForm((f) => ({ ...f, [name]: value }));
+    setError("");
   };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const next = () => {
+    if (
+      form.budget &&
+      (!Number.isFinite(Number(form.budget)) ||
+        Number(form.budget) < 0 ||
+        Number(form.budget) > 10000000)
+    ) {
+      setError("أدخل ميزانية صحيحة بين 0 و10,000,000 ريال.");
+      return;
+    }
+    if (
+      !form.serviceType ||
+      !form.specialty ||
+      !form.title.trim() ||
+      form.description.trim().length < 20
+    ) {
+      setError("اختر الخدمة والتخصص، وأضف عنوانًا ووصفًا لا يقل عن 20 حرفًا.");
+      return;
+    }
+    setError("");
+    setStep(2);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
+  const submit = async () => {
+    setBusy(true);
+    setError("");
+    setAuthRequired(false);
     try {
-      console.log("Service request:", formData);
-      
-      await createServiceRequest(formData);
-      
-      toast({
-        title: "تم تقديم الطلب بنجاح!",
-        description: "سيتم التواصل معك قريباً من قبل المحامين المتخصصين.",
-      });
-      
-      navigate('/client-dashboard');
-    } catch (error) {
-      console.error('Error submitting request:', error);
-      toast({
-        title: "خطأ في تقديم الطلب",
-        description: "حدث خطأ أثناء تقديم الطلب. يرجى المحاولة مرة أخرى.",
-        variant: "destructive",
-      });
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+      if (authError || !user) {
+        setAuthRequired(true);
+        return;
+      }
+      if (params.get("lawyer") && !chosenLawyer)
+        throw new Error(
+          "المحامي المختار غير متاح. يرجى العودة إلى دليل المحامين.",
+        );
+      if (params.get("quick_service") && !quick)
+        throw new Error(
+          "الخدمة المختارة غير متاحة. يرجى العودة إلى قائمة الخدمات.",
+        );
+      const description = [
+        form.description,
+        `نوع الخدمة: ${form.serviceType}`,
+        `وسيلة التواصل المفضلة: ${{ platform: "من خلال المنصة", phone: "هاتف", video: "اجتماع مرئي" }[form.contactMethod] ?? form.contactMethod}`,
+        chosenLawyer
+          ? `المحامي المطلوب: ${chosenLawyer.name} (معرّف الملف: ${chosenLawyer.id})`
+          : "",
+        quick
+          ? `الخدمة السريعة: ${quick.title} | المعرّف: ${quick.id} | السعر المعلن عند الطلب: ${quick.price} ريال | المدة المعلنة: ${quick.duration}`
+          : "",
+        form.budget ? `الميزانية المقترحة: ${form.budget} ريال` : "",
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+      const { data, error: insertError } = await supabase
+        .from("legal_cases")
+        .insert({
+          client_id: user.id,
+          title: form.title.trim(),
+          description,
+          category: form.specialty,
+          urgency: form.urgency,
+          status: "open",
+          is_auction: false,
+          budget_min:
+            quick?.price ?? (form.budget ? Number(form.budget) : null),
+          budget_max:
+            quick?.price ?? (form.budget ? Number(form.budget) : null),
+        })
+        .select("id,case_number")
+        .single();
+      if (insertError)
+        throw new Error("تعذّر حفظ الطلب. حاول مرة أخرى أو تواصل مع الدعم.");
+      setCreated(data);
+      if (files.length) {
+        const uploaded: string[] = [];
+        let failed = 0;
+        for (const file of files) {
+          const path = `${data.id}/${crypto.randomUUID()}.${file.name.split(".").pop()}`;
+          const { error: uploadError } = await supabase.storage
+            .from("case-files")
+            .upload(path, file);
+          if (uploadError) failed++;
+          else uploaded.push(path);
+        }
+        if (uploaded.length) {
+          const { error: saveError } = await supabase
+            .from("legal_cases")
+            .update({ attachments: uploaded })
+            .eq("id", data.id);
+          if (saveError) failed = files.length;
+        }
+        if (failed)
+          setAttachmentError(
+            `حُفظ الطلب، وتعذّر إرفاق ${failed} من الملفات. احتفظ بها لمشاركتها مع المحامي عبر القناة المتفق عليها.`,
+          );
+      }
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "تعذّر تقديم الطلب. حاول مرة أخرى.",
+      );
     } finally {
-      setIsSubmitting(false);
+      setBusy(false);
     }
   };
-
+  const pickFiles = (incoming: FileList | null) => {
+    if (!incoming) return;
+    const list = [...files, ...Array.from(incoming)];
+    if (list.length > 3) {
+      setError("يمكن إرفاق 3 ملفات كحد أقصى.");
+      return;
+    }
+    if (
+      list.some(
+        (f) =>
+          f.size > 10 * 1024 * 1024 ||
+          ![
+            "application/pdf",
+            "image/jpeg",
+            "image/png",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          ].includes(f.type),
+      )
+    ) {
+      setError("اختر ملفات PDF أو Word أو صورًا، بحجم لا يتجاوز 10MB لكل ملف.");
+      return;
+    }
+    setFiles(list);
+    setError("");
+  };
+  if (
+    (params.get("quick_service") && servicesLoading) ||
+    (params.get("lawyer") && lawyersLoading)
+  )
+    return (
+      <Layout>
+        <p className="loading-state" role="status">
+          جاري تحميل اختيارك...
+        </p>
+      </Layout>
+    );
+  if (created)
+    return (
+      <Layout>
+        <div className="site-container page-content">
+          <div className="surface success-message max-w-2xl mx-auto my-12">
+            <CheckCircle2 size={42} />
+            <h1 className="text-2xl font-bold mb-3">تم حفظ طلبك</h1>
+            <p>
+              رقم الطلب: <bdi>{created.case_number ?? created.id}</bdi>
+            </p>
+            <p>يمكنك متابعة الطلب من حسابك. لم تُنفّذ عملية دفع.</p>
+            {attachmentError && (
+              <p className="error-message mt-4">{attachmentError}</p>
+            )}
+            <Link className="navy-button mt-6" to="/my-cases">
+              متابعة طلباتي
+            </Link>
+          </div>
+        </div>
+      </Layout>
+    );
   return (
     <Layout>
-      <div className="py-8">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-primary mb-4">طلب خدمة قانونية</h1>
-              <p className="text-muted-foreground text-lg">
-                احصل على أفضل الخدمات القانونية من محامين متخصصين
-              </p>
-            </div>
-
-            <Card className="shadow-xl border-0">
-              <CardHeader>
-                <CardTitle className="text-2xl">تفاصيل الطلب</CardTitle>
-                <p className="text-muted-foreground">
-                  يرجى ملء جميع المعلومات لضمان تقديم أفضل خدمة
-                </p>
-              </CardHeader>
-
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Service Type */}
+      <div className="site-container page-content">
+        <div className="page-intro">
+          <p className="eyebrow">من احتياجك إلى طلب واضح</p>
+          <h1>طلب خدمة قانونية</h1>
+          <p>أضف التفاصيل، ثم راجع طلبك قبل إرساله.</p>
+        </div>
+        <ol className="stepper">
+          <li className={step === 1 ? "current" : ""}>1. تفاصيل الطلب</li>
+          <li className={step === 2 ? "current" : ""}>2. المراجعة والإرسال</li>
+        </ol>
+        <div className="form-grid">
+          <section className="surface">
+            {step === 1 ? (
+              <>
+                <h2>ما الذي تحتاج المساعدة فيه؟</h2>
+                <div className="form-fields">
                   <div>
-                    <label className="block text-sm font-medium mb-2">نوع الخدمة المطلوبة *</label>
-                    <Select value={formData.serviceType} onValueChange={(value) => handleSelectChange('serviceType', value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر نوع الخدمة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {serviceTypes.map((service) => (
-                          <SelectItem key={service} value={service}>
-                            {service}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Specialty */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2">التخصص المطلوب *</label>
-                    <Select value={formData.specialty} onValueChange={(value) => handleSelectChange('specialty', value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر التخصص" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {specialties.map((specialty) => (
-                          <SelectItem key={specialty} value={specialty}>
-                            {specialty}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Service Details */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2">عنوان الطلب *</label>
-                    <Input
-                      name="title"
-                      value={formData.title}
-                      onChange={handleInputChange}
-                      placeholder="عنوان مختصر للطلب"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">وصف تفصيلي للطلب *</label>
-                    <Textarea
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      placeholder="اشرح تفاصيل الطلب والمساعدة المطلوبة..."
-                      rows={5}
-                      required
-                    />
-                  </div>
-
-                  {/* Urgency Level */}
-                  <div>
-                    <label className="block text-sm font-medium mb-4">مستوى الأولوية *</label>
-                    <RadioGroup value={formData.urgency} onValueChange={(value) => handleSelectChange('urgency', value)}>
-                      {urgencyLevels.map((level) => (
-                        <div key={level.value} className="flex items-start space-x-reverse space-x-2 p-4 border rounded-lg">
-                          <RadioGroupItem value={level.value} id={level.value} className="mt-1" />
-                          <div className="flex-1">
-                            <Label htmlFor={level.value} className="font-medium cursor-pointer">
-                              {level.label}
-                            </Label>
-                            <p className="text-sm text-muted-foreground">{level.extra}</p>
-                          </div>
-                        </div>
+                    <label htmlFor="request-service-type">نوع الخدمة *</label>
+                    <select
+                      id="request-service-type"
+                      disabled={!!quick}
+                      value={form.serviceType}
+                      onChange={(e) => update("serviceType", e.target.value)}
+                    >
+                      <option value="">اختر الخدمة</option>
+                      {[
+                        ...new Set([...types, ...(quick ? [quick.title] : [])]),
+                      ].map((t) => (
+                        <option key={t}>{t}</option>
                       ))}
-                    </RadioGroup>
+                    </select>
                   </div>
-
-                  {/* Budget */}
                   <div>
-                    <label className="block text-sm font-medium mb-2">الميزانية المقترحة *</label>
-                    <Select value={formData.budget} onValueChange={(value) => handleSelectChange('budget', value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر نطاق الميزانية" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {budgetRanges.map((range) => (
-                          <SelectItem key={range} value={range}>
-                            {range}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <label htmlFor="request-specialty">التخصص القانوني *</label>
+                    <select
+                      id="request-specialty"
+                      value={form.specialty}
+                      onChange={(e) => update("specialty", e.target.value)}
+                    >
+                      <option value="">اختر التخصص</option>
+                      {[
+                        ...new Set([
+                          ...specialties,
+                          ...(chosenLawyer ? [chosenLawyer.specialty] : []),
+                        ]),
+                      ].map((t) => (
+                        <option key={t}>{t}</option>
+                      ))}
+                    </select>
                   </div>
-
-                  {/* Preferred Contact Method */}
                   <div>
-                    <label className="block text-sm font-medium mb-4">طريقة التواصل المفضلة *</label>
-                    <RadioGroup value={formData.contactMethod} onValueChange={(value) => handleSelectChange('contactMethod', value)}>
-                      <div className="flex items-center space-x-reverse space-x-2">
-                        <RadioGroupItem value="phone" id="phone" />
-                        <Label htmlFor="phone">هاتف</Label>
-                      </div>
-                      <div className="flex items-center space-x-reverse space-x-2">
-                        <RadioGroupItem value="email" id="email" />
-                        <Label htmlFor="email">بريد إلكتروني</Label>
-                      </div>
-                      <div className="flex items-center space-x-reverse space-x-2">
-                        <RadioGroupItem value="whatsapp" id="whatsapp" />
-                        <Label htmlFor="whatsapp">واتساب</Label>
-                      </div>
-                      <div className="flex items-center space-x-reverse space-x-2">
-                        <RadioGroupItem value="platform" id="platform" />
-                        <Label htmlFor="platform">من خلال المنصة</Label>
-                      </div>
-                    </RadioGroup>
+                    <label htmlFor="request-title">عنوان الطلب *</label>
+                    <input
+                      id="request-title"
+                      value={form.title}
+                      maxLength={180}
+                      onChange={(e) => update("title", e.target.value)}
+                      placeholder="مثال: مراجعة بنود عقد عمل"
+                    />
                   </div>
-
-                  {/* Contact Information */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="request-description">
+                      تفاصيل احتياجك *
+                    </label>
+                    <textarea
+                      id="request-description"
+                      value={form.description}
+                      maxLength={10000}
+                      onChange={(e) => update("description", e.target.value)}
+                      placeholder="اشرح الموضوع وما الذي تتوقعه من الخدمة..."
+                    />
+                  </div>
+                  <div className="field-row">
                     <div>
-                      <label className="block text-sm font-medium mb-2">رقم الهاتف *</label>
-                      <Input
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        placeholder="رقم الهاتف"
-                        required
+                      <label htmlFor="request-urgency">الأولوية</label>
+                      <select
+                        id="request-urgency"
+                        value={form.urgency}
+                        onChange={(e) => update("urgency", e.target.value)}
+                      >
+                        <option value="normal">عادية</option>
+                        <option value="urgent">عاجلة</option>
+                        <option value="flexible">مرنة</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor="request-contact">
+                        طريقة التواصل المفضلة
+                      </label>
+                      <select
+                        id="request-contact"
+                        value={form.contactMethod}
+                        onChange={(e) =>
+                          update("contactMethod", e.target.value)
+                        }
+                      >
+                        <option value="platform">من خلال المنصة</option>
+                        <option value="phone">مكالمة هاتفية</option>
+                        <option value="video">اجتماع مرئي</option>
+                      </select>
+                    </div>
+                  </div>
+                  {!quick && (
+                    <div>
+                      <label htmlFor="request-budget">
+                        ميزانية مقترحة بالريال (اختياري)
+                      </label>
+                      <input
+                        id="request-budget"
+                        type="number"
+                        min="0"
+                        max="10000000"
+                        value={form.budget}
+                        onChange={(e) => update("budget", e.target.value)}
+                        placeholder="تُحدّد الأتعاب عند الاتفاق"
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">البريد الإلكتروني *</label>
-                      <Input
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="البريد الإلكتروني"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* File Upload */}
+                  )}
                   <div>
-                    <label className="block text-sm font-medium mb-2">إرفاق ملفات (اختياري)</label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                      <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-sm font-medium">رفع المستندات ذات الصلة</p>
-                      <p className="text-xs text-muted-foreground">PDF, DOC, JPG, PNG حتى 10MB</p>
-                      <Button variant="outline" size="sm" className="mt-2" type="button">
-                        اختيار الملفات
-                      </Button>
+                    <label htmlFor="request-files">
+                      المستندات ذات الصلة (اختياري)
+                    </label>
+                    <div className="notice">
+                      <Upload size={20} className="mb-2" />
+                      <input
+                        id="request-files"
+                        type="file"
+                        multiple
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                        onChange={(e) => pickFiles(e.target.files)}
+                      />
+                      <p className="mt-2">حتى 3 ملفات، 10MB لكل ملف.</p>
                     </div>
-                  </div>
-
-                  {/* Summary Card */}
-                  <Card className="bg-primary/5">
-                    <CardContent className="p-6">
-                      <h3 className="font-bold mb-4 flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-primary" />
-                        ملخص الطلب
-                      </h3>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span>نوع الخدمة:</span>
-                          <span className="font-medium">{formData.serviceType || "لم يتم التحديد"}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>التخصص:</span>
-                          <span className="font-medium">{formData.specialty || "لم يتم التحديد"}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>الميزانية:</span>
-                          <span className="font-medium">{formData.budget || "لم يتم التحديد"}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>الأولوية:</span>
-                          <span className="font-medium">
-                            {formData.urgency === 'urgent' ? 'عاجل' : 
-                             formData.urgency === 'normal' ? 'عادي' : 
-                             formData.urgency === 'flexible' ? 'مرن' : 'لم يتم التحديد'}
-                          </span>
-                        </div>
+                    {files.map((f, i) => (
+                      <div
+                        key={`${f.name}-${i}`}
+                        className="flex justify-between items-center text-xs mt-2"
+                      >
+                        <span>{f.name}</span>
+                        <button
+                          aria-label={`إزالة ${f.name}`}
+                          onClick={() =>
+                            setFiles(files.filter((_, n) => n !== i))
+                          }
+                        >
+                          <X size={18} />
+                        </button>
                       </div>
-                    </CardContent>
-                  </Card>
-
-                  <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? 'جاري التقديم...' : 'تقديم الطلب'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="form-actions">
+                  <button className="navy-button" onClick={next}>
+                    مراجعة الطلب <ArrowLeft size={16} />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2>راجع التفاصيل قبل الإرسال</h2>
+                <dl className="summary-list">
+                  <div>
+                    <dt>عنوان الطلب</dt>
+                    <dd>{form.title}</dd>
+                  </div>
+                  <div>
+                    <dt>نوع الخدمة</dt>
+                    <dd>{form.serviceType}</dd>
+                  </div>
+                  <div>
+                    <dt>التخصص</dt>
+                    <dd>{form.specialty}</dd>
+                  </div>
+                  <div>
+                    <dt>المحامي المطلوب</dt>
+                    <dd>{chosenLawyer?.name ?? "طلب عام"}</dd>
+                  </div>
+                  <div>
+                    <dt>المرفقات</dt>
+                    <dd>{files.length} ملفات</dd>
+                  </div>
+                </dl>
+                <p className="whitespace-pre-wrap mt-6">{form.description}</p>
+                <div className="notice mt-5">
+                  يُرسل الطلب إلى المنصة لتنسيق الخدمة. تُراجع الأتعاب والنطاق
+                  قبل التنفيذ، ولا يتم الدفع في هذه الخطوة.
+                </div>
+                <div className="form-actions">
+                  <button
+                    className="outline-button"
+                    disabled={busy}
+                    onClick={() => setStep(1)}
+                  >
+                    <ArrowRight size={16} />
+                    تعديل التفاصيل
+                  </button>
+                  <button
+                    className="navy-button"
+                    disabled={busy || lawyersLoading || servicesLoading}
+                    onClick={submit}
+                  >
+                    {busy ? "جاري حفظ الطلب..." : "إرسال الطلب"}
+                  </button>
+                </div>
+                {authRequired && (
+                  <div className="notice mt-5" role="alert">
+                    سجّل الدخول في تبويب جديد، ثم عُد لإرسال الطلب؛ ستبقى
+                    التفاصيل في هذه الصفحة.
+                    <Link
+                      className="text-link block mt-2"
+                      to="/login"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      تسجيل الدخول
+                    </Link>
+                  </div>
+                )}
+              </>
+            )}
+            {error && (
+              <p className="error-message mt-5" role="alert">
+                {error}
+              </p>
+            )}
+          </section>
+          <aside className="surface request-summary">
+            <h2>ملخص اختيارك</h2>
+            <dl className="summary-list">
+              <div>
+                <dt>الخدمة</dt>
+                <dd>{quick?.title ?? form.serviceType ?? "لم تُحدد"}</dd>
+              </div>
+              <div>
+                <dt>المحامي</dt>
+                <dd>{chosenLawyer?.name ?? "طلب عام"}</dd>
+              </div>
+              {quick && (
+                <>
+                  <div>
+                    <dt>السعر المعلن</dt>
+                    <dd>{quick.price} ريال</dd>
+                  </div>
+                  <div>
+                    <dt>المدة المعلنة</dt>
+                    <dd>{quick.duration}</dd>
+                  </div>
+                </>
+              )}
+            </dl>
+            <p className="notice">
+              تُحدّد بداية التنفيذ بعد قبول الطلب واكتمال متطلباته.
+            </p>
+          </aside>
         </div>
       </div>
     </Layout>
   );
-};
-
-export default RequestService;
+}

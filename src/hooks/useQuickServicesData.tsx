@@ -4,7 +4,7 @@ import { FileText, MessageCircle, Scale, Edit, Users, Clock } from "lucide-react
 import { supabase } from "@/integrations/supabase/client";
 
 export interface QuickService {
-  id: number;
+  id: string;
   title: string;
   description: string;
   duration: string;
@@ -45,7 +45,7 @@ export const useQuickServicesData = () => {
       if (error) throw error;
 
       const formattedServices: QuickService[] = (data || []).map((service: any) => ({
-        id: parseInt(service.id.split('-')[0], 16), // Convert UUID to number for compatibility
+        id: service.id,
         title: service.title,
         description: service.description || '',
         duration: `خلال ${service.duration_hours} ساعة`,

@@ -80,7 +80,7 @@ export const useClientData = () => {
           *,
           lawyers(name)
         `)
-        .eq('client_id', clientData?.id || '')
+        .eq('client_id', user.id)
         .order('created_at', { ascending: false });
 
       if (casesData) {
@@ -108,7 +108,7 @@ export const useClientData = () => {
           lawyers(name),
           legal_services(name)
         `)
-        .eq('client_id', clientData?.id || '')
+        .eq('client_id', user.id)
         .order('created_at', { ascending: false });
 
       if (consultationsData) {
@@ -126,14 +126,14 @@ export const useClientData = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user || !profile) {
+      if (!user) {
         throw new Error('المستخدم غير مسجل الدخول');
       }
 
       const { data, error } = await supabase
         .from('legal_cases')
         .insert({
-          client_id: profile.id,
+          client_id: user.id,
           title: requestData.title,
           description: requestData.description,
           category: requestData.specialty,

@@ -1,20 +1,20 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
-import DemoBanner from "./DemoBanner";
-
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-const Layout = ({ children }: LayoutProps) => {
+export default function Layout({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [pathname]);
   return (
-    <div className="min-h-screen bg-background font-arabic" dir="rtl">
-      <DemoBanner />
+    <div className="site-layout" dir="rtl">
+      <a href="#main-content" className="skip-link">
+        انتقل إلى المحتوى
+      </a>
       <Header />
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
       <Footer />
     </div>
   );
-};
-
-export default Layout;
+}

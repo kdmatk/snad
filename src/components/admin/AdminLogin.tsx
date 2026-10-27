@@ -51,17 +51,6 @@ const AdminLogin = () => {
               </Alert>
             )}
 
-            <Alert className="bg-blue-50 border-blue-200">
-              <Info className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-blue-800">
-                <strong>بيانات الدخول للاختبار:</strong>
-                <br />
-                البريد: <code className="bg-blue-100 px-1 rounded">admin@example.com</code>
-                <br />
-                كلمة المرور: <code className="bg-blue-100 px-1 rounded">Admin771298!</code>
-              </AlertDescription>
-            </Alert>
-
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">البريد الإلكتروني</Label>
@@ -72,7 +61,7 @@ const AdminLogin = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@example.com"
+                    placeholder="البريد الإلكتروني"
                     className="pl-10"
                     required
                     disabled={loading}

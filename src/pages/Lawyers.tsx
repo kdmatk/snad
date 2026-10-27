@@ -1,58 +1,84 @@
-
+import { useState } from "react";
 import Layout from "@/components/Layout";
-import LawyersHeader from "@/components/lawyers/LawyersHeader";
-import LawyersSearch from "@/components/lawyers/LawyersSearch";
-import LawyersGrid from "@/components/lawyers/LawyersGrid";
+import LawyerCard from "@/components/lawyers/LawyerCard";
 import { useLawyersData } from "@/hooks/useLawyersData";
-import { Loader2 } from "lucide-react";
-
-const Lawyers = () => {
-  const {
-    filteredLawyers,
-    specialties,
-    cities,
-    searchTerm,
-    setSearchTerm,
-    selectedCity,
-    setSelectedCity,
-    selectedSpecialty,
-    setSelectedSpecialty,
-    resetFilters,
-    loading
-  } = useLawyersData();
-
+export default function Lawyers() {
+  const d = useLawyersData();
+  const [sort, setSort] = useState("default");
+  const list = [...d.filteredLawyers]
+    .filter((l) => !l.name.includes("تجريبي"))
+    .sort((a, b) =>
+      sort === "price"
+        ? (a.hourlyRate ?? Infinity) - (b.hourlyRate ?? Infinity)
+        : sort === "experience"
+          ? parseInt(b.experience || "0") - parseInt(a.experience || "0")
+          : 0,
+    );
   return (
     <Layout>
-      <div className="py-8">
-        <div className="container mx-auto px-4">
-          <LawyersHeader />
-          
-          <LawyersSearch
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            selectedCity={selectedCity}
-            setSelectedCity={setSelectedCity}
-            selectedSpecialty={selectedSpecialty}
-            setSelectedSpecialty={setSelectedSpecialty}
-            specialties={specialties}
-            cities={cities}
-          />
-
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin" />
-              <span className="mr-2">جاري تحميل المحامين...</span>
-            </div>
-          ) : (
-            <LawyersGrid 
-              filteredLawyers={filteredLawyers}
-              onResetFilters={resetFilters}
-            />
-          )}
+      <div className="site-container">
+        <div className="page-intro">
+          <p className="eyebrow">خبرات قانونية متعددة</p>
+          <h1>اختر المحامي المناسب لك</h1>
+          <p>
+            تعرّف على التخصص والخبرة والسعر، ثم اطلع على الملف قبل تقديم طلبك.
+          </p>
         </div>
+        <section className="page-content">
+          <div className="filter-bar">
+            <input
+              aria-label="البحث عن محامٍ أو تخصص"
+              placeholder="ابحث عن محامٍ أو تخصص..."
+              value={d.searchTerm}
+              onChange={(e) => d.setSearchTerm(e.target.value)}
+            />
+            <select
+              aria-label="التخصص"
+              value={d.selectedSpecialty}
+              onChange={(e) => d.setSelectedSpecialty(e.target.value)}
+            >
+              <option value="">جميع التخصصات</option>
+              {d.specialties.map((s) => (
+                <option key={s}>{s}</option>
+              ))}
+            </select>
+            <select
+              aria-label="ترتيب المحامين"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+            >
+              <option value="default">ترتيب افتراضي</option>
+              <option value="price">السعر: الأقل أولًا</option>
+              <option value="experience">الخبرة: الأعلى أولًا</option>
+            </select>
+          </div>
+          {d.loading ? (
+            <p className="loading-state" role="status">
+              جاري تحميل المحامين...
+            </p>
+          ) : (
+            <>
+              <p className="result-count" aria-live="polite">
+                {list.length} محاميًا ضمن نتائج البحث
+              </p>
+              {list.length ? (
+                <div className="featured-lawyers-grid">
+                  {list.map((l) => (
+                    <LawyerCard key={l.id} lawyer={l} />
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state">
+                  <p>لم نعثر على محامين بهذه المعايير.</p>
+                  <button className="outline-button" onClick={d.resetFilters}>
+                    إعادة تعيين البحث
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </section>
       </div>
     </Layout>
   );
-};
-
-export default Lawyers;
+}

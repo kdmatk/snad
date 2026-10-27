@@ -33,26 +33,7 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
 
   const checkAdminStatus = async () => {
     try {
-      const localSession = localStorage.getItem('admin_session');
-      if (localSession) {
-        const sessionData = JSON.parse(localSession);
-        
-        const { data: adminData, error } = await supabase
-          .from('admins')
-          .select('*')
-          .eq('email', sessionData.email)
-          .eq('is_active', true)
-          .single();
-
-        if (!error && adminData) {
-          setAdmin(adminData);
-          setLoading(false);
-          return;
-        } else {
-          localStorage.removeItem('admin_session');
-        }
-      }
-
+      localStorage.removeItem('admin_session');
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user?.email) {
@@ -78,34 +59,6 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       setLoading(true);
       
-      // التحقق من بيانات المدير الافتراضي
-      if (email === 'admin@example.com' && password === 'Admin771298!') {
-        const { data: adminData, error } = await supabase
-          .from('admins')
-          .select('*')
-          .eq('email', email)
-          .eq('is_active', true)
-          .single();
-
-        if (error || !adminData) {
-          throw new Error('هذا المستخدم ليس مديراً مفعلاً');
-        }
-
-        setAdmin(adminData);
-        localStorage.setItem('admin_session', JSON.stringify({
-          email: adminData.email,
-          name: adminData.name,
-          role: adminData.role
-        }));
-
-        toast({
-          title: "تم تسجيل الدخول بنجاح",
-          description: `مرحباً ${adminData.name}`,
-        });
-
-        return;
-      }
-
       // محاولة تسجيل الدخول عبر Supabase Auth
       const { data, error } = await supabase.auth.signInWithPassword({
         email,

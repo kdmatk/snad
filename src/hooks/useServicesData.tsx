@@ -25,7 +25,7 @@ export const useServicesData = () => {
       icon: MessageCircle,
       price: "من 200 ريال",
       duration: "30-60 دقيقة",
-      features: ["استشارة فورية", "عبر الهاتف أو الفيديو", "تقرير مكتوب"],
+      features: ["تنسيق الاستشارة", "تنسيق وسيلة التواصل", "تقرير مكتوب"],
       category: "استشارات",
       popular: true
     },
@@ -46,7 +46,7 @@ export const useServicesData = () => {
       icon: FileText,
       price: "من 500 ريال",
       duration: "3-5 أيام عمل",
-      features: ["صياغة احترافية", "مراجعة قانونية", "ضمان الحماية"],
+      features: ["صياغة احترافية", "مراجعة قانونية", "ملاحظات على البنود"],
       category: "وثائق"
     },
     {
@@ -56,7 +56,7 @@ export const useServicesData = () => {
       icon: Users,
       price: "من 1000 ريال",
       duration: "حسب تعقيد النزاع",
-      features: ["حل سريع", "توفير التكاليف", "سرية تامة"],
+      features: ["حل سريع", "توفير التكاليف", "تنسيق نطاق العمل"],
       category: "حلول"
     },
     {

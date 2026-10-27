@@ -1,9 +1,7 @@
-
 import { useState, useMemo } from "react";
-import { useSupabaseLawyers, SupabaseLawyer } from "./useSupabaseLawyers";
-
+import { useSupabaseLawyers, type SupabaseLawyer } from "./useSupabaseLawyers";
 export interface Lawyer {
-  id: number;
+  id: string;
   name: string;
   specialty: string;
   experience: string;
@@ -16,82 +14,60 @@ export interface Lawyer {
   phone: string;
   cases: number;
   successRate: number;
+  image: string | null;
+  hourlyRate: number | null;
   isOnline?: boolean;
   lastSeen?: string | null;
 }
-
-// دالة لتحويل بيانات قاعدة البيانات إلى الواجهة المحلية
-const transformSupabaseLawyer = (lawyer: SupabaseLawyer): Lawyer => {
-  return {
-    id: parseInt(lawyer.id.replace(/-/g, '').substring(0, 8), 16), // تحويل UUID إلى رقم
-    name: lawyer.name,
-    specialty: lawyer.specialty,
-    experience: lawyer.experience_years ? `${lawyer.experience_years} سنة` : "غير محدد",
-    rating: lawyer.rating || 0,
-    reviews: Math.floor(Math.random() * 200) + 50, // مؤقت حتى نضيف جدول التقييمات
-    location: "المملكة العربية السعودية", // مؤقت حتى نضيف الموقع
-    verified: lawyer.license_verified,
-    price: lawyer.hourly_rate ? `${lawyer.hourly_rate} ريال/ساعة` : "غير محدد",
-    description: lawyer.bio || "محامي معتمد ومتخصص",
-    phone: lawyer.phone || "",
-    cases: lawyer.total_cases || 0,
-    successRate: Math.floor(Math.random() * 20) + 80, // مؤقت حتى نحسب النسبة الفعلية
-    isOnline: lawyer.is_online,
-    lastSeen: lawyer.last_seen
-  };
-};
-
-export const useLawyersData = () => {
+export const transformSupabaseLawyer = (l: SupabaseLawyer): Lawyer => ({
+  id: l.id,
+  name: l.name,
+  specialty: l.specialty,
+  experience: l.experience_years ? `${l.experience_years} سنة` : "غير محدد",
+  rating: l.rating ?? 0,
+  reviews: 0,
+  location: "",
+  verified: l.license_verified,
+  price: l.hourly_rate ? `${l.hourly_rate} ريال / ساعة` : "السعر حسب الطلب",
+  hourlyRate: l.hourly_rate ?? null,
+  description: l.bio || "",
+  phone: l.phone || "",
+  cases: l.total_cases ?? 0,
+  successRate: 0,
+  image: l.avatar_url,
+  isOnline: l.is_online,
+  lastSeen: l.last_seen,
+});
+export const matchesLawyerId = (l: Lawyer, id: string | null | undefined) =>
+  l.id === id ||
+  String(parseInt(l.id.replace(/-/g, "").substring(0, 8), 16)) === id;
+export function useLawyersData() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState("");
-  
-  const { lawyers: supabaseLawyers, loading } = useSupabaseLawyers();
-  
-  // تحويل بيانات قاعدة البيانات إلى التنسيق المطلوب
-  const lawyers = useMemo(() => {
-    return supabaseLawyers.map(transformSupabaseLawyer);
-  }, [supabaseLawyers]);
-
-  const specialties = [
-    "القانون التجاري",
-    "قانون الأسرة", 
-    "القانون الجنائي",
-    "القانون العقاري",
-    "قانون العمل",
-    "القانون المالي",
-    "القانون الإداري",
-    "قانون الضرائب"
-  ];
-
-  const cities = [
-    "الرياض، السعودية",
-    "دبي، الإمارات",
-    "القاهرة، مصر",
-    "جدة، السعودية",
-    "الكويت، الكويت",
-    "المنامة، البحرين",
-    "الدوحة، قطر",
-    "مسقط، عمان"
-  ];
-
-  const filteredLawyers = useMemo(() => {
-    return lawyers.filter(lawyer => {
-      const matchesSearch = lawyer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           lawyer.specialty.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCity = !selectedCity || selectedCity === "all" || lawyer.location === selectedCity;
-      const matchesSpecialty = !selectedSpecialty || selectedSpecialty === "all" || lawyer.specialty === selectedSpecialty;
-      
-      return matchesSearch && matchesCity && matchesSpecialty;
-    });
-  }, [searchTerm, selectedCity, selectedSpecialty, lawyers]);
-
+  const { lawyers: data, loading } = useSupabaseLawyers();
+  const lawyers = useMemo(() => data.map(transformSupabaseLawyer), [data]);
+  const specialties = useMemo(
+    () => [...new Set(lawyers.map((l) => l.specialty))],
+    [lawyers],
+  );
+  const cities: string[] = [];
+  const filteredLawyers = useMemo(
+    () =>
+      lawyers.filter(
+        (l) =>
+          (!searchTerm || `${l.name} ${l.specialty}`.includes(searchTerm)) &&
+          (!selectedSpecialty ||
+            selectedSpecialty === "all" ||
+            l.specialty === selectedSpecialty),
+      ),
+    [lawyers, searchTerm, selectedSpecialty],
+  );
   const resetFilters = () => {
     setSearchTerm("");
     setSelectedCity("");
     setSelectedSpecialty("");
   };
-
   return {
     lawyers,
     filteredLawyers,
@@ -104,6 +80,6 @@ export const useLawyersData = () => {
     selectedSpecialty,
     setSelectedSpecialty,
     resetFilters,
-    loading
+    loading,
   };
-};
+}

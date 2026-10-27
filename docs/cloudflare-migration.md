@@ -37,7 +37,7 @@ Workers AI answered an Arabic platform-services question successfully.
 The GitHub App now has access to kdmatk/snad. Migration changes are stored in GitHub.
 Cloudflare Workers Builds is connected to kdmatk/snad on branch `main`.
 Automatic builds are enabled, with a registered build token and production trigger.
-The first pipeline validation was started on 2026-10-27; deployment success must be checked in build history.
+The first native build and a GitHub push-triggered build both completed successfully on 2026-10-27.
 Use build command `npm run build` and deployment command `npx wrangler deploy`, with root `/`.
 Supabase credentials and database content are unchanged.
 
@@ -47,3 +47,7 @@ and an Arabic AI answer after the migration.
 
 Cloudflare reports the zone active. Custom-domain HTTP verification is separate from zone activation;
 the workers.dev address remains available as a fallback.
+
+## Service-first redesign — selected design 3
+
+The public UI adopts the selected navy/gold service-first concept. Lawyer profile and request links preserve source UUIDs; randomized ratings and success rates are removed from the public cards. Requests preserve the chosen service and requested lawyer in their details. The flow does not simulate a payment or an instant call. Public pages no longer display platform-sale or demo banners. Visual and interaction checks are recorded in `design-qa.md`. No RLS changes were made; existing data-access policies still require a separate review.

@@ -52,7 +52,7 @@ const Login = () => {
         const { data: profile } = await supabase
           .from('clients')
           .select('id')
-          .eq('id', data.user.id)
+          .eq('user_id', data.user.id)
           .single();
 
         if (profile) {
@@ -62,7 +62,7 @@ const Login = () => {
           const { data: lawyer } = await supabase
             .from('lawyers')
             .select('id')
-            .eq('id', data.user.id)
+            .eq('user_id', data.user.id)
             .single();
 
           if (lawyer) {
@@ -136,6 +136,7 @@ const Login = () => {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
                         className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                         disabled={loading}
                       >
@@ -167,13 +168,6 @@ const Login = () => {
                 </form>
 
                 <Separator />
-
-                <div className="text-center">
-                  <p className="text-muted-foreground mb-4">للاختبار السريع:</p>
-                  <div className="text-xs text-muted-foreground bg-gray-50 p-3 rounded">
-                    <p>مدير: admin@example.com / Admin771298!</p>
-                  </div>
-                </div>
 
                 <div className="text-center space-y-4">
                   <p className="text-muted-foreground">
