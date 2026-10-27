@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,9 +50,17 @@ interface Lawyer {
   experience_years?: number | null;
 }
 
-const LawyersManagement = () => {
+const LawyersManagement = ({
+  selectedLawyerId,
+  initialStatus,
+}: {
+  selectedLawyerId?: string | null;
+  initialStatus?: string | null;
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterStatus, setFilterStatus] = useState(
+    initialStatus === "review" ? "review" : "all",
+  );
   const [lawyers, setLawyers] = useState<Lawyer[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedLawyer, setSelectedLawyer] = useState<Lawyer | null>(null);
@@ -59,6 +68,25 @@ const LawyersManagement = () => {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const { toast } = useToast();
   const { addLawyer } = useSupabaseLawyers();
+  const queryClient = useQueryClient();
+  const openedLawyer = useRef<string | null>(null);
+
+  useEffect(() => {
+    setFilterStatus(initialStatus === "review" ? "review" : "all");
+  }, [initialStatus]);
+  useEffect(() => {
+    if (!selectedLawyerId) {
+      openedLawyer.current = null;
+      return;
+    }
+    if (openedLawyer.current === selectedLawyerId) return;
+    const candidate = lawyers.find((l) => l.id === selectedLawyerId);
+    if (candidate) {
+      openedLawyer.current = selectedLawyerId;
+      setSelectedLawyer(candidate);
+      setDialogOpen(true);
+    }
+  }, [selectedLawyerId, lawyers]);
 
   const loadLawyers = useCallback(async () => {
     try {
@@ -70,6 +98,7 @@ const LawyersManagement = () => {
 
       if (error) throw error;
       setLawyers(data || []);
+      void queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
     } catch (error) {
       console.error("Error loading lawyers:", error);
       toast({
@@ -80,7 +109,7 @@ const LawyersManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, queryClient]);
 
   useEffect(() => {
     loadLawyers();
@@ -190,7 +219,10 @@ const LawyersManagement = () => {
       lawyer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lawyer.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
-      filterStatus === "all" || lawyer.registration_status === filterStatus;
+      filterStatus === "all" ||
+      (filterStatus === "review"
+        ? ["pending", "incomplete"].includes(lawyer.registration_status)
+        : lawyer.registration_status === filterStatus);
     return matchesSearch && matchesStatus;
   });
 
@@ -289,16 +321,16 @@ const LawyersManagement = () => {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline">
-                <Filter className="h-4 w-4 ml-2" />
-                تصفية
-              </Button>
               <select
+                aria-label="تصفية ملفات المحامين"
                 className="px-4 py-2 border rounded-md bg-background"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
                 <option value="all">جميع الحالات</option>
+                <option value="review">
+                  ملفات بحاجة إلى مراجعة أو استكمال
+                </option>
                 <option value="approved">معتمد</option>
                 <option value="pending">قيد المراجعة</option>
                 <option value="incomplete">بانتظار استكمال البيانات</option>
