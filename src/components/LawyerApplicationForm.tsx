@@ -14,6 +14,8 @@ export default function LawyerApplicationForm({
   userId: string;
   onSaved: () => Promise<unknown>;
 }) {
+  const approved =
+    lawyer.registration_status === "approved" && !!lawyer.license_verified;
   const [fields, setFields] = useState({
     name: lawyer.name || "",
     phone: lawyer.phone || "",
@@ -41,23 +43,34 @@ export default function LawyerApplicationForm({
     try {
       const { error } = await supabase
         .from("lawyers")
-        .update({
-          name: fields.name.trim(),
-          phone: fields.phone.trim() || null,
-          specialty: fields.specialty.trim(),
-          license_number: fields.license_number.trim(),
-          bio: fields.bio.trim() || null,
-          registration_status: "pending",
-          license_verified: false,
-        })
+        .update(
+          approved
+            ? {
+                phone: fields.phone.trim() || null,
+                bio: fields.bio.trim() || null,
+              }
+            : {
+                name: fields.name.trim(),
+                phone: fields.phone.trim() || null,
+                specialty: fields.specialty.trim(),
+                license_number: fields.license_number.trim(),
+                bio: fields.bio.trim() || null,
+                registration_status: "pending",
+                license_verified: false,
+              },
+        )
         .eq("id", lawyer.id)
         .eq("user_id", userId)
-        .neq("registration_status", "approved")
+        .eq("registration_status", lawyer.registration_status)
         .select("id")
         .single();
       if (error) throw error;
       await onSaved();
-      setMessage("تم حفظ بياناتك وإرسال طلبك إلى الإدارة للمراجعة.");
+      setMessage(
+        approved
+          ? "تم تحديث بيانات التواصل والنبذة المهنية."
+          : "تم حفظ بياناتك وإرسال طلبك إلى الإدارة للمراجعة.",
+      );
     } catch (error) {
       setFailed(true);
       setMessage(
@@ -78,9 +91,13 @@ export default function LawyerApplicationForm({
       className="space-y-5 border-t pt-6"
       aria-label="استكمال طلب المحامي"
     >
-      <h2 className="text-xl font-bold">استكمال طلب الانضمام</h2>
+      <h2 className="text-xl font-bold">
+        {approved ? "تحديث الملف المهني" : "استكمال طلب الانضمام"}
+      </h2>
       <p className="text-sm text-muted-foreground leading-7">
-        طلبك ظاهر للإدارة. أكمل البيانات التالية ليصبح جاهزًا للمراجعة.
+        {approved
+          ? "يمكنك تحديث رقم الهاتف والنبذة. لتعديل بيانات الترخيص أو الاسم المعتمد، تواصل مع الإدارة."
+          : "طلبك ظاهر للإدارة. أكمل البيانات التالية ليصبح جاهزًا للمراجعة."}
       </p>
       <div className="grid sm:grid-cols-2 gap-4">
         {(
@@ -108,7 +125,7 @@ export default function LawyerApplicationForm({
               required={key !== "phone"}
               type={key === "phone" ? "tel" : "text"}
               maxLength={key === "name" ? 150 : 100}
-              disabled={busy}
+              disabled={busy || (approved && key !== "phone")}
             />
           </div>
         ))}
@@ -135,7 +152,11 @@ export default function LawyerApplicationForm({
       )}
       <Button disabled={busy}>
         {busy && <Loader2 className="animate-spin h-4 w-4 ml-2" />}
-        {busy ? "جاري الحفظ..." : "حفظ وإرسال للمراجعة"}
+        {busy
+          ? "جاري الحفظ..."
+          : approved
+            ? "حفظ التعديلات"
+            : "حفظ وإرسال للمراجعة"}
       </Button>
     </form>
   );

@@ -1,52 +1,57 @@
-# Snad client dashboard — selected design 1
+# Snad lawyer dashboard — selected design 3
 
-Source visual truth: `/workspace/scratch/10dab1f5e471/generated_images/exec-2a0381de-bf8b-4eb3-ba5b-cd35f647c521.png` (1488 × 1056 pixels).
-Implementation: browser-rendered React dashboard, `http://terminal.local:4173/client-dashboard`.
-Same-state comparison: isolated, git-ignored development entry renders the actual `ClientDashboardView` with two illustrative requests and a confirmed future consultation; no customer records read or created for this fixture. This entry is not imported into the production application or committed.
-Viewport: desktop iframe 1488 × 1056 CSS pixels, density 1; source displayed at the same dimensions without scaling. Mobile iframe 390 × 844 CSS pixels (382px content width plus scrollbar). Full comparison capture is 2990 × 2016 pixels including source, implementation, labels and mobile artboard.
+Source visual truth: `/workspace/scratch/10dab1f5e471/generated_images/exec-6cebf8c2-7383-4a98-bbcd-8ed3f5cbf1ed.png` (1488 × 1056 pixels). This is the third displayed lawyer-dashboard ideation result, selected by the user.
+Implementation: actual React view at `http://terminal.local:4173/lawyer-dashboard`.
+
+## State and normalization
+
+The populated comparison renders the exported production `LawyerDashboardView` through a git-ignored development entry with three illustrative requests, one cancelled request and one future confirmed consultation. No production customer records were created, edited, approved or used for these fixture screenshots. Production has no fixture import.
+Desktop source and implementation iframe both use 1488 × 1056 CSS/pixel dimensions, displayed at identical 650/1488 scale (43.6828%) in the combined browser capture. Screenshot viewport/pixels: 1363 × 936 at density 1. Both desktop frames fit completely in the captured top portion. Mobile is verified separately at 390 × 844 CSS pixels (382px content plus scrollbar), inside a 1363 × 936 captured host viewport.
 
 ## Findings and comparison history
 
-1. Initial combined browser capture: `/workspace/scratch/snad-client-comparison-1.jpg`.
-   - P2: table text and metadata noticeably undersized relative to the source. Increased table typography to 15px, metadata to 12px and restored clearer status/link weights.
-   - P2: mobile desktop-table scrolling concealed request status in the initial view. Changed mobile rows to two-column cards with service, lawyer, status, date and details visible together.
-   - P2: closed off-canvas mobile sidebar remained available to keyboard/accessibility navigation. Added visibility gating when closed.
-   - P3: active sidebar edge placed on the wrong side. Moved it to the left, matching the visual source.
-2. Revised combined capture: `/workspace/scratch/snad-client-comparison-2.jpg`.
-3. Final combined source + browser evidence: `/workspace/scratch/snad-client-comparison-final.jpg`.
-   Focused source/implementation table-and-appointment comparison: `/workspace/scratch/snad-client-focused.jpg`.
-   Earlier findings resolved. No actionable P0/P1/P2 visual issues remain.
+1. Initial full comparison: `/workspace/scratch/snad-lawyer-comparison-1.jpg`.
+   Focused source and actual browser request lane: `/workspace/scratch/snad-lawyer-focus-1.jpg`.
+   - P2: request descriptions and date/client metadata too small relative to the source, changing wrapping and readability. Increased description to 16px and metadata to 14px on desktop, raised card heading to 18px and avatar diameter to 54px, and adjusted description space to restore the source rhythm.
+   - P2: lane count was pushed to the far left rather than grouped with its heading. Removed auto margin and grouped the counter near the label.
+   - P2: mobile toolbar inherited a 405px search width, pushing the bell outside the page (body 382px, scroll width 471px). Applied shrinkable search/actions sizing at the mobile breakpoint.
+2. Final combined source/implementation evidence: `/workspace/scratch/snad-lawyer-comparison-final.jpg`.
+   Final focused lane evidence: `/workspace/scratch/snad-lawyer-focus-final.jpg` (native-size content crop using source and actual iframe offset x=815,y=385, each displayed in a 430 × 560 clip).
+   Final mobile: `/workspace/scratch/snad-lawyer-mobile-final.jpg`; measured content width and scroll width both 382px after the fix. No horizontal page overflow.
+   Full-page screenshot API timed out; the documented `getScreenshot` viewport capture worked. Combined desktop and focused comparisons were arranged to fit the captured viewport. No unobserved full-page capture is claimed.
 
 ## Required fidelity surfaces
 
-- Typography: Cairo retained; navy 800-weight heading, 15px table data and 12px supporting metadata reviewed in the focused comparison. Minor natural raster-versus-browser font differences accepted.
-- Spacing/layout: fixed right navy sidebar, pale toolbar, welcome/action row, gold-tinted action banner, left request table and right appointment/update column preserved. Single-column mobile view uses cards and an off-canvas navigation menu. Mobile content/scroll widths both 382px; no horizontal page overflow.
-- Colors/tokens: navy #17384f, muted gold #b2934d, warm action background, blue appointment tint and amber/green status labels reviewed. Focus outlines remain visible.
-- Images/icons: supplied existing Brand retained and outline Lucide icons reused. The source contains no photographic assets requiring generation; initials intentionally avoid attributing generated portraits to lawyers.
-- Copy: heading and section labels follow the selected design. Real account data, absolute dates, actual case numbers, current state and device timezone replace illustrative source content. Latest update describes recorded state, without inventing an activity event or an unread count.
+- Typography: Cairo, navy 800-weight main heading, readable request titles, 16px desktop descriptions and 14px metadata checked at native size in the focused comparison. Natural browser/raster text rendering differences accepted.
+- Spacing/layout: fixed right navy sidebar, pale toolbar, warm next-appointment strip, heading with gold profile action, three RTL request columns, tinted column headers and standalone request cards preserved. Board min-height 584px matches the source. Mobile stacks columns and turns the sidebar into a closed-by-default menu.
+- Colors/tokens: navy #17384f, muted gold #b2934d, restrained amber/blue/green lane surfaces, white request cards and thin borders match the chosen direction. No heavy shadows or decorative photos introduced.
+- Images/icons: existing supplied Brand and outline Lucide icons retained; source uses standard icons and text initials, with no photographic assets to generate. Unknown client names use an icon rather than an invented identity. Board cards remain semantic buttons with accessible names.
+- Copy: requested heading and section names retained. Production uses actual case numbers, names, descriptions, statuses and device-local dates. No sample income, ratings, clients, calls or success metrics remain in this dashboard.
 
-## Production data behavior
+## Interactions verified in browser
 
-- Requests filter legal_cases.client_id by auth user ID; lawyer display resolves lawyer.user_id rather than an invalid join.
-- Consultations filter by clients.id, after resolving clients.user_id. No automatic client creation on dashboard read.
-- No scheduled_at column exists. Only explicitly scheduled/confirmed consultations with future started_at can appear as upcoming; created_at is never used as a meeting time. No new scheduling backend is claimed.
-- Profile reads authenticated email; editing updates allowlisted own user-profile fields.
-- Existing private case-files upload/download support is connected in the request dialog. Up to three allowed files, maximum 10MB each; ownership checked and errors visible. No production files were transferred during QA.
-- Existing database RLS policies are unchanged. This implementation does not constitute the separate access-control remediation previously identified.
+- Actual signed-out route shows the new shell, sign-in notice and truthful empty lanes.
+- Request SN-1042 opens its correct description, category, status, number and timestamps.
+- Search SN-1037 shows only the in-progress request, updates lane counts and displays clear empty search states in other lanes. Search can be cleared.
+- Cancelled request is available in the separate archive, does not increase completed count, and opens the correct detail dialog.
+- Confirmed upcoming appointment opens details with actual time, status, consultation method and request creation date separately labelled.
+- Mobile menu opens and closes after choosing the professional profile. No hidden closed-menu controls in normal keyboard navigation. Escape closes the menu.
+- Approved profile has read-only name/specialty/license fields and editable phone/bio; save payload only allows phone/bio and retains approval status.
+- Incomplete profile fixture exposes required professional fields and the existing save-and-submit action within the redesigned shell.
+- Actual preview console checked: no application-origin errors. Browser-extension metadata transport errors excluded.
 
-## Browser interactions checked
+## Data and implementation checks
 
-- Real signed-out dashboard: guest action banner, truthful empty requests/appointments, profile sign-in state.
-- Illustrative populated view: document-action opens matching request details; attachment upload disabled before selection; close works.
-- Search by SN-1042 filters to one request. Unknown search displays a resettable empty state.
-- Upcoming appointment opens its detail dialog with status, lawyer, method, time, request creation date and duration.
-- Mobile menu opens, selecting requests changes the section and closes the menu; all key request data remains visible in the card layout.
-- Browser console checked on actual preview and comparison tabs: no application-origin errors; extension metadata transport errors excluded.
-- TypeScript app check, changed-file ESLint and production Vite build passed. Existing bundle-size and Browserslist age warnings remain.
-- Pure data assertions passed: future-confirmed filtering, chronological sorting, rejecting missing/invalid dates, case number display and waiting-document labels.
+- legal_cases query filters lawyer_id by authenticated user ID; consultations filters lawyer_id by the own lawyers-row ID. Client names resolve only for already assigned case client IDs.
+- Data queries for requests/consultations run only for an approved, license-verified own lawyer profile. Incomplete accounts keep profile completion visible without simulated customer work.
+- Only explicitly scheduled/confirmed consultations with future started_at appear upcoming. created_at is never treated as an appointment slot.
+- Open/assigned/document-waiting requests map to review; in_progress to execution; completed alone to completed; closed/cancelled/rejected to a separate archive. No drag-and-drop or case-status mutations were added.
+- Private attachment count is displayed in details; no public file links or storage-access policy changes were introduced.
+- TypeScript app check, changed-file ESLint and production Vite build pass. Pure assertions verify status grouping, cancelled/closed separation, future appointment ordering, invalid/missing timestamps and actual request numbers. Existing bundle-size/Browserslist warnings remain.
+- No database schema/RLS changes in this redesign. Existing broader access-control concerns are outside this visual change and are not claimed resolved.
 
-## Limits and follow-up polish
+## Limits and follow-up
 
-Authenticated profile save, private upload/download and real client transactions were not executed against production customer data. Populated visual evidence is explicitly illustrative. P3: refine icon variations and display initials after final real-data review; no additional design approval is needed for this implementation.
+No authenticated customer/legal transaction or actual profile save was submitted during visual QA. Populated evidence is illustrative; actual account data rendering is wired and the real signed-out flow is browser verified. Minor source raster/icon rendering differences are P3. No actionable P0/P1/P2 issues remain in the reviewed scope.
 
 final result: passed
