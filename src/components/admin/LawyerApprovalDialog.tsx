@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -11,7 +10,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CheckCircle, XCircle, Phone, Mail, Calendar, FileText } from "lucide-react";
+import {
+  CheckCircle,
+  XCircle,
+  Phone,
+  Mail,
+  Calendar,
+  FileText,
+} from "lucide-react";
 
 interface Lawyer {
   id: string;
@@ -19,7 +25,7 @@ interface Lawyer {
   email: string;
   phone: string | null;
   specialty: string;
-  license_number: string;
+  license_number: string | null;
   registration_status: string;
   rating: number | null;
   total_cases: number | null;
@@ -37,18 +43,23 @@ interface LawyerApprovalDialogProps {
   onReject: (lawyerId: string) => void;
 }
 
-const LawyerApprovalDialog = ({ 
-  lawyer, 
-  isOpen, 
-  onClose, 
-  onApprove, 
-  onReject 
+const LawyerApprovalDialog = ({
+  lawyer,
+  isOpen,
+  onClose,
+  onApprove,
+  onReject,
 }: LawyerApprovalDialogProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   if (!lawyer) return null;
 
+  const complete =
+    !!lawyer.name.trim() &&
+    !!lawyer.specialty.trim() &&
+    !!lawyer.license_number?.trim();
   const handleApprove = async () => {
+    if (!complete) return;
     setIsProcessing(true);
     try {
       await onApprove(lawyer.id);
@@ -83,11 +94,17 @@ const LawyerApprovalDialog = ({
           <div className="flex items-start gap-4">
             <Avatar className="h-20 w-20">
               <AvatarImage src={lawyer.avatar_url || undefined} />
-              <AvatarFallback className="text-lg">{lawyer.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="text-lg">
+                {lawyer.name.charAt(0)}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold">{lawyer.name}</h3>
-              <p className="text-muted-foreground">{lawyer.specialty}</p>
+              <h3 className="text-lg font-semibold">
+                {lawyer.name || "ملف محامٍ غير مكتمل"}
+              </h3>
+              <p className="text-muted-foreground">
+                {lawyer.specialty || "التخصص لم يُضف"}
+              </p>
               <div className="flex items-center gap-4 mt-2">
                 <span className="flex items-center gap-1 text-sm">
                   <Mail className="h-4 w-4" />
@@ -101,9 +118,20 @@ const LawyerApprovalDialog = ({
                 )}
               </div>
             </div>
-            <Badge variant={lawyer.registration_status === 'pending' ? 'secondary' : 'default'}>
-              {lawyer.registration_status === 'pending' ? 'قيد المراجعة' : 
-               lawyer.registration_status === 'approved' ? 'معتمد' : 'مرفوض'}
+            <Badge
+              variant={
+                lawyer.registration_status === "pending"
+                  ? "secondary"
+                  : "default"
+              }
+            >
+              {lawyer.registration_status === "incomplete"
+                ? "بانتظار استكمال البيانات"
+                : lawyer.registration_status === "pending"
+                  ? "قيد المراجعة"
+                  : lawyer.registration_status === "approved"
+                    ? "معتمد"
+                    : "مرفوض"}
             </Badge>
           </div>
 
@@ -113,12 +141,16 @@ const LawyerApprovalDialog = ({
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">رقم الترخيص:</span>
-                <span className="font-mono">{lawyer.license_number}</span>
+                <span className="font-mono">
+                  {lawyer.license_number || "لم يُضف"}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">تاريخ التسجيل:</span>
-                <span>{new Date(lawyer.created_at).toLocaleDateString('ar-SA')}</span>
+                <span>
+                  {new Date(lawyer.created_at).toLocaleDateString("ar-SA")}
+                </span>
               </div>
             </div>
             <div className="space-y-2">
@@ -146,21 +178,30 @@ const LawyerApprovalDialog = ({
           )}
         </div>
 
+        {!complete && (
+          <p className="text-sm text-amber-800 bg-amber-50 p-3 rounded-md">
+            لا يمكن اعتماد الطلب قبل استكمال الاسم المهني والتخصص ورقم الترخيص.
+          </p>
+        )}
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose} disabled={isProcessing}>
             إلغاء
           </Button>
-          <Button 
-            variant="destructive" 
+          <Button
+            variant="destructive"
             onClick={handleReject}
             disabled={isProcessing}
           >
             <XCircle className="h-4 w-4 ml-2" />
             رفض الطلب
           </Button>
-          <Button 
+          <Button
             onClick={handleApprove}
-            disabled={isProcessing}
+            disabled={
+              isProcessing ||
+              !complete ||
+              lawyer.registration_status === "approved"
+            }
           >
             <CheckCircle className="h-4 w-4 ml-2" />
             قبول الطلب

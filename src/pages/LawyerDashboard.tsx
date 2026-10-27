@@ -24,6 +24,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import LawyerApplicationForm from "@/components/LawyerApplicationForm";
 const LawyerDashboard = () => {
   const navigate = useNavigate();
   const { user, error: profileError, profile, loading } = useUserProfile();
@@ -33,7 +34,7 @@ const LawyerDashboard = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("lawyers")
-        .select("id,registration_status,license_verified")
+        .select("*")
         .eq("user_id", user!.id)
         .maybeSingle();
       if (error) throw error;
@@ -101,7 +102,13 @@ const LawyerDashboard = () => {
           </p>
           <Card>
             <CardHeader>
-              <CardTitle>الملف المهني قيد الاستكمال</CardTitle>
+              <CardTitle>
+                {lawyerQuery.data?.registration_status === "pending"
+                  ? "طلبك قيد المراجعة"
+                  : lawyerQuery.data?.registration_status === "rejected"
+                    ? "الطلب يحتاج مراجعة بياناتك"
+                    : "الملف المهني قيد الاستكمال"}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
               <p className="leading-8 text-muted-foreground">
@@ -119,9 +126,18 @@ const LawyerDashboard = () => {
                 ستظهر طلباتك ومواعيدك هنا بعد اعتماد الملف وإسناد خدمات فعلية
                 إليك.
               </p>
-              <Link to="/contact" className="navy-button">
-                التواصل لاستكمال الملف المهني
-              </Link>
+              {lawyerQuery.data ? (
+                <LawyerApplicationForm
+                  key={lawyerQuery.data.id}
+                  lawyer={lawyerQuery.data}
+                  userId={user.id}
+                  onSaved={lawyerQuery.refetch}
+                />
+              ) : (
+                <Link to="/contact" className="navy-button">
+                  التواصل لاستكمال الملف المهني
+                </Link>
+              )}
             </CardContent>
           </Card>
         </div>

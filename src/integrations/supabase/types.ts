@@ -311,7 +311,7 @@ export type Database = {
           id: string
           is_online: boolean | null
           last_seen: string | null
-          license_number: string
+          license_number: string | null
           license_verified: boolean | null
           name: string
           phone: string | null
@@ -332,7 +332,7 @@ export type Database = {
           id?: string
           is_online?: boolean | null
           last_seen?: string | null
-          license_number: string
+          license_number?: string | null
           license_verified?: boolean | null
           name: string
           phone?: string | null
@@ -353,7 +353,7 @@ export type Database = {
           id?: string
           is_online?: boolean | null
           last_seen?: string | null
-          license_number?: string
+          license_number?: string | null
           license_verified?: boolean | null
           name?: string
           phone?: string | null

@@ -9,7 +9,7 @@ export interface SupabaseLawyer {
   email: string;
   phone: string | null;
   specialty: string;
-  license_number: string;
+  license_number: string | null;
   registration_status: string;
   rating: number | null;
   total_cases: number | null;
