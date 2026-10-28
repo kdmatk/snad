@@ -1,3 +1,4 @@
+import { LoadingState } from "@/components/ui/workspace-state";
 import { adminDate } from "@/components/admin/adminUtils";
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -374,9 +375,7 @@ export function AdminWorkspaceView({
                       retry={onReload}
                     />
                   ) : overview.isPending ? (
-                    <div className="ad-empty" role="status">
-                      جارٍ تحميل الملفات...
-                    </div>
+                    <LoadingState text="جارٍ تحميل الملفات..." />
                   ) : stats?.lawyers.length ? (
                     stats.lawyers.map((l) => (
                       <article className="ad-review-lawyer" key={l.id}>
@@ -497,8 +496,7 @@ export default function AdminDashboard() {
   if (loading)
     return (
       <div className="admin-workspace ad-loading" dir="rtl" role="status">
-        <RefreshCw className="animate-spin" />
-        جارٍ التحقق من صلاحية الإدارة...
+        <LoadingState text="جارٍ التحقق من صلاحية الإدارة..." />
       </div>
     );
   if (!isAuthenticated || !admin) return <AdminLogin />;

@@ -1,3 +1,4 @@
+import { EmptyState as Empty, LoadingState, FailureState } from "@/components/ui/workspace-state";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -59,15 +60,7 @@ const lanes = [
   { id: "progress", title: "قيد التنفيذ", Icon: Settings },
   { id: "complete", title: "مكتمل", Icon: Check },
 ] as const;
-function Empty({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="lw-empty">
-      <FileText size={26} aria-hidden="true" />
-      <h3>{title}</h3>
-      <p>{text}</p>
-    </div>
-  );
-}
+
 function RequestCard({
   request,
   onOpen,
@@ -296,30 +289,15 @@ export function LawyerDashboardView({ data }: { data: Workspace }) {
           </div>
         </header>
         <main id="lawyer-main" className="cd-main lw-main">
-          {data.error && (
-            <div role="alert" className="cd-load-error">
-              <span>{data.error}</span>
-              <button
-                className="cd-link"
-                onClick={() => data.reloadData()}
-                disabled={data.refreshing}
-              >
-                <RefreshCw size={16} />
-                إعادة المحاولة
-              </button>
-            </div>
-          )}
+          {data.error && <FailureState message={data.error} retry={() => { void data.reloadData(); }} busy={data.refreshing} />}
           {signOutError && (
             <p role="alert" className="cd-load-error">
               {signOutError}
             </p>
           )}
           {data.loading ? (
-            <div role="status" className="cd-loading">
-              <RefreshCw size={24} className="animate-spin" />
-              جاري تحميل مساحة عملك...
-            </div>
-          ) : (
+            <LoadingState text="جارٍ تحميل مساحة عملك..." />
+          ) : data.error && !data.requests.length && !data.consultations.length && ["requests", "consultations", "archive"].includes(view) ? null : (
             <>
               {view === "requests" && (
                 <>

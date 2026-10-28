@@ -3,9 +3,7 @@ import { useState } from "react";
 import {
   ArrowLeft,
   CalendarDays,
-  CheckCheck,
   FileText,
-  RefreshCw,
   Search,
   UserRound,
 } from "lucide-react";
@@ -19,32 +17,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export function AdminEmpty({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="ad-empty">
-      <CheckCheck size={30} aria-hidden="true" />
-      <h3>{title}</h3>
-      <p>{text}</p>
-    </div>
-  );
-}
-export function AdminFailure({
-  message,
-  retry,
-}: {
-  message: string;
-  retry: () => void;
-}) {
-  return (
-    <div className="ad-failure" role="alert">
-      <p>{message}</p>
-      <button className="ad-outline" onClick={retry}>
-        <RefreshCw size={16} />
-        إعادة المحاولة
-      </button>
-    </div>
-  );
-}
+export { EmptyState as AdminEmpty, FailureState as AdminFailure } from "@/components/ui/workspace-state";
+import { EmptyState as AdminEmpty, FailureState as AdminFailure, LoadingState } from "@/components/ui/workspace-state";
 export interface AdminRequestsProps {
   requests: AdminRequest[];
   count: number;
@@ -146,12 +120,9 @@ export default function AdminRequests({
         </button>
       </div>
       {error ? (
-        <AdminFailure message={error} retry={retry} />
+        <AdminFailure message={error} retry={retry} busy={refreshing} />
       ) : loading ? (
-        <div className="ad-empty" role="status">
-          <RefreshCw className="animate-spin" />
-          جارٍ تحميل الطلبات...
-        </div>
+        <LoadingState text="جارٍ تحميل الطلبات..." />
       ) : requests.length ? (
         <>
           <div className="ad-table-wrap" aria-busy={refreshing}>

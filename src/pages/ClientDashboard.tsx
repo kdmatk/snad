@@ -1,3 +1,4 @@
+import { EmptyState as Empty, LoadingState, FailureState } from "@/components/ui/workspace-state";
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -15,7 +16,6 @@ import {
   Clock3,
   Menu,
   X,
-  RefreshCw,
   LogOut,
   CheckCircle2,
 } from "lucide-react";
@@ -61,15 +61,7 @@ function Status({ value }: { value: string | null }) {
     </span>
   );
 }
-function Empty({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="cd-empty">
-      <FileText size={28} aria-hidden="true" />
-      <h3>{title}</h3>
-      <p>{text}</p>
-    </div>
-  );
-}
+
 function ClientProfile({ data }: { data: Workspace }) {
   const p = data.userProfile;
   const [editing, setEditing] = useState(false);
@@ -420,20 +412,8 @@ export function ClientDashboardView({ data }: { data: Workspace }) {
               طلب خدمة جديدة
             </Link>
           </div>
-          {data.error && (
-            <div className="cd-load-error" role="alert">
-              <span>{data.error}</span>
-              <button
-                className="cd-link"
-                onClick={() => data.reloadData()}
-                disabled={data.refreshing}
-              >
-                <RefreshCw size={16} />
-                إعادة المحاولة
-              </button>
-            </div>
-          )}
-          {view === "overview" && dismissed !== bannerKey && !data.loading && (
+          {data.error && <FailureState message={data.error} retry={() => { void data.reloadData(); }} busy={data.refreshing} />}
+          {view === "overview" && dismissed !== bannerKey && !data.loading && !data.error && (
             <section className="cd-action-banner">
               <span className="cd-action-icon">
                 <FileText size={25} />
@@ -471,11 +451,8 @@ export function ClientDashboardView({ data }: { data: Workspace }) {
             </section>
           )}
           {data.loading ? (
-            <div className="cd-loading" role="status">
-              <RefreshCw className="animate-spin" size={24} />
-              جاري تحميل بيانات حسابك...
-            </div>
-          ) : view === "profile" ? (
+            <LoadingState text="جارٍ تحميل بيانات حسابك..." />
+          ) : data.error && !data.requests.length && !data.consultations.length && view !== "profile" ? null : view === "profile" ? (
             <ClientProfile key={data.user?.id || "guest"} data={data} />
           ) : view === "overview" || view === "requests" ? (
             <div className={view === "overview" ? "cd-overview-grid" : ""}>
@@ -570,6 +547,7 @@ export function ClientDashboardView({ data }: { data: Workspace }) {
                   </div>
                 ) : (
                   <Empty
+                    action={query ? <button className="navy-button" onClick={() => { const next = new URLSearchParams(params); next.delete("q"); setParams(next); }}>مسح البحث</button> : <Link className="navy-button" to={data.user ? "/request-service" : "/login"}>{data.user ? "طلب خدمة جديدة" : "تسجيل الدخول"}</Link>}
                     title={
                       query
                         ? "لا توجد طلبات تطابق بحثك"
