@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -32,6 +33,9 @@ interface Lawyer {
   avatar_url: string | null;
   created_at: string;
   bio?: string | null;
+  license_document_path?: string | null;
+  country?: string | null;
+  city?: string | null;
   experience_years?: number | null;
 }
 
@@ -52,6 +56,30 @@ const LawyerApprovalDialog = ({
 }: LawyerApprovalDialogProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const [documentUrl, setDocumentUrl] = useState<string | null>(null);
+  const [documentError, setDocumentError] = useState("");
+  const [documentLoading, setDocumentLoading] = useState(false);
+  useEffect(() => {
+    setDocumentUrl(null);
+    setDocumentError("");
+  }, [lawyer?.id]);
+  useEffect(() => {
+    if (!documentUrl) return;
+    const timer = window.setTimeout(() => setDocumentUrl(null), 55000);
+    return () => window.clearTimeout(timer);
+  }, [documentUrl]);
+  const openLicense = async () => {
+    if (!lawyer?.license_document_path) return;
+    setDocumentLoading(true);
+    setDocumentError("");
+    const { data, error } = await supabase.storage
+      .from("lawyer-licenses")
+      .createSignedUrl(lawyer.license_document_path, 60);
+    if (error || !data?.signedUrl)
+      setDocumentError("تعذّر فتح الترخيص. أعد المحاولة.");
+    else setDocumentUrl(data.signedUrl);
+    setDocumentLoading(false);
+  };
   if (!lawyer) return null;
 
   const complete =
@@ -167,6 +195,36 @@ const LawyerApprovalDialog = ({
             </div>
           </div>
 
+          {lawyer.license_document_path && (
+            <section className="space-y-2">
+              <h4 className="font-medium">ترخيص المحاماة المرفق</h4>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={openLicense}
+                disabled={documentLoading}
+              >
+                {documentLoading
+                  ? "جارٍ تجهيز الرابط..."
+                  : "تجهيز رابط عرض الترخيص"}
+              </Button>
+              {documentUrl && (
+                <a
+                  className="block text-primary underline"
+                  href={documentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  فتح الترخيص — رابط مؤقت لمدة دقيقة
+                </a>
+              )}
+              {documentError && (
+                <p role="alert" className="text-sm text-red-700">
+                  {documentError}
+                </p>
+              )}
+            </section>
+          )}
           {/* النبذة الشخصية */}
           {lawyer.bio && (
             <div>

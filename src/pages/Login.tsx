@@ -5,12 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const lawyerReturn = params.get("redirect") === "/lawyer-register";
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -62,9 +64,11 @@ const Login = () => {
         if (profileResult.error || lawyerResult.error)
           throw new Error("تعذّر تحميل نوع الحساب. أعد المحاولة.");
         navigate(
-          lawyerResult.data || profileResult.data?.user_type === "lawyer"
-            ? "/lawyer-dashboard"
-            : "/client-dashboard",
+          lawyerReturn
+            ? "/lawyer-register"
+            : lawyerResult.data || profileResult.data?.user_type === "lawyer"
+              ? "/lawyer-dashboard"
+              : "/client-dashboard",
         );
       }
     } catch (error: unknown) {
@@ -208,7 +212,11 @@ const Login = () => {
                   <p className="text-muted-foreground">
                     ليس لديك حساب؟{" "}
                     <Link
-                      to="/register"
+                      to={
+                        lawyerReturn
+                          ? "/register?redirect=/lawyer-register"
+                          : "/register"
+                      }
                       className="text-primary hover:underline font-medium"
                     >
                       إنشاء حساب جديد

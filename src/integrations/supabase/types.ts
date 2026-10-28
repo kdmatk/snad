@@ -302,6 +302,9 @@ export type Database = {
       }
       lawyers: {
         Row: {
+          country: string | null
+          city: string | null
+          license_document_path: string | null
           avatar_url: string | null
           bio: string | null
           created_at: string | null
@@ -323,6 +326,9 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          country?: string | null
+          city?: string | null
+          license_document_path?: string | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
@@ -344,6 +350,9 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          country?: string | null
+          city?: string | null
+          license_document_path?: string | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
