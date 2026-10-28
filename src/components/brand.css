@@ -1,0 +1,47 @@
+/* Approved identity 1: original scale/pillar emblem and custom Arabic wordmark.
+   Asset canvases retain the generated artwork; the frame only removes the
+   presentation margin at display time, without stretching the artwork. */
+.brand > .brand-frame {
+  --brand-width: 168px;
+  position: relative;
+  display: block;
+  width: var(--brand-width);
+  height: calc(var(--brand-width) * 0.335);
+  flex-shrink: 0;
+  overflow: hidden;
+  line-height: 0;
+}
+.brand .brand-logo {
+  position: absolute;
+  top: calc(var(--brand-width) * -0.102);
+  left: 0;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  object-fit: contain;
+}
+.brand .brand-logo-on-navy {
+  display: none;
+}
+:is(.site-header, .site-footer) {
+  --navy: #17384f;
+}
+:is(.site-header, .site-footer, .cd-sidebar, .ad-sidebar-content)
+  .brand-logo-color {
+  display: none;
+}
+:is(.site-header, .site-footer, .cd-sidebar, .ad-sidebar-content)
+  .brand-logo-on-navy {
+  display: block;
+}
+.ad-sidebar-content .brand > .brand-frame {
+  --brand-width: 180px;
+}
+.cd-sidebar .brand > .brand-frame {
+  --brand-width: 176px;
+}
+@media (max-width: 767px) {
+  .site-header .brand > .brand-frame {
+    --brand-width: 138px;
+  }
+}
